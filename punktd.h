@@ -13,7 +13,8 @@ class Punktd {
 	hThreadPoolPtr m_pool;
 	TaskLauncherPtr m_srv_tasklauncher;
 	HttpSrvPtr m_srv;
-
+	PunktPtr m_punkt;
+	
 	hiaux::hashtable<std::string,std::string> parseConfig(const std::string &_config_file);
 	void fallDown(std::string _s);
 public:

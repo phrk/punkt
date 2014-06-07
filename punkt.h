@@ -2,20 +2,22 @@
 #define _PUNKT_H_
 
 #include <ecl/ecl.h>
+#include <boost/function.hpp>
+#include "hiaux/network/HttpSrv.h"
 
 class Punkt {
 	
 	// path / lisp fun name
 	hiaux::hashtable<std::string, std::string> m_handlers_names;
-	
-	HttpSrvPtr m_srv;
-	
+	boost::function<HttpSrv::ConnectionPtr(int)> m_getConnById;
 public:
 	
-	Punkt(HttpSrvPtr _http_srv);
+	static Punkt* single;
+	
+	Punkt(boost::function<HttpSrv::ConnectionPtr(int)> _getConnById);
 	// connid, response 
-	cl_object onLispHandlerFinished(cl_narg narg, ...);
-	void addHandler(const std::string &_path, const std::string &_lispcode);
+	void onLispFormatterFinished(int _connid, const std::string &_resp);
+	void onLispSourceUpdate(const std::string &_lispcode);
 	void connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 };
 
