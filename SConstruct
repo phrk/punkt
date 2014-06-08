@@ -14,6 +14,8 @@ hithird_path = "../"
 b.addPath(hicore_path)
 b.addPath(hiaux_path)
 
+b.connectLib(hicore_path+"geber/cpp-client/")
+
 b.addPath("./")
 b.addPath(hiaux_path+"hiaux/hpoolserver/")
 

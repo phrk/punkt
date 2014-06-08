@@ -1,90 +1,57 @@
 #include "punkt.h"
 
-Punkt* Punkt::single;
-
-void get_string_copy(cl_object _str, std::string &_to) {
+Punkt::PlaceInfo::PlaceInfo (uint64_t _formatter_id, const std::string _formatter_args):
+	formatter_id(_formatter_id),
+	formatter_args(_formatter_args){
 	
-	char *lisp_str = (char*)(_str)->string.self;
-
-	int cap = 1;
-	for (int i = 0; lisp_str[i] != 0; i+=4)
-		cap++;
-	
-	char bf[cap];
-	
-	int k = 0;
-	for (int i = 0; lisp_str[i] != 0; i+=4) {
-		bf[k] = lisp_str[i];
-		k++;
-	}
-	bf[k] = '\0';
-	_to = std::string(bf);
 }
 
-cl_object g_onLispFormatterFinished(cl_narg narg, ...) {
-	
-	if (narg < 2) {
-		std::cout << "g_onLispFormatterFinished narg < 2\n";
-		return;
-	}
-	
-	va_list ap;
-	va_start(ap, narg);
-	
-	std::string str_connid;
-	std::string resp;
-	
-	cl_lispunion *arg = va_arg(ap, cl_object);
-	get_string_copy(arg, str_connid);
-	
-	arg = va_arg(ap, cl_object);
-	get_string_copy(arg, resp);
-	
-	va_end(ap);
-	
-	Punkt::single->onLispFormatterFinished(strtoint(str_connid), resp);
+void Punkt::updatePlace(uint64_t _pid, PlaceInfoPtr _placeinfo) {
+	hLockTicketPtr ticket = lock.lock();
+	m_places[_pid] = _placeinfo;
 }
 
-Punkt::Punkt(boost::function<HttpSrv::ConnectionPtr(int)> _getConnById):
-	m_getConnById(_getConnById) {
-
-	char a[1][1];
-	cl_boot(0, (char**)a);
-	cl_def_c_function_va(c_string_to_object("on-formatter-finished"), &g_onLispFormatterFinished);
-	
-	std::string lisp_code = \
-	"(defun on-formatter (connid req)"
-	"	(format t \"on-formatter not set!~%\")"
-	"	(on-formatter-finished connid \"RESPONSE\" ))";
-	
-	si_safe_eval(3, c_string_to_object(lisp_code.c_str()), Cnil, OBJNULL);
-	
-	std::string _lisp_code = "(on-formatter 4 \"aihoiah\")";
-	si_safe_eval(3, c_string_to_object(_lisp_code.c_str()), Cnil, OBJNULL);
-}
-
-// connid, response 
-void Punkt::onLispFormatterFinished(int _connid, const std::string &_resp) {
-	std::cout << "Punkt::onLispFormatterFinished\n";
-	
-	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
-	if (conn) {
-		conn->sendResponse(_resp);
-		conn->close();
-	}
-}
-
-void Punkt::onLispSourceUpdate(const std::string &_lisp_code) {
-	si_safe_eval(3, c_string_to_object(_lisp_code.c_str()), Cnil, OBJNULL);
+void Punkt::updateFormatter(uint64_t _fid, FormatterFun _formatter) {
+	hLockTicketPtr ticket = lock.lock();
+	m_formatters[_fid] = _formatter;
 }
 
 void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	std::string _lisp_code = "(on-formatter " + inttostr(_conn->getSock());
-	_lisp_code += " \"" + _req->toJson() + "\")";
+	std::string pid_str;
+	if (!_req->getField("pid", pid_str)) {
+		_conn->sendResponse("{ \"status\" : \"pid not set\" }");
+		_conn->close();
+		return;
+	}
 	
-	std::cout << "connHandler lispcode: " + _lisp_code << std::endl;
+	uint64_t pid = string_to_uint64(pid_str);
 	
-	_lisp_code = "(on-formatter 4 \"aihoiah\")";
-	si_safe_eval(3, c_string_to_object(_lisp_code.c_str()), Cnil, OBJNULL);
+	FormatterFun formatter;
+	std::string args;
+	
+	{
+		hLockTicketPtr ticket = lock.lock();
+	
+		hiaux::hashtable<uint64_t, PlaceInfoPtr>::iterator it = m_places.find(pid);
+		if (it == m_places.end()) {
+			_conn->sendResponse("{ \"status\" : \"unknown pid\" }");
+			_conn->close();
+			return;
+		}
+	
+		hiaux::hashtable<uint64_t, FormatterFun>::iterator f_it = m_formatters.find(it->second->formatter_id);
+	
+		if (f_it == m_formatters.end()) {
+			std::cout << "Punkt::connHandler unknown formatter " << it->second->formatter_id << " pid: " << pid << std::endl;
+			_conn->sendResponse("{ \"status\" : \"internal error\" }");
+			_conn->close();
+			return;
+		}
+	
+		formatter = f_it->second;
+		args = it->second->formatter_args;
+	}
+	
+	formatter(_conn, _req, args);
 }
