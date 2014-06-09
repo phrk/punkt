@@ -1,12 +1,13 @@
 #include "punkt.h"
 
-Punkt::PlaceInfo::PlaceInfo (uint64_t _formatter_id, const std::string _formatter_args):
+Punkt::PlaceInfo::PlaceInfo (uint64_t _formatter_id, FormatterArgsPtr _formatter_args):
 	formatter_id(_formatter_id),
 	formatter_args(_formatter_args){
 	
 }
 
 void Punkt::updatePlace(uint64_t _pid, PlaceInfoPtr _placeinfo) {
+	//std::cout << "Punkt::updatePlace " << _pid << std::endl;
 	hLockTicketPtr ticket = lock.lock();
 	m_places[_pid] = _placeinfo;
 }
@@ -28,7 +29,7 @@ void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) 
 	uint64_t pid = string_to_uint64(pid_str);
 	
 	FormatterFun formatter;
-	std::string args;
+	FormatterArgsPtr args;
 	
 	{
 		hLockTicketPtr ticket = lock.lock();

@@ -1,5 +1,11 @@
 #include "ShowcaseSimpleFormatter.h"
 
+ShowcaseSimpleFormatterArgs::ShowcaseSimpleFormatterArgs(uint64_t _pid, uint64_t _shid, int _nres):
+	pid(_pid),
+	shid(_shid),
+	nres(_nres) {
+}
+
 ShowcaseSimpleFormatter::ShowcaseSimpleFormatter(HttpOutRequestDispPtr _req_disp,
 						boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 						GeberdCliApiClientPtr _geber_cli):
@@ -8,32 +14,57 @@ ShowcaseSimpleFormatter::ShowcaseSimpleFormatter(HttpOutRequestDispPtr _req_disp
 	m_geber_cli(_geber_cli) {
 							
 }
+
+FormatterArgsPtr ShowcaseSimpleFormatter::parseArgs(uint64_t _pid, const std::string &_args_js) {
+
+	uint64_t shid;
+	int nres;
+	
+	json_error_t error;
+	json_t *root = json_loads(_args_js.c_str(), 0, &error);
+	
+	json_t *j_shid = json_object_get(root, "shid");
+	if (json_is_string(j_shid)) {
+		shid = string_to_uint64(json_string_value(j_shid));
+	} else
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse shid";
+		
+	json_t *j_n = json_object_get(root, "n");
+	if (json_is_string(j_n)) {
+		nres = string_to_uint64(json_string_value(j_n));
+	} else
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse n";
+	
+	json_decref(root);
+	
+	return FormatterArgsPtr(new ShowcaseSimpleFormatterArgs(_pid, shid, nres));
+}
 						
-void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_args) {
-	//std::cout << "ShowcaseSimpleFormatter::format\n";
+void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args) {
 	
-	std::string geberd_call_url;
+	ShowcaseSimpleFormatterArgs* args = (ShowcaseSimpleFormatterArgs*)_args.get();
 	
-	// TODO parse shid and n
-	m_geber_cli->buildUrlGetShowcase(2, 6, geberd_call_url);
+	std::string geberd_call_url;	
+	m_geber_cli->buildUrlGetShowcase(args->shid, args->nres, geberd_call_url);
 	
 	HttpOutRequestDisp::RequesterPtr requester
 		(new ShowcaseSimpleRequester (boost::bind(&HttpOutRequestDisp::onCall, m_req_disp.get(), _1, _2, _3),
 										boost::bind(&HttpOutRequestDisp::onRequesterFinished, m_req_disp.get(), _1),
 										_conn->getSock(),
+										args->pid,
 										geberd_call_url,
-										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOk, this, _1, _2),
+										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOk, this, _1, _2, _3),
 										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberFail, this, _1) ) );
 	
 	m_req_disp->addRequester(requester);
 }
 
-void ShowcaseSimpleFormatter::onCalledGeberOk (int _connid, const std::string &_resp) {
+void ShowcaseSimpleFormatter::onCalledGeberOk (int _connid, uint64_t _pid, const std::string &_resp) {
 	//std::cout << "ShowcaseSimpleFormatter::onCalledGeberOk resp: " << _resp << std::endl;
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
 	if (conn) {
 		
-		std::string view = "<table><tr>";
+		
 		GeberdCliApiClient::ShowcaseInst show;
 		
 		try {
@@ -46,18 +77,33 @@ void ShowcaseSimpleFormatter::onCalledGeberOk (int _connid, const std::string &_
 			return;
 		}
 		
-		for (int i = 0; i < show.items.size(); i++) {
-			
-			view = view + "<td width=100 height=100 valign=top>";
-			view = view + "<a href=" + show.items[i].clickurl + ">";
-			view = view + "<img height=100px width=100px src=" + show.items[i].imgurl + "     </img><br>";
-			view = view + show.items[i].caption + "<br>";
-			view = view + "<b>"+ show.items[i].price + "руб </b><br>";
-			view = view + "</a> id: " + show.items[i].id + "</td>";
-		}
-		view = view + "</tr></table>";
+		std::string resp = \
+		\
+		"function renderShowcaseSimple(show) {\n"
+		"\n"
+		"	view = \"<table><tr>\";\n"
+		"	for (var i in show.items) {\n"
+		"\n"
+		"		view = view + \"<td width=100 height=100 valign=top>\";\n"
+		"		view = view + \"<a href= \"+ show.items[i].clickurl + \">\";\n"
+		"		view = view + \"<img height=100px width=100px src=\" + show.items[i].imgurl + \"></img><br>\";\n"
+		"		view = view + show.items[i].caption + \"<br>\";\n"
+		"		view = view + \"<b>\"+ show.items[i].price + \"руб </b><br>\";\n"
+		"		view = view + \"</a> id: \" + show.items[i].id + \"</td>\";\n"
+		"	}\n"
+		"	view = view + \"</tr></table>\";\n"
+		"	return view;\n"
+		"}\n"
+		"\n"
+		"if (document._punkt_codes == null)\n"
+		"	document._punkt_codes = {};\n"
+		"\n"	
+		"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
+		"	var show = JSON.parse(\'" + _resp + "\');\n"
+		"	return renderShowcaseSimple(show);\n"
+		"}\n";
 		
-		conn->sendResponse(view);
+		conn->sendResponse(resp);
 		conn->close();
 	}
 }

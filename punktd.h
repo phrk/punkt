@@ -8,9 +8,13 @@
 
 #include "geber/cpp-client/GeberdCliApiClient.h"
 
+#include "punktd_consts.h"
+
 #include "punkt.h"
 #include "formatter.h"
 #include "ShowcaseSimpleFormatter.h"
+
+#include "libpq-fe.h"
 
 #define PUNKTD_NTHREADS 4
 
@@ -22,14 +26,18 @@ private:
 	HttpSrvPtr m_srv;
 	PunktPtr m_punkt;
 	HttpOutRequestDispPtr m_req_disp;
-	
 	GeberdCliApiClientPtr m_geber_cli;
+	PGconn *m_pg;
 	
-	std::vector<FormatterPtr> m_formatters;
+	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
+	uint64_t m_last_reload_ts;
+	uint64_t m_reload_period;
 	
 	hiaux::hashtable<std::string,std::string> parseConfig(const std::string &_config_file);
 	void fallDown(std::string _s);
-	void loadFormatters();
+	void bindFormatters();
+	void loadPlaces();
+	void checkReload();
 public:
 	
 	Punktd(const std::string &_config_file);

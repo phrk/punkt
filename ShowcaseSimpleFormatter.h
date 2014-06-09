@@ -5,6 +5,16 @@
 #include "hiaux/network/HttpOutReqDisp.h"
 #include "formatter.h"
 #include "ShowcaseSimpleRequester.h"
+#include <jansson.h>
+
+class ShowcaseSimpleFormatterArgs: public FormatterArgs {
+public:
+	uint64_t pid;
+	uint64_t shid;
+	int nres;
+	
+	ShowcaseSimpleFormatterArgs(uint64_t _pid, uint64_t _shid, int _nres);
+};
 
 class ShowcaseSimpleFormatter : public Formatter {
 	HttpOutRequestDispPtr m_req_disp;
@@ -15,10 +25,11 @@ public:
 	ShowcaseSimpleFormatter(HttpOutRequestDispPtr _req_disp,
 							boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 							GeberdCliApiClientPtr _geber_cli);
-							
-	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_args);
 	
-	void onCalledGeberOk (int _connid, const std::string &_resp);
+	virtual FormatterArgsPtr parseArgs(uint64_t pid, const std::string &_args_js);
+	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args);
+	
+	void onCalledGeberOk (int _connid, uint64_t _pid, const std::string &_resp);
 	void onCalledGeberFail (int _connid);
 };
 
