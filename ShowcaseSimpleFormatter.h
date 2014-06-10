@@ -28,8 +28,10 @@ public:
 	
 	virtual FormatterArgsPtr parseArgs(uint64_t pid, const std::string &_args_js);
 	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args);
+	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args);
 	
 	void onCalledGeberOk (int _connid, uint64_t _pid, const std::string &_resp);
+	void onCalledGeberOkDemo (int _connid, uint64_t _pid, const std::string &_resp);
 	void onCalledGeberFail (int _connid);
 };
 

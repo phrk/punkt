@@ -8,7 +8,7 @@
 
 #include "geber/cpp-client/GeberdCliApiClient.h"
 
-#include "punktd_consts.h"
+#include "punkt_consts.h"
 
 #include "punkt.h"
 #include "formatter.h"

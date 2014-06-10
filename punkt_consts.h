@@ -3,4 +3,6 @@
 
 #define SHOWCASE_SIMPLE_FORMATTER_ID 0
 
+#define EMPTY_PLACE 0
+
 #endif

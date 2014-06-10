@@ -12,6 +12,7 @@ class Formatter {
 public:
 	virtual FormatterArgsPtr parseArgs(uint64_t pid, const std::string &_args_js) = 0;
 	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args) = 0;
+	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args) = 0;
 };
 
 typedef boost::shared_ptr<Formatter> FormatterPtr;

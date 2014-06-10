@@ -4,6 +4,7 @@
 #include "hiconfig.h"
 #include "hiaux/network/HttpSrv.h"
 
+#include "punkt_consts.h"
 #include "formatter.h"
 
 class Punkt {
@@ -23,15 +24,17 @@ public:
 
 private:	
 	hiaux::hashtable<uint64_t, PlaceInfoPtr> m_places;
-	hiaux::hashtable<uint64_t, FormatterFun> m_formatters;
+	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
 
 	hAutoLock lock;
 
 public:
 		
 	void updatePlace(uint64_t _pid, PlaceInfoPtr _placeinfo);
-	void updateFormatter(uint64_t _fid, FormatterFun _formatter);
+	void updateFormatter(uint64_t _fid, FormatterPtr _formatter);
 	
+	void handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
 };

@@ -41,7 +41,8 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 void Punktd::bindFormatters() {
 	
 	FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
-	m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, (Punkt::FormatterFun)boost::bind(&Formatter::format, f.get(), _1, _2, _3));
+	//(Punkt::FormatterFun)boost::bind(&Formatter::format, f.get(), _1, _2, _3)
+	m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
 	m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SIMPLE_FORMATTER_ID, f));
 }
 
@@ -150,7 +151,7 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 	
 	m_srv.reset(new HttpSrv(m_srv_tasklauncher,
-							HttpSrv::ResponseInfo("text/html; charset=utf-8", "punktd"),
+							HttpSrv::ResponseInfo("text/plain; charset=utf-8", "punktd"),
 							boost::bind(&Punktd::connHandler, this, _1, _2)));
 
 	//m_punkt.reset(new Punkt(boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1)));
