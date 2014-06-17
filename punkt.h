@@ -13,9 +13,9 @@ public:
 	class PlaceInfo {
 	public:
 		uint64_t formatter_id;
-		FormatterArgsPtr formatter_args;
+		std::vector<FormatterArgsPtr> formatter_args;
 		
-		PlaceInfo (uint64_t _formatter_id, FormatterArgsPtr _formatter_args);
+		PlaceInfo (uint64_t _formatter_id, std::vector<FormatterArgsPtr> &_formatter_args);
 	};
 	
 	typedef boost::shared_ptr<PlaceInfo> PlaceInfoPtr;
@@ -25,7 +25,11 @@ public:
 private:	
 	hiaux::hashtable<uint64_t, PlaceInfoPtr> m_places;
 	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
-
+	// place -> flights_ids []
+	// hiaux::hashtable<uint64_t, std::vector<uin64_t> > m_targets;
+	// flight 
+	//hiaux::hashtable<uint64_t, FormatterArgsPtr> m_formatter_args;
+	
 	hAutoLock lock;
 
 public:

@@ -1,6 +1,6 @@
 #include "punkt.h"
 
-Punkt::PlaceInfo::PlaceInfo (uint64_t _formatter_id, FormatterArgsPtr _formatter_args):
+Punkt::PlaceInfo::PlaceInfo (uint64_t _formatter_id, std::vector<FormatterArgsPtr> &_formatter_args):
 	formatter_id(_formatter_id),
 	formatter_args(_formatter_args){
 	
@@ -60,7 +60,7 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 		formatter_args = formatter->parseArgs(EMPTY_PLACE, formatter_args_str);
 	}
 	catch (...) {
-		std::cout << "Punkt::handleDemo wrong args " << formatter_id << std::endl;
+		std::cout << "Punkt::handleDemo wrong args " << formatter_id << "args: " << formatter_args_str << std::endl;
 		_conn->sendResponse("{ \"status\" : \"wrong args\" }");
 		_conn->close();
 		return;
@@ -95,7 +95,7 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 		}
 	
 		formatter = f_it->second;
-		args = it->second->formatter_args;
+		args = it->second->formatter_args[ rand() % it->second->formatter_args.size() ];
 	}
 	
 	formatter->format(_conn, _req, args);

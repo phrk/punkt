@@ -56,6 +56,29 @@ void Punktd::checkReload() {
 	m_last_reload_ts = time(0);
 }
 
+void Punktd::loadPlaceTarges(uint64_t _place, std::vector<std::string> &_formaters_args) {
+	
+	std::string query("SELECT formatter_args FROM punkt.targets WHERE place_id=" + uint64_to_string(_place));
+	PGresult *res = PQexec(m_pg, query.c_str());
+	
+	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+		std::cout << "Punktd::loadPlaceTarges !PGRES_TUPLES_OK\n";
+		return;
+	}
+	
+	int ntuples = PQntuples(res);
+	int ncols = PQnfields(res);
+	
+	for (int t = 0; t<ntuples; t++) {	
+		for (int c = 0; c < ncols; c++) {
+		
+			if (std::string("formatter_args") == PQfname(res, c))
+				_formaters_args.push_back(PQgetvalue(res, t, c));
+		}
+	}
+	PQclear(res);
+}
+
 void Punktd::loadPlaces() {
 	//std::cout << "Punktd::loadPlaces\n";
 	// INSERT INTO punkt.places (formatter_id, formatter_args, ownerid, caption) VALUES (0, '{ "shid" : "2", "n" : "6"}', 0, '');
@@ -84,8 +107,8 @@ void Punktd::loadPlaces() {
 			if (std::string("formatter_id") == PQfname(res, c))
 				formatter_id = string_to_uint64(PQgetvalue(res, t, c));
 			
-			if (std::string("formatter_args") == PQfname(res, c))
-				formatter_args = PQgetvalue(res, t, c);
+	//		if (std::string("formatter_args") == PQfname(res, c))
+	//			formatter_args = PQgetvalue(res, t, c);
 			
 			if (std::string("ownerid") == PQfname(res, c))
 				ownerid = string_to_uint64(PQgetvalue(res, t, c));
@@ -100,15 +123,24 @@ void Punktd::loadPlaces() {
 			continue;
 		}
 		
-		FormatterArgsPtr args;
-		try {
-			args = it->second->parseArgs(id, formatter_args);
-		} catch (...) {
-			std::cout << "Punktd::loadPlaces could not parse args for place " << id << std::endl;
-			continue;
+		std::vector<FormatterArgsPtr> args;
+		
+		std::vector<std::string> formaters_args_strs;
+		loadPlaceTarges(id, formaters_args_strs);
+		
+		for (int i = 0; i<formaters_args_strs.size(); i++) {
+			try {
+				args.push_back( it->second->parseArgs(id, formaters_args_strs[i]) );
+			} catch (...) {
+				std::cout << "Punktd::loadPlaces could not parse args for place " 
+						<< id << " formaters_args_strs[i]: " << formaters_args_strs[i] << std::endl;
+				continue;
+			}
 		}
 		m_punkt->updatePlace(id, Punkt::PlaceInfoPtr(new Punkt::PlaceInfo(formatter_id, args)));
 	}
+	
+	PQclear(res);
 	
 		// pid shid nres
 	 // (new ShowcaseSimpleFormatterArgs (0, 2, 6) );

@@ -36,7 +36,10 @@ private:
 	hiaux::hashtable<std::string,std::string> parseConfig(const std::string &_config_file);
 	void fallDown(std::string _s);
 	void bindFormatters();
+	
+	void loadPlaceTarges(uint64_t _place, std::vector<std::string> &_formaters_args);
 	void loadPlaces();
+	
 	void checkReload();
 public:
 	

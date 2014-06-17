@@ -18,26 +18,26 @@ ShowcaseSimpleFormatter::ShowcaseSimpleFormatter(HttpOutRequestDispPtr _req_disp
 FormatterArgsPtr ShowcaseSimpleFormatter::parseArgs(uint64_t _pid, const std::string &_args_js) {
 
 	uint64_t shid;
-	int nres;
+	int nitems;
 	
 	json_error_t error;
 	json_t *root = json_loads(_args_js.c_str(), 0, &error);
 	
 	json_t *j_shid = json_object_get(root, "shid");
-	if (json_is_string(j_shid)) {
-		shid = string_to_uint64(json_string_value(j_shid));
+	if (json_is_integer(j_shid)) {
+		shid = json_integer_value(j_shid);
 	} else
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse shid";
 		
-	json_t *j_n = json_object_get(root, "n");
-	if (json_is_string(j_n)) {
-		nres = string_to_uint64(json_string_value(j_n));
+	json_t *j_n = json_object_get(root, "nitems");
+	if (json_is_integer(j_n)) {
+		nitems = json_integer_value(j_n);
 	} else
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse n";
 	
 	json_decref(root);
 	
-	return FormatterArgsPtr(new ShowcaseSimpleFormatterArgs(_pid, shid, nres));
+	return FormatterArgsPtr(new ShowcaseSimpleFormatterArgs(_pid, shid, nitems));
 }
 						
 void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args) {
