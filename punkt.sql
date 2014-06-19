@@ -9,5 +9,5 @@ CREATE TABLE punkt.places (id BIGSERIAL PRIMARY KEY,
 
 CREATE TABLE punkt.targets (id BIGSERIAL PRIMARY KEY,
 							place_id BIGINT NOT NULL,
-							flight_id BIGINT NOT NULL, -- showcase id
+							flight_id BIGINT NOT NULL,
 							formatter_args TEXT NOT NULL);

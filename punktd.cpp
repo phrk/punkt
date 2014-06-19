@@ -183,7 +183,7 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 	
 	m_srv.reset(new HttpSrv(m_srv_tasklauncher,
-							HttpSrv::ResponseInfo("text/plain; charset=utf-8", "punktd"),
+							HttpSrv::ResponseInfo("text/html; charset=utf-8", "punktd"),
 							boost::bind(&Punktd::connHandler, this, _1, _2)));
 
 	//m_punkt.reset(new Punkt(boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1)));
