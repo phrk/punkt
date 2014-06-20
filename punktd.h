@@ -37,8 +37,9 @@ private:
 	void fallDown(std::string _s);
 	void bindFormatters();
 	
-	void loadPlaceTarges(uint64_t _place, std::vector<std::string> &_formaters_args);
+	void loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids);
 	void loadPlaces();
+	void loadAds();
 	
 	void checkReload();
 public:

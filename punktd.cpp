@@ -50,19 +50,56 @@ void Punktd::checkReload() {
 	uint64_t now = time(0);
 	if (now - m_last_reload_ts < m_reload_period)
 		return;
-
+	
+	loadAds();
 	loadPlaces();
 	
 	m_last_reload_ts = time(0);
 }
 
-void Punktd::loadPlaceTarges(uint64_t _place, std::vector<std::string> &_formaters_args) {
-	
-	std::string query("SELECT formatter_args FROM punkt.targets WHERE place_id=" + uint64_to_string(_place));
+void Punktd::loadAds() {
+	std::string query("SELECT * FROM punkt.ads");
 	PGresult *res = PQexec(m_pg, query.c_str());
 	
 	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-		std::cout << "Punktd::loadPlaceTarges !PGRES_TUPLES_OK\n";
+		std::cout << "Punktd::loadAds !PGRES_TUPLES_OK\n";
+		return;
+	}
+	
+	int ntuples = PQntuples(res);
+	int ncols = PQnfields(res);
+	
+	uint64_t id;
+	uint64_t format_id;
+	std::string formatter_args;
+	
+	for (int t = 0; t<ntuples; t++) {	
+		for (int c = 0; c < ncols; c++) {
+		
+			if (std::string("id") == PQfname(res, c)) {
+				id = string_to_uint64( PQgetvalue(res, t, c) );
+			}
+		
+			if (std::string("format_id") == PQfname(res, c)) {
+				format_id = string_to_uint64( PQgetvalue(res, t, c) );
+			}
+			if (std::string("formatter_args") == PQfname(res, c)) {
+				formatter_args = PQgetvalue(res, t, c);
+			}
+		}
+		AdPtr ad (new Ad(id, format_id, formatter_args));
+		m_punkt->updateAd(ad);
+	}
+	
+}
+
+void Punktd::loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids) {
+	
+	std::string query("SELECT ad_id FROM punkt.targets WHERE place_id=" + uint64_to_string(_place));
+	PGresult *res = PQexec(m_pg, query.c_str());
+	
+	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
+		std::cout << "Punktd::loadPlaceTarges !PGRES_TUPLES_OK _place: " << _place << std::endl;
 		return;
 	}
 	
@@ -72,16 +109,15 @@ void Punktd::loadPlaceTarges(uint64_t _place, std::vector<std::string> &_formate
 	for (int t = 0; t<ntuples; t++) {	
 		for (int c = 0; c < ncols; c++) {
 		
-			if (std::string("formatter_args") == PQfname(res, c))
-				_formaters_args.push_back(PQgetvalue(res, t, c));
+			if (std::string("ad_id") == PQfname(res, c))
+				_ads_ids.push_back( string_to_uint64( PQgetvalue(res, t, c) ) );
 		}
 	}
 	PQclear(res);
 }
 
 void Punktd::loadPlaces() {
-	//std::cout << "Punktd::loadPlaces\n";
-	// INSERT INTO punkt.places (formatter_id, formatter_args, ownerid, caption) VALUES (0, '{ "shid" : "2", "n" : "6"}', 0, '');
+
 	std::string query  ("SELECT * FROM punkt.places");
 	PGresult *res = PQexec(m_pg, query.c_str());
 	
@@ -94,62 +130,29 @@ void Punktd::loadPlaces() {
 	int ncols = PQnfields(res);
 	
 	uint64_t id;
-	uint64_t formatter_id;
-	std::string formatter_args;
-	uint64_t ownerid;
-	std::string caption;
+	bool readok = false;
 	
 	for (int t = 0; t<ntuples; t++) {	
+		readok = false;
 		for (int c = 0; c < ncols; c++) {
-			if (std::string("id") == PQfname(res, c))
+			if (std::string("id") == PQfname(res, c)) {
 				id = string_to_uint64(PQgetvalue(res, t, c));
-			
-			if (std::string("formatter_id") == PQfname(res, c))
-				formatter_id = string_to_uint64(PQgetvalue(res, t, c));
-			
-	//		if (std::string("formatter_args") == PQfname(res, c))
-	//			formatter_args = PQgetvalue(res, t, c);
-			
-			if (std::string("ownerid") == PQfname(res, c))
-				ownerid = string_to_uint64(PQgetvalue(res, t, c));
-			
-			if (std::string("caption") == PQfname(res, c))
-				caption = PQgetvalue(res, t, c);
+				readok = true;
+			}		
 		}
 		
-		hiaux::hashtable<uint64_t, FormatterPtr>::iterator it = m_formatters.find(formatter_id);
-		if (it == m_formatters.end()) {
-			std::cout << "Punktd::loadPlaces formatter " << formatter_id << " dont exists. Place " << id << std::endl;
+		if (!readok) {
+			std::cout << "Punktd::loadPlaces could not load place id\n";
 			continue;
 		}
 		
-		std::vector<FormatterArgsPtr> args;
 		
-		std::vector<std::string> formaters_args_strs;
-		loadPlaceTarges(id, formaters_args_strs);
-		
-		for (int i = 0; i<formaters_args_strs.size(); i++) {
-			try {
-				args.push_back( it->second->parseArgs(id, formaters_args_strs[i]) );
-			} catch (...) {
-				std::cout << "Punktd::loadPlaces could not parse args for place " 
-						<< id << " formaters_args_strs[i]: " << formaters_args_strs[i] << std::endl;
-				continue;
-			}
-		}
-		m_punkt->updatePlace(id, Punkt::PlaceInfoPtr(new Punkt::PlaceInfo(formatter_id, args)));
+		std::vector<uint64_t> ads_ids;
+		loadPlaceTarges(id, ads_ids);
+		m_punkt->updatePlaceTargets(id, ads_ids);
 	}
 	
 	PQclear(res);
-	
-		// pid shid nres
-	 // (new ShowcaseSimpleFormatterArgs (0, 2, 6) );
-	
-	/*
-	{
-		FormatterArgsPtr args (new ShowcaseSimpleFormatterArgs (1, 2, 6) );
-		m_punkt->updatePlace(1, Punkt::PlaceInfoPtr(new Punkt::PlaceInfo(SHOWCASE_SIMPLE_FORMATTER_ID, args)));
-	}*/
 }
 
 Punktd::Punktd(const std::string &_config_file) {
@@ -187,9 +190,15 @@ Punktd::Punktd(const std::string &_config_file) {
 							boost::bind(&Punktd::connHandler, this, _1, _2)));
 
 	//m_punkt.reset(new Punkt(boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1)));
-	
+							
 	bindFormatters();
+	std::cout << "Formatters binded\n";
+	loadAds();
+	std::cout << "Ads loaded\n";
 	loadPlaces();
+	std::cout << "Places loaded\n";
+	
+	std::cout << "All loaded\n";
 	
 	m_srv->start(strtoint(_config["listen_port"]));
 	m_pool->run();

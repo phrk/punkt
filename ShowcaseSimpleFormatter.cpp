@@ -1,7 +1,6 @@
 #include "ShowcaseSimpleFormatter.h"
 
-ShowcaseSimpleFormatterArgs::ShowcaseSimpleFormatterArgs(uint64_t _pid, uint64_t _shid, int _nres):
-	pid(_pid),
+ShowcaseSimpleFormatterArgs::ShowcaseSimpleFormatterArgs(uint64_t _shid, int _nres):
 	shid(_shid),
 	nres(_nres) {
 }
@@ -15,7 +14,7 @@ ShowcaseSimpleFormatter::ShowcaseSimpleFormatter(HttpOutRequestDispPtr _req_disp
 							
 }
 
-FormatterArgsPtr ShowcaseSimpleFormatter::parseArgs(uint64_t _pid, const std::string &_args_js) {
+FormatterArgsPtr ShowcaseSimpleFormatter::parseArgs(const std::string &_args_js) {
 
 	uint64_t shid;
 	int nitems;
@@ -26,21 +25,23 @@ FormatterArgsPtr ShowcaseSimpleFormatter::parseArgs(uint64_t _pid, const std::st
 	json_t *j_shid = json_object_get(root, "shid");
 	if (json_is_integer(j_shid)) {
 		shid = json_integer_value(j_shid);
-	} else
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse shid\n";
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse shid";
-		
-	json_t *j_n = json_object_get(root, "nitems");
+	}
+	json_t *j_n = json_object_get(root, "n");
 	if (json_is_integer(j_n)) {
 		nitems = json_integer_value(j_n);
-	} else
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse n\n";
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse n";
-	
+	}
 	json_decref(root);
 	
-	return FormatterArgsPtr(new ShowcaseSimpleFormatterArgs(_pid, shid, nitems));
+	return FormatterArgsPtr(new ShowcaseSimpleFormatterArgs(shid, nitems));
 }
 						
-void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args) {
+void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args) {
 	
 	ShowcaseSimpleFormatterArgs* args = (ShowcaseSimpleFormatterArgs*)_args.get();
 	
@@ -51,7 +52,7 @@ void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::Requ
 		(new ShowcaseSimpleRequester (boost::bind(&HttpOutRequestDisp::onCall, m_req_disp.get(), _1, _2, _3),
 										boost::bind(&HttpOutRequestDisp::onRequesterFinished, m_req_disp.get(), _1),
 										_conn->getSock(),
-										args->pid,
+										_pid,
 										geberd_call_url,
 										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOk, this, _1, _2, _3),
 										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberFail, this, _1) ) );
@@ -59,7 +60,7 @@ void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::Requ
 	m_req_disp->addRequester(requester);
 }
 
-void ShowcaseSimpleFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, FormatterArgsPtr _args) {
+void ShowcaseSimpleFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args) {
 	
 	ShowcaseSimpleFormatterArgs* args = (ShowcaseSimpleFormatterArgs*)_args.get();
 	
@@ -70,7 +71,7 @@ void ShowcaseSimpleFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::
 		(new ShowcaseSimpleRequester (boost::bind(&HttpOutRequestDisp::onCall, m_req_disp.get(), _1, _2, _3),
 										boost::bind(&HttpOutRequestDisp::onRequesterFinished, m_req_disp.get(), _1),
 										_conn->getSock(),
-										args->pid,
+										_pid,
 										geberd_call_url,
 										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOkDemo, this, _1, _2, _3),
 										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberFail, this, _1) ) );
