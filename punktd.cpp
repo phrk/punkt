@@ -48,6 +48,7 @@ void Punktd::bindFormatters() {
 		m_jscache->addFile("renderShowcaseSlider.js", "js/renderShowcaseSlider.js");
 		m_jscache->addFile("mootools", "js/mootools-core-1.5.0.js");
 		m_jscache->addFile("slider.js", "js/buildSlider.js");
+		m_jscache->addFile("ShowcaseSliderEvents.js", "js/ShowcaseSliderEvents.js");
 		
 		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp, m_jscache, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);

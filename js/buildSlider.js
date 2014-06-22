@@ -1,4 +1,8 @@
-function buildSlider(pid) {
+
+function buildSlider(pid, isdemo, punkturl, adid) {
+	
+	if (!isdemo)
+		evShowcaseSliderDisp(punkturl, pid, adid);
 	
 	var Scroller = function(container, left, right){
 	    var self = this;

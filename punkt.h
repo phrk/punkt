@@ -27,12 +27,16 @@ private:
 	
 	hAutoLock lock;
 
+	void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+
 public:
 	
 	void updateAd(AdPtr _ad);
 	void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);
 	void updateFormatter(uint64_t _fid, FormatterPtr _formatter);
 	
+	
+	void handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_evtype_str);
 	void handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);

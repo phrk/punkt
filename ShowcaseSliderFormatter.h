@@ -23,6 +23,11 @@ class ShowcaseSliderFormatter : public Formatter {
 	FileCachePtr m_jscache;
 	boost::function<HttpSrv::ConnectionPtr(int)> m_getConnById;
 	GeberdCliApiClientPtr m_geber_cli;
+
+	void handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	
 public:
 	
 	ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
@@ -31,11 +36,12 @@ public:
 							GeberdCliApiClientPtr _geber_cli);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
-	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args);
-	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args);
+	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
-	void onCalledGeberOk (int _connid, uint64_t _pid, const std::string &_resp);
-	void onCalledGeberOkDemo (int _connid, uint64_t _pid, const std::string &_resp);
+	void onCalledGeberOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
+	void onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
 	void onCalledGeberFail (int _connid);
 };
 

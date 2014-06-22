@@ -41,7 +41,7 @@ FormatterArgsPtr ShowcaseSimpleFormatter::parseArgs(const std::string &_args_js)
 	return FormatterArgsPtr(new ShowcaseSimpleFormatterArgs(shid, nitems));
 }
 						
-void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args) {
+void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	ShowcaseSimpleFormatterArgs* args = (ShowcaseSimpleFormatterArgs*)_args.get();
 	
@@ -53,14 +53,15 @@ void ShowcaseSimpleFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::Requ
 										boost::bind(&HttpOutRequestDisp::onRequesterFinished, m_req_disp.get(), _1),
 										_conn->getSock(),
 										_pid,
+										_adid,
 										geberd_call_url,
-										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOk, this, _1, _2, _3),
+										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOk, this, _1, _2, _3, _4),
 										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberFail, this, _1) ) );
 	
 	m_req_disp->addRequester(requester);
 }
 
-void ShowcaseSimpleFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args) {
+void ShowcaseSimpleFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	ShowcaseSimpleFormatterArgs* args = (ShowcaseSimpleFormatterArgs*)_args.get();
 	
@@ -72,14 +73,15 @@ void ShowcaseSimpleFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::
 										boost::bind(&HttpOutRequestDisp::onRequesterFinished, m_req_disp.get(), _1),
 										_conn->getSock(),
 										_pid,
+										_adid,
 										geberd_call_url,
-										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOkDemo, this, _1, _2, _3),
+										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberOkDemo, this, _1, _2, _3, _4),
 										boost::bind(&ShowcaseSimpleFormatter::onCalledGeberFail, this, _1) ) );
 	
 	m_req_disp->addRequester(requester);	
 }
 
-void ShowcaseSimpleFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, const std::string &_resp) {
+void ShowcaseSimpleFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp) {
 	
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
 	if (conn) {
@@ -115,7 +117,7 @@ void ShowcaseSimpleFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, c
 	}
 }
 
-void ShowcaseSimpleFormatter::onCalledGeberOk (int _connid, uint64_t _pid, const std::string &_resp) {
+void ShowcaseSimpleFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp) {
 	//std::cout << "ShowcaseSimpleFormatter::onCalledGeberOk resp: " << _resp << std::endl;
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
 	if (conn) {
@@ -172,4 +174,9 @@ void ShowcaseSimpleFormatter::onCalledGeberFail (int _connid) {
 		conn->sendResponse("{ \"status\" : \"ShowcaseSimpleFormatter::onCalledGeberFail\" }");
 		conn->close();
 	}
+}
+
+void ShowcaseSimpleFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	_conn->close();
 }

@@ -26,11 +26,12 @@ public:
 							GeberdCliApiClientPtr _geber_cli);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
-	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args);
-	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args);
+	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
-	void onCalledGeberOk (int _connid, uint64_t _pid, const std::string &_resp);
-	void onCalledGeberOkDemo (int _connid, uint64_t _pid, const std::string &_resp);
+	void onCalledGeberOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
+	void onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
 	void onCalledGeberFail (int _connid);
 };
 

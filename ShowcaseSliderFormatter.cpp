@@ -43,7 +43,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems));
 }
 						
-void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
 	
@@ -55,14 +55,15 @@ void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::Requ
 										boost::bind(&HttpOutRequestDisp::onRequesterFinished, m_req_disp.get(), _1),
 										_conn->getSock(),
 										_pid,
+										_adid,
 										geberd_call_url,
-										boost::bind(&ShowcaseSliderFormatter::onCalledGeberOk, this, _1, _2, _3),
+										boost::bind(&ShowcaseSliderFormatter::onCalledGeberOk, this, _1, _2, _3, _4),
 										boost::bind(&ShowcaseSliderFormatter::onCalledGeberFail, this, _1) ) );
 	
 	m_req_disp->addRequester(requester);
 }
 
-void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
 	
@@ -74,14 +75,15 @@ void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::
 										boost::bind(&HttpOutRequestDisp::onRequesterFinished, m_req_disp.get(), _1),
 										_conn->getSock(),
 										_pid,
+										_adid,
 										geberd_call_url,
-										boost::bind(&ShowcaseSliderFormatter::onCalledGeberOkDemo, this, _1, _2, _3),
+										boost::bind(&ShowcaseSliderFormatter::onCalledGeberOkDemo, this, _1, _2, _3, _4),
 										boost::bind(&ShowcaseSliderFormatter::onCalledGeberFail, this, _1) ) );
 	
 	m_req_disp->addRequester(requester);
 }
 
-void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, const std::string &_resp) {
+void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp) {
 	
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
 	if (conn) {
@@ -98,9 +100,14 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, c
 			return;
 		}
 		
+		std::string slider_events;
 		std::string render_slider;
 		std::string mootools;
 		std::string slider;
+		
+		if (!m_jscache->getFile("ShowcaseSliderEvents.js", slider_events)) {
+			std::cout << "ShowcaseSliderFormatter::onCalledGeberOkDemo ShowcaseSliderEvents.js not loaded in cache  \n";
+		}
 		
 		if (!m_jscache->getFile("renderShowcaseSlider.js", render_slider)) {
 			
@@ -115,6 +122,7 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, c
 		}
 		
 		std::string format_files_path = "http://localhost:8080/tests/punkt/sh_slider_240x400/";
+		std::string punkt_url = "http://127.0.0.1:4249/";
 		
 		std::string format_renderer_bind = \
 		
@@ -130,15 +138,16 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, c
 		"}\n"
 		
 		"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"
-		"	buildSlider('" + uint64_to_string(_pid) + "'); \n"
+		"	buildSlider('" + uint64_to_string(_pid) + "', true, '" +punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
 		"} \n";
 		
 		std::string resp = \		
 			"<div id=\"punkt_place_0\" width=\"240\" height=\"400\"></div>"
 			"<script type=\"text/JavaScript\">";
 	
-		resp.reserve(render_slider.size() + mootools.size() + slider.size() + format_renderer_bind.size());
+		resp.reserve(slider_events.size() + render_slider.size() + mootools.size() + slider.size() + format_renderer_bind.size());
 		
+		resp += slider_events;
 		resp += render_slider;
 		resp += mootools;
 		resp += slider;
@@ -152,7 +161,7 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, c
 	}
 }
 
-void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, const std::string &_resp) {
+void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp) {
 	//std::cout << "ShowcaseSimpleFormatter::onCalledGeberOk resp: " << _resp << std::endl;
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
 	if (conn) {
@@ -169,11 +178,17 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, const
 			return;
 		}
 		
+		std::string slider_events;
 		std::string render_slider;
 		std::string mootools;
 		std::string slider;
 		
 		std::string format_files_path = "http://localhost:8080/tests/punkt/sh_slider_240x400/";
+		std::string punkt_url = "http://127.0.0.1:4249/";
+		
+		if (!m_jscache->getFile("ShowcaseSliderEvents.js", slider_events)) {
+			std::cout << "ShowcaseSliderFormatter::onCalledGeberOkDemo ShowcaseSliderEvents.js not loaded in cache  \n";
+		}
 		
 		if (!m_jscache->getFile("renderShowcaseSlider.js", render_slider)) {
 			
@@ -201,12 +216,13 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, const
 		"}\n"
 		
 		"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"
-		"	buildSlider('" + uint64_to_string(_pid) + "'); \n"
+		"	buildSlider('" + uint64_to_string(_pid) + "', false, '" +punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
 		"} \n";
 		
 		std::string resp;
-		resp.reserve(render_slider.size() + mootools.size() + slider.size() + format_renderer_bind.size());
+		resp.reserve(slider_events.size() + render_slider.size() + mootools.size() + slider.size() + format_renderer_bind.size());
 		
+		resp += slider_events;
 		resp += render_slider;
 		resp += mootools;
 		resp += slider;
@@ -225,4 +241,50 @@ void ShowcaseSliderFormatter::onCalledGeberFail (int _connid) {
 		conn->sendResponse("{ \"status\" : \"ShowcaseSimpleFormatter::onCalledGeberFail\" }");
 		conn->close();
 	}
+}
+
+void ShowcaseSliderFormatter::handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	std::cout << "ShowcaseSliderFormatter::handleShowDispEvent " + _req->url  << std::endl;
+	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
+}
+
+void ShowcaseSliderFormatter::handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleItemsShowEvent\" }");
+}
+
+void ShowcaseSliderFormatter::handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleClickEvent\" }");
+}
+
+void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+
+	std::string ev_str;
+	if (!_req->getField("ev", ev_str)) {
+		
+		_conn->sendResponse("{ \"status\" : \"ev not set\" }");
+		_conn->close();
+		return;
+	}
+
+	if (ev_str == "showdisp") {
+		
+		handleShowDispEvent(_conn, _req);
+
+	} if (ev_str == "itemsdisp") {
+		
+		handleItemsShowEvent(_conn, _req);
+
+	} else if (ev_str == "click") {
+		
+		handleClickEvent(_conn, _req);
+
+	} else {
+		_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleFormatEvent unknown event\" }");
+	}
+
+	//_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleFormatEvent called\" }");
+	_conn->close();
 }

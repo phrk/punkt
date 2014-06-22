@@ -18,12 +18,12 @@ function renderShowcaseSlider (pid, show, format_files_path) {
 	
 		ret += '<tr>';
 		ret += '<td>';
-		ret += '	<img src=' + show.items[i].imgurl + ' width=100px height=100px>';
+		ret += '<a href=' + show.items[i].clickurl + '><img src=' + show.items[i].imgurl + ' width=100px height=100px></a>';
 		ret += '</td>';
-		ret += '<td>';
+		ret += '<td><a href=' + show.items[i].clickurl + ' style="font-family:serif; font-size:12pt; color:black;  word-wrap: break-word;" >';
 		ret += show.items[i].caption + "<br>";
-		ret += show.items[i].price + 'руб';
-		ret += '</td>';
+		ret += '<p style="color:A0522D; text-decoration:none;">' + show.items[i].price + 'руб </p>';
+		ret += '</a></td>';
 		ret += '</tr>';
 
 		nitem++;

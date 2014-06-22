@@ -84,13 +84,15 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 		formatter_args = ad_it->second->args;
 	}
 	
-	formatter->formatDemo(_conn, _req, 0, formatter_args);
+	formatter->formatDemo(_conn, _req, 0, adid, formatter_args);
 }
 
 void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	FormatterPtr formatter;
 	FormatterArgsPtr args;
+	
+	uint64_t adid;
 	
 	{
 		hLockTicketPtr ticket = lock.lock();
@@ -115,9 +117,50 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	
 		formatter = f_it->second;
 		args = ad->args;
+		adid = ad->id;
 	}
 	
-	formatter->format(_conn, _req, _pid, args);
+	formatter->format(_conn, _req, _pid, adid, args);
+}
+
+void Punkt::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	std::string format_id_str;
+	
+	if (!_req->getField("fid", format_id_str)) {
+		_conn->sendResponse("{ \"status\" : \"fid not set\" }");
+		_conn->close();
+		return;
+	}
+	
+	uint64_t format_id = string_to_uint64(format_id_str);
+	
+	FormatterPtr format;
+	
+	{
+		hiaux::hashtable<uint64_t, FormatterPtr>::iterator it = m_formatters.find(format_id);
+		if (it == m_formatters.end()) {
+			_conn->sendResponse("{ \"status\" : \"unknown format\" }");
+			_conn->close();
+			return;
+		}
+		format = it->second;
+	}
+	format->handleFormatEvent(_conn, _req);
+}
+
+void Punkt::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_evtype_str) {
+	
+	// format event
+	if (_evtype_str == "fev") {
+		
+		handleFormatEvent(_conn, _req);
+		
+	} else if (_evtype_str == "gev") {
+	// general event
+		
+	}
+	
 }
 
 void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
@@ -128,7 +171,14 @@ void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) 
 		handleDemo(_conn, _req);
 		return;
 	}
+	
+	std::string evtype_str;
+	if (_req->getField("evtype", evtype_str)) {
 		
+		handleEvent(_conn, _req, evtype_str);
+		return;
+	}
+	
 	std::string pid_str;
 	if (!_req->getField("pid", pid_str)) {
 		_conn->sendResponse("{ \"status\" : \"pid not set\" }");
