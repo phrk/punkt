@@ -39,11 +39,20 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 }
 
 void Punktd::bindFormatters() {
-	
-	FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
-	//(Punkt::FormatterFun)boost::bind(&Formatter::format, f.get(), _1, _2, _3)
-	m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
-	m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SIMPLE_FORMATTER_ID, f));
+	{
+		FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
+		m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SIMPLE_FORMATTER_ID, f));
+	}
+	{
+		m_jscache->addFile("renderShowcaseSlider.js", "js/renderShowcaseSlider.js");
+		m_jscache->addFile("mootools", "js/mootools-core-1.5.0.js");
+		m_jscache->addFile("slider.js", "js/buildSlider.js");
+		
+		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp, m_jscache, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
+		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_FORMATTER_ID, f));
+	}
 }
 
 void Punktd::checkReload() {
@@ -175,6 +184,8 @@ Punktd::Punktd(const std::string &_config_file) {
 		std::cout << "Could not connect to db";
 		exit(0);
 	}
+	
+	m_jscache.reset(new FileCache);
 	
 	m_geber_cli.reset(new GeberdCliApiClient(_config["geberd_url"]));
 	

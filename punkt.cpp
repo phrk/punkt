@@ -45,56 +45,46 @@ void Punkt::updateFormatter(uint64_t _fid, FormatterPtr _formatter) {
 
 void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	std::string formatter_id_str;
-	std::string formatter_args_str;
+	std::string ad_id_str;
 	
-	if (!_req->getField("fid", formatter_id_str)) {
-		_conn->sendResponse("{ \"status\" : \"wrong params\" }");
-		_conn->close();
-		return;
-	}
-	if (!_req->getField("fargs", formatter_args_str)) {
+	if (!_req->getField("adid", ad_id_str)) {
 		_conn->sendResponse("{ \"status\" : \"wrong params\" }");
 		_conn->close();
 		return;
 	}
 	
-	uint64_t formatter_id;
+	uint64_t adid = string_to_uint64(ad_id_str);	
+	
 	FormatterPtr formatter;
-	/*
+	FormatterArgsPtr formatter_args;
+	
 	{
 		hLockTicketPtr ticket = lock.lock();
-	
-		formatter_id = string_to_uint64(formatter_id_str);
-		/
-		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(formatter_id);
-	
+		hiaux::hashtable<uint64_t, AdPtr>::iterator ad_it = m_ads.find(adid);
+		
+		if (ad_it == m_ads.end()) {
+		
+			std::cout << "Punkt::handleDemo unknown ad " << adid << std::endl;
+			_conn->sendResponse("{ \"status\" : \"internal error\" }");
+			_conn->close();
+			return;
+		}
+		
+		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(ad_it->second->format_id);
+		
 		if (f_it == m_formatters.end()) {
 		
-			std::cout << "Punkt::handleDemo unknown formatter " << formatter_id << std::endl;
+			std::cout << "Punkt::handleDemo unknown format " << ad_it->second->format_id << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
 			_conn->close();
 			return;
 		}
 		
 		formatter = f_it->second;
+		formatter_args = ad_it->second->args;
 	}
 	
-	FormatterArgsPtr formatter_args;
-	
-	try {
-		formatter_args = formatter->parseArgs(EMPTY_PLACE, formatter_args_str);
-	}
-	catch (...) {
-		std::cout << "Punkt::handleDemo wrong args " << formatter_id << "args: " << formatter_args_str << std::endl;
-		_conn->sendResponse("{ \"status\" : \"wrong args\" }");
-		_conn->close();
-		return;
-	}
-	
-	//std::cout << "format demo\n";
-	formatter->formatDemo(_conn, _req, formatter_args);
-	*/
+	formatter->formatDemo(_conn, _req, 0, formatter_args);
 }
 
 void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {

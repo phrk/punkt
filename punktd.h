@@ -12,7 +12,9 @@
 
 #include "punkt.h"
 #include "formatter.h"
+#include "FileCache.h"
 #include "ShowcaseSimpleFormatter.h"
+#include "ShowcaseSliderFormatter.h"
 
 #include "libpq-fe.h"
 
@@ -28,6 +30,8 @@ private:
 	HttpOutRequestDispPtr m_req_disp;
 	GeberdCliApiClientPtr m_geber_cli;
 	PGconn *m_pg;
+	
+	FileCachePtr m_jscache;
 	
 	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
 	uint64_t m_last_reload_ts;
