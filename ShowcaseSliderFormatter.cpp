@@ -11,6 +11,7 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 						GeberdCliApiClientPtr _geber_cli):
 	m_req_disp(_req_disp),
 	m_jscache(_jscache),
+	m_punkt_url(_punkt_url),
 	m_getConnById(_getConnById),
 	m_geber_cli(_geber_cli) {
 							
@@ -83,6 +84,11 @@ void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::
 	m_req_disp->addRequester(requester);
 }
 
+void ShowcaseSliderFormatter::rebuildClickLinks(const std::string &_showcase_dump_in, const std::string &_showcase_dump_out) {
+	
+	_showcase_dump_out = _showcase_dump_in;
+}
+
 void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp) {
 	
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
@@ -124,6 +130,9 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, u
 		std::string format_files_path = "http://localhost:8080/tests/punkt/sh_slider_240x400/";
 		std::string punkt_url = "http://127.0.0.1:4249/";
 		
+		std::string showcase_dump;
+		rebuildClickLinks(_resp, showcase_dump);
+		
 		std::string format_renderer_bind = \
 		
 		"if (document._punkt_codes == null)\n"
@@ -133,7 +142,7 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, u
 		"	document._punkt_codes_post = {};\n"
 		"\n"
 		"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
-		"	var show = JSON.parse(\'" + _resp + "\');\n"
+		"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 		"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, '" + format_files_path + "');\n"
 		"}\n"
 		
@@ -202,6 +211,9 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint6
 			
 		}
 		
+		std::string showcase_dump;
+		rebuildClickLinks(_resp, showcase_dump);
+		
 		std::string format_renderer_bind = \
 		
 		"if (document._punkt_codes == null)\n"
@@ -211,7 +223,7 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint6
 		"	document._punkt_codes_post = {};\n"
 		"\n"
 		"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
-		"	var show = JSON.parse(\'" + _resp + "\');\n"
+		"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 		"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, '" +format_files_path+ "');\n"
 		"}\n"
 		

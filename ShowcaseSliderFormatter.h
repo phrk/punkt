@@ -21,6 +21,7 @@ public:
 class ShowcaseSliderFormatter : public Formatter {
 	HttpOutRequestDispPtr m_req_disp;
 	FileCachePtr m_jscache;
+	std::string m_punkt_url;
 	boost::function<HttpSrv::ConnectionPtr(int)> m_getConnById;
 	GeberdCliApiClientPtr m_geber_cli;
 
@@ -28,10 +29,13 @@ class ShowcaseSliderFormatter : public Formatter {
 	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
+	void rebuildClickLinks(const std::string &_showcase_dump_in, const std::string &_showcase_dump_out);
+	
 public:
 	
 	ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 							FileCachePtr _jscache,
+							const std::string &_punkt_url,
 							boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 							GeberdCliApiClientPtr _geber_cli);
 	
