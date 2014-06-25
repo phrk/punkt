@@ -7,6 +7,7 @@ ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nr
 
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 						FileCachePtr _jscache,
+						const std::string &_punkt_url,
 						boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 						GeberdCliApiClientPtr _geber_cli):
 	m_req_disp(_req_disp),
@@ -84,9 +85,14 @@ void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::
 	m_req_disp->addRequester(requester);
 }
 
-void ShowcaseSliderFormatter::rebuildClickLinks(const std::string &_showcase_dump_in, const std::string &_showcase_dump_out) {
-	
-	_showcase_dump_out = _showcase_dump_in;
+void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid) {
+		
+	for (int i = 0; i<_show.items.size(); i++) {
+		std::string aim = _show.items[i].clickurl;
+		escapeUrl(aim);
+		_show.items[i].clickurl = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
+			uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_show.items[i].id) + "&aim=" + aim;
+	}
 }
 
 void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp) {
@@ -94,8 +100,10 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, u
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
 	if (conn) {
 		
-		GeberdCliApiClient::ShowcaseInst show;
+		ShowcaseInstance show;		
+		show.buildFromPb(_resp);
 		
+		/*
 		try {
 			m_geber_cli->parseResponse(_resp, show);
 		}
@@ -104,7 +112,7 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, u
 			std::cout << "ShowcaseSimpleFormatter::onCalledGeberOk could not parse geber response: " << _resp << std::endl; 
 			conn->close();
 			return;
-		}
+		}*/
 		
 		std::string slider_events;
 		std::string render_slider;
@@ -128,10 +136,11 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, u
 		}
 		
 		std::string format_files_path = "http://localhost:8080/tests/punkt/sh_slider_240x400/";
-		std::string punkt_url = "http://127.0.0.1:4249/";
+		//std::string punkt_url = "http://127.0.0.1:4249/";
 		
 		std::string showcase_dump;
-		rebuildClickLinks(_resp, showcase_dump);
+		rebuildClickLinks(show, _pid, _adid);
+		show.dumpJson(showcase_dump);
 		
 		std::string format_renderer_bind = \
 		
@@ -147,7 +156,7 @@ void ShowcaseSliderFormatter::onCalledGeberOkDemo (int _connid, uint64_t _pid, u
 		"}\n"
 		
 		"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"
-		"	buildSlider('" + uint64_to_string(_pid) + "', true, '" +punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
+		"	buildSlider('" + uint64_to_string(_pid) + "', true, '" +m_punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
 		"} \n";
 		
 		std::string resp = \		
@@ -175,9 +184,11 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint6
 	HttpSrv::ConnectionPtr conn = m_getConnById(_connid);
 	if (conn) {
 		
-		GeberdCliApiClient::ShowcaseInst show;
+		ShowcaseInstance show;
 		
-		try {
+		show.buildFromPb(_resp);
+		
+		/*try {
 			m_geber_cli->parseResponse(_resp, show);
 		}
 		catch (...) {
@@ -185,7 +196,7 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint6
 			std::cout << "ShowcaseSimpleFormatter::onCalledGeberOk could not parse geber response: " << _resp << std::endl; 
 			conn->close();
 			return;
-		}
+		}*/
 		
 		std::string slider_events;
 		std::string render_slider;
@@ -193,7 +204,7 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint6
 		std::string slider;
 		
 		std::string format_files_path = "http://localhost:8080/tests/punkt/sh_slider_240x400/";
-		std::string punkt_url = "http://127.0.0.1:4249/";
+		//std::string punkt_url = "http://127.0.0.1:4249/";
 		
 		if (!m_jscache->getFile("ShowcaseSliderEvents.js", slider_events)) {
 			std::cout << "ShowcaseSliderFormatter::onCalledGeberOkDemo ShowcaseSliderEvents.js not loaded in cache  \n";
@@ -212,7 +223,8 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint6
 		}
 		
 		std::string showcase_dump;
-		rebuildClickLinks(_resp, showcase_dump);
+		rebuildClickLinks(show, _pid, _adid);
+		show.dumpJson(showcase_dump);
 		
 		std::string format_renderer_bind = \
 		
@@ -228,7 +240,7 @@ void ShowcaseSliderFormatter::onCalledGeberOk (int _connid, uint64_t _pid, uint6
 		"}\n"
 		
 		"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"
-		"	buildSlider('" + uint64_to_string(_pid) + "', false, '" +punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
+		"	buildSlider('" + uint64_to_string(_pid) + "', false, '" +m_punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
 		"} \n";
 		
 		std::string resp;
@@ -268,7 +280,26 @@ void ShowcaseSliderFormatter::handleItemsShowEvent(HttpSrv::ConnectionPtr _conn,
 
 void ShowcaseSliderFormatter::handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleClickEvent\" }");
+	std::string aim;
+	
+	if (!_req->getField("aim", aim)) {
+		
+	}
+	
+	std::string resp =
+	"<!DOCTYPE HTML>"
+		"<html>"
+		"<head>"
+		" <title>Перенаправление</title>"
+		"</head>"
+		"<body>"
+				"Если вы не перенаправлены автоматически, проследуйте <a href=\'" + aim + "\'>по этой ссылке</a>"
+		"</body>"
+	"</html>";
+	
+	_conn->setHttpStatus(302); // Found
+	_conn->addHeader("Location: " + aim);
+	_conn->sendResponse(resp);
 }
 
 void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {

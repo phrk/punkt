@@ -1,6 +1,6 @@
 #include "punktd.h"
 
-void onFinished() {
+void Punktd::onFinished() {
 
 }
 
@@ -14,6 +14,7 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	
 	std::vector<std::string> required_params;
 	required_params.push_back("listen_port");
+	required_params.push_back("punkt_url");
 	required_params.push_back("geberd_url");
 	
 	required_params.push_back("reload_period");
@@ -38,7 +39,7 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	return ret;
 }
 
-void Punktd::bindFormatters() {
+void Punktd::bindFormatters(const std::string &_punkt_url) {
 	{
 		FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
 		m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
@@ -50,7 +51,7 @@ void Punktd::bindFormatters() {
 		m_jscache->addFile("slider.js", "js/buildSlider.js");
 		m_jscache->addFile("ShowcaseSliderEvents.js", "js/ShowcaseSliderEvents.js");
 		
-		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp, m_jscache, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
+		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp, m_jscache, _punkt_url, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);
 		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_FORMATTER_ID, f));
 	}
@@ -193,7 +194,7 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_punkt.reset(new Punkt());
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
-	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&onFinished)));
+	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));
 	
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 	
@@ -203,7 +204,7 @@ Punktd::Punktd(const std::string &_config_file) {
 
 	//m_punkt.reset(new Punkt(boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1)));
 							
-	bindFormatters();
+	bindFormatters(_config["punkt_url"]);
 	std::cout << "Formatters binded\n";
 	loadAds();
 	std::cout << "Ads loaded\n";

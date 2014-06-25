@@ -9,6 +9,7 @@
 
 #include <jansson.h>
 
+#include "showcase.h"
 
 class ShowcaseSliderFormatterArgs: public FormatterArgs {
 public:
@@ -29,7 +30,7 @@ class ShowcaseSliderFormatter : public Formatter {
 	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
-	void rebuildClickLinks(const std::string &_showcase_dump_in, const std::string &_showcase_dump_out);
+	void rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid);
 	
 public:
 	

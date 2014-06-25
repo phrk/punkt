@@ -15,9 +15,10 @@ b.addPath(hicore_path)
 b.addPath(hiaux_path)
 
 b.connectLib(hicore_path+"geber/cpp-client/")
+b.addPath(hicore_path+"geber/")
+b.connectLib(hicore_path+"geber/")
 
 b.addPath("./")
-b.addPath(hiaux_path+"hiaux/hpoolserver/")
 
 b.addPath(hiaux_path+"hiaux/structs/")
 b.connectLib(hiaux_path+"hiaux/loadconf/")
@@ -32,7 +33,7 @@ b.addCppGlob("*.cpp")
 b.addCppGlob("*.pb.cc")
 
 
-b.addLinkFlags(["-lprotobuf", "-ljansson", "-lpq", "-lecl",
+b.addLinkFlags(["-lprotobuf", "-ljansson", "-lpq", 
     "-L/usr/local/lib/"])
 
 b.build(Program)
