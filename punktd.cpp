@@ -16,6 +16,7 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	required_params.push_back("listen_port");
 	required_params.push_back("punkt_url");
 	required_params.push_back("geberd_url");
+	required_params.push_back("zeit_url");
 	
 	required_params.push_back("reload_period");
 	
@@ -57,6 +58,7 @@ void Punktd::bindFormatters(const std::string &_punkt_url) {
 													_punkt_url,
 													boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1),
 													m_geber_acli,
+													m_zeit_acli,
 													boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1) ));
 																								
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);
@@ -212,6 +214,7 @@ Punktd::Punktd(const std::string &_config_file) {
 //	m_geber_cli.reset(new GeberdCliApiClient(_config["geberd_url"]));
 	
 	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
+	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
 	
 	m_srv.reset(new HttpSrv(m_srv_tasklauncher,
 							HttpSrv::ResponseInfo("text/html; charset=utf-8", "punktd"),

@@ -16,7 +16,7 @@
 
 #include "punkt_consts.h"
 
-#include "zeit_client.h"
+#include "zeit_client_async.h"
 
 class ShowcaseSliderFormatterArgs: public FormatterArgs {
 public:
@@ -34,7 +34,8 @@ class ShowcaseSliderFormatter : public Formatter {
 	//GeberdCliApiClientPtr m_geber_cli;
 
 	GeberdCliApiClientAsyncPtr m_geber_acli;
-
+	ZeitClientAsyncPtr m_zeit_acli;
+		
 	boost::function<uint64_t(uint64_t)> m_getAdOwner;
 
 	void handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
@@ -50,6 +51,7 @@ public:
 							const std::string &_punkt_url,
 							boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 							GeberdCliApiClientAsyncPtr _geber_acli,
+							ZeitClientAsyncPtr _zeit_acli,
 							boost::function<uint64_t(uint64_t)> _getAdOwner);
 	
 	void onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid);
@@ -60,8 +62,7 @@ public:
 	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
 	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
-	void onCalledZeitOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
-	void onCalledZeitFail (int _connid);
+	void onCalledZeit (bool _success);
 	
 	//void onCalledGeberOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
 	//void onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);

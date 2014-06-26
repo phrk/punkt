@@ -10,12 +10,14 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 						const std::string &_punkt_url,
 						boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 						GeberdCliApiClientAsyncPtr _geber_acli,
+						ZeitClientAsyncPtr _zeit_acli,
 						boost::function<uint64_t(uint64_t)> _getAdOwner):
 	m_req_disp(_req_disp),
 	m_jscache(_jscache),
 	m_punkt_url(_punkt_url),
 	m_getConnById(_getConnById),
 	m_geber_acli(_geber_acli),
+	m_zeit_acli(_zeit_acli),
 	m_getAdOwner(_getAdOwner) {
 	
 }
@@ -247,8 +249,9 @@ void ShowcaseSliderFormatter::handleShowDispEvent(HttpSrv::ConnectionPtr _conn, 
 	
 	// call zeit
 	
+	m_zeit_acli->mergeCounter(owner_ads_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+	
 	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
-	_conn->close();
 }
 
 void ShowcaseSliderFormatter::handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
@@ -278,6 +281,32 @@ void ShowcaseSliderFormatter::handleClickEvent(HttpSrv::ConnectionPtr _conn, Htt
 	_conn->setHttpStatus(302); // Found
 	_conn->addHeader("Location: " + aim);
 	_conn->sendResponse(resp);
+	
+	std::string pid_str;
+	std::string adid_str;
+	//uint64_t pid;
+	uint64_t ad_owner;
+	
+	if (!_req->getField("pid", pid_str)) {
+		return;
+	}
+	
+	if (!_req->getField("adid", adid_str)) {
+		return;
+	}
+	
+	try {
+		ad_owner = m_getAdOwner(string_to_uint64(adid_str)) ;
+		
+	} catch (...) {
+		return;
+	}
+	
+	std::string owner_ads_counter = "owners:owner_ads-" + uint64_to_string(ad_owner)
+		+ ":ad-" + adid_str 
+		+ ":clicks:place-" + pid_str;
+	
+	m_zeit_acli->mergeCounter(owner_ads_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 }
 
 void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
@@ -310,11 +339,9 @@ void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, Ht
 	_conn->close();
 }
 
-void ShowcaseSliderFormatter::onCalledZeitOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp) {
+void ShowcaseSliderFormatter::onCalledZeit (bool _success) {
 	
+	if (!_success)
+		std::cout << "zeit call fail" << std::endl;
 }
 
-void ShowcaseSliderFormatter::onCalledZeitFail (int _connid) {
-	std::cout << "ShowcaseSimpleFormatter::onCalledZeitFail\n";
-
-}

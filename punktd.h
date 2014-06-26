@@ -30,6 +30,8 @@ private:
 	HttpOutRequestDispPtr m_req_disp;
 	//GeberdCliApiClientPtr m_geber_cli;
 	GeberdCliApiClientAsyncPtr m_geber_acli;
+	ZeitClientAsyncPtr m_zeit_acli;
+	
 	PGconn *m_pg;
 	
 	FileCachePtr m_jscache;
