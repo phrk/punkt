@@ -1,10 +1,11 @@
 #ifndef _SHOWCASE_SIMPLE_FORMATTER_H_
 #define _SHOWCASE_SIMPLE_FORMATTER_H_
 
+/*
 #include "geber/cpp-client/GeberdCliApiClient.h"
 #include "hiaux/network/HttpOutReqDisp.h"
 #include "formatter.h"
-#include "ShowcaseSimpleRequester.h"
+//#include "ShowcaseSimpleRequester.h"
 #include <jansson.h>
 
 class ShowcaseSimpleFormatterArgs: public FormatterArgs {
@@ -36,5 +37,5 @@ public:
 };
 
 typedef boost::shared_ptr<ShowcaseSimpleFormatter> ShowcaseSimpleFormatterPtr;
-
+*/
 #endif

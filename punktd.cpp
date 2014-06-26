@@ -41,17 +41,24 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 
 void Punktd::bindFormatters(const std::string &_punkt_url) {
 	{
-		FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
-		m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
-		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SIMPLE_FORMATTER_ID, f));
+//		FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
+//		m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
+//		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SIMPLE_FORMATTER_ID, f));
 	}
 	{
+
 		m_jscache->addFile("renderShowcaseSlider.js", "js/renderShowcaseSlider.js");
 		m_jscache->addFile("mootools", "js/mootools-core-1.5.0.js");
 		m_jscache->addFile("slider.js", "js/buildSlider.js");
 		m_jscache->addFile("ShowcaseSliderEvents.js", "js/ShowcaseSliderEvents.js");
 		
-		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp, m_jscache, _punkt_url, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
+		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp,
+													m_jscache,
+													_punkt_url,
+													boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1),
+													m_geber_acli,
+													boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1) ));
+																								
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);
 		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_FORMATTER_ID, f));
 	}
@@ -83,6 +90,7 @@ void Punktd::loadAds() {
 	uint64_t id;
 	uint64_t format_id;
 	std::string formatter_args;
+	uint64_t ad_owner;
 	
 	for (int t = 0; t<ntuples; t++) {	
 		for (int c = 0; c < ncols; c++) {
@@ -90,7 +98,11 @@ void Punktd::loadAds() {
 			if (std::string("id") == PQfname(res, c)) {
 				id = string_to_uint64( PQgetvalue(res, t, c) );
 			}
-		
+			
+			if (std::string("ad_owner") == PQfname(res, c)) {
+				ad_owner = string_to_uint64( PQgetvalue(res, t, c) );
+			}
+			
 			if (std::string("format_id") == PQfname(res, c)) {
 				format_id = string_to_uint64( PQgetvalue(res, t, c) );
 			}
@@ -98,7 +110,7 @@ void Punktd::loadAds() {
 				formatter_args = PQgetvalue(res, t, c);
 			}
 		}
-		AdPtr ad (new Ad(id, format_id, formatter_args));
+		AdPtr ad (new Ad(id, format_id, ad_owner, formatter_args));
 		m_punkt->updateAd(ad);
 	}
 	
@@ -189,14 +201,17 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_jscache.reset(new FileCache);
 	
-	m_geber_cli.reset(new GeberdCliApiClient(_config["geberd_url"]));
-	
+
 	m_punkt.reset(new Punkt());
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
 	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));
 	
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
+
+//	m_geber_cli.reset(new GeberdCliApiClient(_config["geberd_url"]));
+	
+	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
 	
 	m_srv.reset(new HttpSrv(m_srv_tasklauncher,
 							HttpSrv::ResponseInfo("text/html; charset=utf-8", "punktd"),

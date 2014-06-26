@@ -188,3 +188,19 @@ void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) 
 	
 	handlePlace(string_to_uint64(pid_str), _conn, _req);
 }
+
+uint64_t Punkt::getAdOwner(uint64_t _adid) {
+	
+	uint64_t ownerid;
+	{
+		hLockTicketPtr ticket = lock.lock();
+		hiaux::hashtable<uint64_t, AdPtr>::iterator it = m_ads.find(_adid);
+		if (it == m_ads.end()) {
+			std::cout << "Punkt::getAdOwner unknown ad: " << _adid << std::endl;
+			throw "Punkt::getAdOwner unknown ad"; 
+		}
+		
+		ownerid = it->second->ownerid;
+	}
+	return ownerid;
+}

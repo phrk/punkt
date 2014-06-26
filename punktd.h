@@ -28,7 +28,8 @@ private:
 	HttpSrvPtr m_srv;
 	PunktPtr m_punkt;
 	HttpOutRequestDispPtr m_req_disp;
-	GeberdCliApiClientPtr m_geber_cli;
+	//GeberdCliApiClientPtr m_geber_cli;
+	GeberdCliApiClientAsyncPtr m_geber_acli;
 	PGconn *m_pg;
 	
 	FileCachePtr m_jscache;

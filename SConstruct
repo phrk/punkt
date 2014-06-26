@@ -18,6 +18,9 @@ b.connectLib(hicore_path+"geber/cpp-client/")
 b.addPath(hicore_path+"geber/")
 b.connectLib(hicore_path+"geber/")
 
+b.addPath(hicore_path+"zeit/cpp-client/")
+b.connectLib(hicore_path+"zeit/cpp-client/")
+
 b.addPath("./")
 
 b.addPath(hiaux_path+"hiaux/structs/")

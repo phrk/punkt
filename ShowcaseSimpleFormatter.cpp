@@ -1,5 +1,6 @@
 #include "ShowcaseSimpleFormatter.h"
 
+/*
 ShowcaseSimpleFormatterArgs::ShowcaseSimpleFormatterArgs(uint64_t _shid, int _nres):
 	shid(_shid),
 	nres(_nres) {
@@ -180,3 +181,4 @@ void ShowcaseSimpleFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, Ht
 	
 	_conn->close();
 }
+*/
