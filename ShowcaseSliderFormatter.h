@@ -38,6 +38,7 @@ class ShowcaseSliderFormatter : public Formatter {
 		
 	boost::function<uint64_t(uint64_t)> m_getAdOwner;
 
+	// Events
 	void handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
@@ -60,6 +61,7 @@ public:
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
 	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
 	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	
 	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
 	void onCalledZeit (bool _success);
