@@ -37,7 +37,8 @@ class ShowcaseSliderFormatter : public Formatter {
 	ZeitClientAsyncPtr m_zeit_acli;
 		
 	boost::function<uint64_t(uint64_t)> m_getAdOwner;
-
+	
+	std::string m_punkt_rsrc_url;
 	// Events
 	void handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
@@ -50,6 +51,7 @@ public:
 	ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 							FileCachePtr _jscache,
 							const std::string &_punkt_url,
+							const std::string &_punkt_rsrc_url,
 							boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 							GeberdCliApiClientAsyncPtr _geber_acli,
 							ZeitClientAsyncPtr _zeit_acli,

@@ -8,6 +8,7 @@ ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nr
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 						FileCachePtr _jscache,
 						const std::string &_punkt_url,
+						const std::string &_punkt_rsrc_url,
 						boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 						GeberdCliApiClientAsyncPtr _geber_acli,
 						ZeitClientAsyncPtr _zeit_acli,
@@ -15,6 +16,7 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 	m_req_disp(_req_disp),
 	m_jscache(_jscache),
 	m_punkt_url(_punkt_url),
+	m_punkt_rsrc_url(_punkt_rsrc_url),
 	m_getConnById(_getConnById),
 	m_geber_acli(_geber_acli),
 	m_zeit_acli(_zeit_acli),
@@ -100,7 +102,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		
 	}
 	
-	std::string format_files_path = "http://localhost:8080/tests/punkt/sh_slider_240x400/";
+	std::string format_files_path = m_punkt_rsrc_url + "sh_slider_240x400/";
 	//std::string punkt_url = "http://127.0.0.1:4249/";
 	
 	std::string showcase_dump;
@@ -156,7 +158,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	std::string mootools;
 	std::string slider;
 	
-	std::string format_files_path = "http://localhost:8080/tests/punkt/sh_slider_240x400/";
+	std::string format_files_path = m_punkt_rsrc_url + "sh_slider_240x400/";
 	//std::string punkt_url = "http://127.0.0.1:4249/";
 	
 	if (!m_jscache->getFile("ShowcaseSliderEvents.js", slider_events)) {

@@ -15,6 +15,7 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	std::vector<std::string> required_params;
 	required_params.push_back("listen_port");
 	required_params.push_back("punkt_url");
+	required_params.push_back("punkt_rsrc_url");
 	required_params.push_back("geberd_url");
 	required_params.push_back("zeit_url");
 	
@@ -40,7 +41,7 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	return ret;
 }
 
-void Punktd::bindFormatters(const std::string &_punkt_url) {
+void Punktd::bindFormatters(const std::string &_punkt_url, const std::string &_punkt_rsrc_url) {
 	{
 //		FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
 //		m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
@@ -56,6 +57,7 @@ void Punktd::bindFormatters(const std::string &_punkt_url) {
 		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp,
 													m_jscache,
 													_punkt_url,
+													_punkt_rsrc_url,
 													boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1),
 													m_geber_acli,
 													m_zeit_acli,
@@ -222,7 +224,7 @@ Punktd::Punktd(const std::string &_config_file) {
 
 	//m_punkt.reset(new Punkt(boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1)));
 							
-	bindFormatters(_config["punkt_url"]);
+	bindFormatters(_config["punkt_url"], _config ["punkt_rsrc_url"]);
 	std::cout << "Formatters binded\n";
 	loadAds();
 	std::cout << "Ads loaded\n";
