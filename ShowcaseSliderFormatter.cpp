@@ -80,7 +80,13 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		_conn->close();
 		return;
 	}
-				
+	
+	if (_show.items.size()<3) {
+		
+		_conn->sendResponse("<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>");
+		_conn->close();
+	}
+	
 	std::string slider_events;
 	std::string render_slider;
 	std::string mootools;
