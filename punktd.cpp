@@ -13,6 +13,9 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	hiaux::hashtable<std::string,std::string> ret;
 	
 	std::vector<std::string> required_params;
+	required_params.push_back("systemid");
+	required_params.push_back("replid");
+	
 	required_params.push_back("listen_port");
 	required_params.push_back("punkt_url");
 	required_params.push_back("punkt_rsrc_url");
@@ -206,7 +209,7 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_jscache.reset(new FileCache);
 	
 
-	m_punkt.reset(new Punkt());
+	m_punkt.reset(new Punkt( _config ["systemid"],  _config ["replid"]));
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
 	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));

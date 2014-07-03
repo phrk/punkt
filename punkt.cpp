@@ -1,5 +1,12 @@
 #include "punkt.h"
 
+Punkt::Punkt(const std::string &_systemid,
+	const std::string &_replid):
+	m_systemid(_systemid),
+	m_replid(_replid) {
+		
+}
+
 void Punkt::updateAd(AdPtr _ad) {
 	
 	hLockTicketPtr ticket = lock.lock();
@@ -164,6 +171,12 @@ void Punkt::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, 
 }
 
 void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	//_conn->setCookie("punkt_systemid_vid", "zhi est'");
+	
+	//std::string id;
+	//_req->getCookie("punkt_systemid_vid", id);
+	//std::cout << "id: " << id << std::endl;
 	
 	std::string demo_str;
 	if (_req->getField("demo", demo_str)) {

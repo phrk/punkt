@@ -27,9 +27,15 @@ private:
 	
 	hAutoLock lock;
 
+	std::string m_systemid;
+	std::string m_replid;
+
 	void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 
 public:
+	
+	Punkt(const std::string &_systemid,
+		const std::string &_replid);
 	
 	void updateAd(AdPtr _ad);
 	void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);
