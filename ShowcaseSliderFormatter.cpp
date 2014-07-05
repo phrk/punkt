@@ -1,8 +1,9 @@
 #include "ShowcaseSliderFormatter.h"
 
-ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nres):
+ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems, const std::string &_json_dump):
 	shid(_shid),
-	nres(_nres) {
+	nitems(_nitems),
+	json_dump(_json_dump) {
 }
 
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
@@ -26,6 +27,8 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 
 FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js) {
 
+	std::cout << "ShowcaseSliderFormatter::parseArgs " <<  _args_js << std::endl;
+
 	uint64_t shid;
 	int nitems;
 	
@@ -39,28 +42,31 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse shid\n";
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse shid";
 	}
-	json_t *j_n = json_object_get(root, "n");
-	if (json_is_integer(j_n)) {
-		nitems = json_integer_value(j_n);
+	json_t *j_nitems = json_object_get(root, "nitems");
+	if (json_is_integer(j_nitems)) {
+		nitems = json_integer_value(j_nitems);
 	} else {
-		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse n\n";
-		throw "ShowcaseSimpleFormatter::parseArgs could not parse n";
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse nitems\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse nitems";
 	}
+	
+	
+	
 	json_decref(root);
 	
-	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems));
+	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, _args_js));
 }
 
 void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
-	m_geber_acli->getShowcase(args->shid, args->nres, boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _conn, _pid, _adid));
+	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _conn, _pid, _adid, _args));
 }
 
 void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
-	m_geber_acli->getShowcase(args->shid, args->nres, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _conn, _pid, _adid));
+	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _conn, _pid, _adid, _args));
 }
 
 void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid) {
@@ -73,7 +79,8 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show, uint64_
 	}
 }
 
-void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid) {
+void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn,
+						uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	if (!_success) {
 		
@@ -86,6 +93,8 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		_conn->sendResponse("<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>");
 		_conn->close();
 	}
+	
+	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
 	
 	std::string slider_events;
 	std::string render_slider;
@@ -125,7 +134,8 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	"\n"
 	"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
-	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, '" + format_files_path + "');\n"
+	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
+	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "');\n"
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"
@@ -151,14 +161,17 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	_conn->close();
 }
 
-void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid) {
+void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, 
+								uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
 	
 	if (!_success) {
 		
 		_conn->close();
 		return;
 	}
-		
+	
+	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();	
+	
 	std::string slider_events;
 	std::string render_slider;
 	std::string mootools;
@@ -197,7 +210,8 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	"\n"
 	"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
-	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, '" +format_files_path+ "');\n"
+	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
+	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "');\n"
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"

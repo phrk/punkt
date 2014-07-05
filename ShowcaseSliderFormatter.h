@@ -21,9 +21,11 @@
 class ShowcaseSliderFormatterArgs: public FormatterArgs {
 public:
 	uint64_t shid;
-	int nres;
+	int nitems;
 	
-	ShowcaseSliderFormatterArgs(uint64_t _shid, int _nres);
+	std::string json_dump;
+	
+	ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems, const std::string &_json_dump);
 };
 
 class ShowcaseSliderFormatter : public Formatter {
@@ -57,8 +59,8 @@ public:
 							ZeitClientAsyncPtr _zeit_acli,
 							boost::function<uint64_t(uint64_t)> _getAdOwner);
 	
-	void onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid);
-	void onGotShowcaseDemo(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid);
+	void onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	void onGotShowcaseDemo(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
 	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
