@@ -191,6 +191,8 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	hiaux::hashtable<std::string,std::string> _config = parseConfig(_config_file);
 	
+	std::cout << "Config loaded\n";
+	
 	m_reload_period = string_to_uint64(_config["reload_period"]);
 	
 	m_pg  = PQsetdbLogin(_config["pg_ip"].c_str(),
@@ -205,6 +207,8 @@ Punktd::Punktd(const std::string &_config_file) {
 		std::cout << "Could not connect to db";
 		exit(0);
 	}
+	
+	std::cout << "Connected to db\n";
 	
 	m_jscache.reset(new FileCache);
 	
