@@ -12,7 +12,7 @@ int main (int argc, char** argv) {
 	//std::cout << "nargs: " << argc << " confif: " << argv[1] << std::endl <<  std::endl;
 	
 	pid_t pid = getpid();
-	
+		
 	std::ofstream pidfile("punkt.pid");
 	pidfile << pid << std::endl;
 	pidfile.close();

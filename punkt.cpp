@@ -111,6 +111,12 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 			return;
 		}
 	
+		if (pit->second->ads.size()==0) {
+			_conn->sendResponse("{ \"status\" : \"no targets\" }");
+			_conn->close();
+			return;
+		}
+	
 		AdPtr ad = pit->second->ads[ rand() % pit->second->ads.size() ];
 	
 		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(ad->format_id);
