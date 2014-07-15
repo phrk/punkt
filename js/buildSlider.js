@@ -24,7 +24,7 @@ function buildSlider(pid, isdemo, punkturl, adid) {
 	        if(Math.abs(t - x) <= dx) return c.scrollLeft = t;
 	        if(t > x) c.scrollLeft = x + dx;
 	        else c.scrollLeft = x - dx;
-	        setTimeout(function(){self.prettyScroll(t, mid)},20);
+	        setTimeout(function(){self.prettyScroll(t, mid)},3);
 	    };
 	    // Add functions to left&right buttons
 	    left.addEventListener('click',function(){
