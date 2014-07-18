@@ -22,10 +22,14 @@ class ShowcaseSliderFormatterArgs: public FormatterArgs {
 public:
 	uint64_t shid;
 	int nitems;
+	hiaux::hashtable<std::string, std::string> partner_ids;
 	
 	std::string json_dump;
 	
-	ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems, const std::string &_json_dump);
+	ShowcaseSliderFormatterArgs(uint64_t _shid,
+								int _nitems,
+								hiaux::hashtable<std::string, std::string> partner_ids,
+								const std::string &_json_dump);
 };
 
 class ShowcaseSliderFormatter : public Formatter {
@@ -70,9 +74,6 @@ public:
 	
 	void onCalledZeit (bool _success);
 	
-	//void onCalledGeberOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
-	//void onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
-	//void onCalledGeberFail (int _connid);
 };
 
 typedef boost::shared_ptr<ShowcaseSliderFormatter> ShowcaseSliderFormatterPtr;

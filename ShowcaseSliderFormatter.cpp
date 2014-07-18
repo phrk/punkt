@@ -31,6 +31,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 
 	uint64_t shid;
 	int nitems;
+	hiaux::hashtable<std::string, std::string> partner_ids;
 	
 	json_error_t error;
 	json_t *root = json_loads(_args_js.c_str(), 0, &error);
@@ -42,6 +43,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse shid\n";
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse shid";
 	}
+	
 	json_t *j_nitems = json_object_get(root, "nitems");
 	if (json_is_integer(j_nitems)) {
 		nitems = json_integer_value(j_nitems);
@@ -50,7 +52,21 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse nitems";
 	}
 	
-	
+	json_t *j_partner_ids = json_object_get(root, "partner_ids");
+	if (json_is_object(j_partner_ids)) {
+		
+		json_t *j_ozon_partnerid = json_object_get(j_partner_ids, "ozon");
+		if (json_is_string(j_ozon_partnerid))
+			partner_ids["ozon"] = json_string_value(j_ozon_partnerid);
+		
+		json_t *j_wikimart_partnerid = json_object_get(j_partner_ids, "wikimart");
+		if (json_is_string(j_wikimart_partnerid))
+			partner_ids["wikimart"] = json_string_value(j_wikimart_partnerid);
+		
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse partner_ids\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse partner_ids";
+	}
 	
 	json_decref(root);
 	
@@ -72,9 +88,9 @@ void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::
 void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid) {
 		
 	for (int i = 0; i<_show.items.size(); i++) {
-		std::string aim = _show.items[i].clickurl;
+		std::string aim = _show.items[i].directurl;
 		escapeUrl(aim);
-		_show.items[i].clickurl = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
+		_show.items[i].directurl = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
 			uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_show.items[i].id) + "&aim=" + aim;
 	}
 }

@@ -29,9 +29,9 @@ function renderShowcaseSlider (pid, show, formatter_args, format_files_path) {
 	
 		ret += '<tr>';
 		ret += '<td>';
-		ret += '<a href=' + show.items[i].clickurl + '><img src=' + show.items[i].imgurl + ' width=100px height=100px></a>';
+		ret += '<a href=' + show.items[i].directurl + '><img src=' + show.items[i].imgurl + ' width=100px height=100px></a>';
 		ret += '</td>';
-		ret += '<td><a href=' + show.items[i].clickurl + ' style="font-family:serif; font-size:12pt; color:' + formatter_args.textcolor 
+		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:serif; font-size:12pt; color:' + formatter_args.textcolor 
 				+ ';  word-wrap: break-word;" >';
 		ret += show.items[i].caption + "<br>";
 		ret += '<p style="color:' + formatter_args.pricecolor + '; text-decoration:none;">' + show.items[i].price + 'руб </p>';
