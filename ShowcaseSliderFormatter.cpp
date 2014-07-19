@@ -1,8 +1,10 @@
 #include "ShowcaseSliderFormatter.h"
 
-ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems, const std::string &_json_dump):
+ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems,
+	 hiaux::hashtable<std::string, std::string> _partner_ids, const std::string &_json_dump):
 	shid(_shid),
 	nitems(_nitems),
+	partner_ids(_partner_ids),
 	json_dump(_json_dump) {
 }
 
@@ -62,7 +64,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 		json_t *j_wikimart_partnerid = json_object_get(j_partner_ids, "wikimart");
 		if (json_is_string(j_wikimart_partnerid))
 			partner_ids["wikimart"] = json_string_value(j_wikimart_partnerid);
-		
+				
 	} else {
 		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse partner_ids\n";
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse partner_ids";
@@ -70,7 +72,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	
 	json_decref(root);
 	
-	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, _args_js));
+	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, _args_js));
 }
 
 void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
@@ -97,7 +99,10 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show, uint64_
 
 void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn,
 						uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
-	
+
+
+	_conn->addHeader("Access-Control-Allow-Origin: http://localhost:8080");
+
 	if (!_success) {
 		
 		_conn->close();
@@ -169,8 +174,25 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	resp += mootools;
 	resp += slider;
 	resp += format_renderer_bind + 
-		"document.getElementById(\"punkt_place_0\").innerHTML = document._punkt_codes[\"0\"]();\n"
+		"document.punkt_rsrc_url = \"" + m_punkt_rsrc_url + "\";\n"
+		"var place = document.getElementById(\"punkt_place_0\");\n"
+		"place.innerHTML = document._punkt_codes[\"0\"]();\n"
 		"document._punkt_codes_post[\"0\"]();\n"
+		"xmlHttp = new XMLHttpRequest();\n"
+		"xmlHttp.open(\"GET\", \""+ m_punkt_rsrc_url +"vkauth.html\", false);\n"
+		"xmlHttp.send(null);\n"
+		"var au = document.createElement('div');\n"
+		"au.innerHTML = xmlHttp.responseText;\n"
+		"place.appendChild(au);\n"
+		"\n"
+		"var head = document.getElementsByTagName('head')[0];\n"
+		"var script = document.createElement('script');\n"
+		"script.type = 'text/javascript';\n"
+		"script.onload = function () {\n"
+		"	authVk();\n"
+		"}\n"
+		"script.src =\"" + m_punkt_rsrc_url + "vkauth.js\";\n"
+		"head.appendChild(script);\n"
 		"</script>";
 	
 	_conn->sendResponse(resp);

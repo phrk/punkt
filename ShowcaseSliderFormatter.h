@@ -28,7 +28,7 @@ public:
 	
 	ShowcaseSliderFormatterArgs(uint64_t _shid,
 								int _nitems,
-								hiaux::hashtable<std::string, std::string> partner_ids,
+								hiaux::hashtable<std::string, std::string> _partner_ids,
 								const std::string &_json_dump);
 };
 
