@@ -1,10 +1,13 @@
 #include "ShowcaseSliderFormatter.h"
 
 ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems,
-	 hiaux::hashtable<std::string, std::string> _partner_ids, const std::string &_json_dump):
+	 const hiaux::hashtable<std::string, std::string> &_partner_ids,
+	 const hiaux::hashtable<std::string, std::string> &_click_templates,
+	 const std::string &_json_dump):
 	shid(_shid),
 	nitems(_nitems),
 	partner_ids(_partner_ids),
+	click_templates(_click_templates),
 	json_dump(_json_dump) {
 }
 
@@ -34,6 +37,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	uint64_t shid;
 	int nitems;
 	hiaux::hashtable<std::string, std::string> partner_ids;
+	hiaux::hashtable<std::string, std::string> click_templates;
 	
 	json_error_t error;
 	json_t *root = json_loads(_args_js.c_str(), 0, &error);
@@ -70,9 +74,31 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse partner_ids";
 	}
 	
+	json_t *j_click_templates = json_object_get(root, "click_templates");
+	if (json_is_object(j_click_templates)) {
+		
+		json_t *j_ozon_click_template = json_object_get(j_click_templates, "ozon");
+		if (json_is_string(j_ozon_click_template)) {
+			std::string ozon_template (json_string_value(j_ozon_click_template));
+			if (ozon_template != "")
+				click_templates["ozon"] = ozon_template;
+		}
+		
+		json_t *j_wikimart_click_template = json_object_get(j_click_templates, "wikimart");
+		if (json_is_string(j_wikimart_click_template)) {
+			std::string wikimart_template(json_string_value(j_wikimart_click_template));
+			if (wikimart_template != "")
+				click_templates["wikimart"] = wikimart_template;
+		}
+				
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse click_templates\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse click_templates";
+	}
+	
 	json_decref(root);
 	
-	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, _args_js));
+	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, click_templates, _args_js));
 }
 
 void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
@@ -87,13 +113,60 @@ void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::
 	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _conn, _pid, _adid, _args));
 }
 
-void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid) {
+void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,
+													uint64_t _pid,
+													uint64_t _adid,
+													uint64_t _itemid,
+													const std::string _itemurl,
+													const hiaux::hashtable<std::string, std::string> &_click_templates,
+													std::string &_target) const {
+	
+	char clickid_c[256];
+	sprintf(clickid_c, "%llu_%llu_%llu", _pid, _adid, _itemid);
+	//std::string clickid(clickid_c);
+	std::string itemurl = _itemurl;
+	replaceSubstring(itemurl, "http://", "");
+	// prepare itemurl 
+	
+	hiaux::hashtable<std::string, std::string>::const_iterator it = _click_templates.find(_advid);
+	if (it == _click_templates.end()) {
+		std::cout << "ShowcaseSliderFormatter::renderClickTemplate click template not found for advid: " << _advid << " adid: " << _adid << std::endl;
+	}
+		
+	std::string aim = it->second;
+	
+	replaceSubstring(aim, "{target}", itemurl);
+	replaceSubstring(aim, "{clickid}", clickid_c);
+	
+	escapeUrl(aim);
+	_target = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
+					uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_itemid) + "&aim=" + aim;
+}
+
+void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
+												uint64_t _pid,
+												uint64_t _adid,
+												const hiaux::hashtable<std::string, std::string> &_click_templates) {
 		
 	for (int i = 0; i<_show.items.size(); i++) {
-		std::string aim = _show.items[i].directurl;
-		escapeUrl(aim);
-		_show.items[i].directurl = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
-			uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_show.items[i].id) + "&aim=" + aim;
+		
+		if (_click_templates.find(_show.items[i].advid) != _click_templates.end()) {
+			
+			renderClickTemplate(_show.items[i].advid,
+								_pid,
+								_adid,
+								_show.items[i].id,
+								_show.items[i].directurl,
+								_click_templates,
+								_show.items[i].directurl);
+			
+		} else {
+		
+			std::string aim = _show.items[i].directurl;
+			escapeUrl(aim);
+			_show.items[i].directurl = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
+				uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_show.items[i].id) + "&aim=" + aim;
+		}
 	}
 }
 
@@ -142,7 +215,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	//std::string punkt_url = "http://127.0.0.1:4249/";
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _pid, _adid);
+	rebuildClickLinks(_show, _pid, _adid, args->click_templates);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \
@@ -178,21 +251,6 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		"var place = document.getElementById(\"punkt_place_0\");\n"
 		"place.innerHTML = document._punkt_codes[\"0\"]();\n"
 		"document._punkt_codes_post[\"0\"]();\n"
-		"xmlHttp = new XMLHttpRequest();\n"
-		"xmlHttp.open(\"GET\", \""+ m_punkt_rsrc_url +"vkauth.html\", false);\n"
-		"xmlHttp.send(null);\n"
-		"var au = document.createElement('div');\n"
-		"au.innerHTML = xmlHttp.responseText;\n"
-		"place.appendChild(au);\n"
-		"\n"
-		"var head = document.getElementsByTagName('head')[0];\n"
-		"var script = document.createElement('script');\n"
-		"script.type = 'text/javascript';\n"
-		"script.onload = function () {\n"
-		"	authVk();\n"
-		"}\n"
-		"script.src =\"" + m_punkt_rsrc_url + "vkauth.js\";\n"
-		"head.appendChild(script);\n"
 		"</script>";
 	
 	_conn->sendResponse(resp);
@@ -235,7 +293,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	}
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _pid, _adid);
+	rebuildClickLinks(_show, _pid, _adid, args->click_templates);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \

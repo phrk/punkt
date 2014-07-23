@@ -41,8 +41,10 @@ private:
 	uint64_t m_reload_period;
 	
 	hiaux::hashtable<std::string,std::string> parseConfig(const std::string &_config_file);
+	
 	void fallDown(std::string _s);
-	void bindFormatters(const std::string &_punkt_url, const std::string &_punkt_rsrc_url);
+	void bindFormatters(const std::string &_punkt_url,
+						const std::string &_punkt_rsrc_url);
 	
 	void loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids);
 	void loadPlaces();

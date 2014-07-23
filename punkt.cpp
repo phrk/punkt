@@ -1,9 +1,11 @@
 #include "punkt.h"
 
 Punkt::Punkt(const std::string &_systemid,
-	const std::string &_replid):
+	const std::string &_replid,
+	const std::string &_punkt_rsrc_url):
 	m_systemid(_systemid),
-	m_replid(_replid) {
+	m_replid(_replid),
+	m_punkt_rsrc_url(_punkt_rsrc_url) {
 		
 }
 
@@ -162,6 +164,37 @@ void Punkt::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr 
 	format->handleFormatEvent(_conn, _req);
 }
 
+std::string Punkt::getVkAuthCode(const std::string &_domain) {
+	return "\n"
+	"xmlHttp = new XMLHttpRequest();\n"
+	"xmlHttp.open(\"GET\", \""+ m_punkt_rsrc_url +"vkauth.html\", false);\n"
+	"xmlHttp.send(null);\n"
+	"var au = document.createElement('div');\n"
+	"au.innerHTML = xmlHttp.responseText;\n"
+	"place.appendChild(au);\n"
+	"\n"
+	"var head = document.getElementsByTagName('head')[0];\n"
+	"var script = document.createElement('script');\n"
+	"script.type = 'text/javascript';\n"
+	"script.onload = function () {\n"
+	"	authVk();\n"
+	"}\n"
+	"script.src =\"" + m_punkt_rsrc_url + "vkauth.js\";\n"
+	"head.appendChild(script);\n";
+}
+
+/*
+void Punkt::genVid(std::string &_vid) const {
+	
+	char bf[128];
+	sprintf(bf, "v%llu_%llu",time(0), rand()%10000);
+	_vid = std::string(bf);
+}
+
+void Punkt::onVkProfile(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+		
+}
+*/
 void Punkt::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_evtype_str) {
 	
 	// format event
@@ -169,19 +202,24 @@ void Punkt::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, 
 		
 		handleFormatEvent(_conn, _req);
 		
-	} else if (_evtype_str == "gev") {
-	// general event
+	} else if (_evtype_str == "vkmatch") {
+		
 		
 	}
-	
 }
 
 void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	//_conn->setCookie("punkt_systemid_vid", "zhi est'");
 	
-	//std::string id;
-	//_req->getCookie("punkt_systemid_vid", id);
+	/*
+	std::string vid;
+	if (!_req->getCookie("punkt_vdid", vid)) {
+		
+		genVid(vid);
+		_conn->setCookie("punkt_vdid", vid);
+	}*/
+	
 	//std::cout << "id: " << id << std::endl;
 	
 	std::string demo_str;

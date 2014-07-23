@@ -6,4 +6,7 @@
 
 #define EMPTY_PLACE 0
 
+#define OZON_ADVID "ozon"
+#define WIKIMART_ADVID "wikimart"
+
 #endif

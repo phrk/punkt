@@ -13,6 +13,7 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	hiaux::hashtable<std::string,std::string> ret;
 	
 	std::vector<std::string> required_params;
+	std::vector<std::string> optional_params;
 	required_params.push_back("systemid");
 	required_params.push_back("replid");
 	
@@ -29,9 +30,9 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	required_params.push_back("pg_user");
 	required_params.push_back("pg_pass");
 	required_params.push_back("pg_db");
-	
+		
 	try {
-		ret = LoadConf::load(_config_file, required_params);
+		ret = LoadConf::load(_config_file, required_params, optional_params);
 	}
 	catch (const std::string s) {
 		fallDown(s);
@@ -44,14 +45,15 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	return ret;
 }
 
-void Punktd::bindFormatters(const std::string &_punkt_url, const std::string &_punkt_rsrc_url) {
+void Punktd::bindFormatters(const std::string &_punkt_url,
+							const std::string &_punkt_rsrc_url) {
 	{
 //		FormatterPtr f(new ShowcaseSimpleFormatter(m_req_disp, boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1), m_geber_cli));
 //		m_punkt->updateFormatter(SHOWCASE_SIMPLE_FORMATTER_ID, f);
 //		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SIMPLE_FORMATTER_ID, f));
 	}
 	{
-
+		
 		m_jscache->addFile("renderShowcaseSlider.js", "js/renderShowcaseSlider.js");
 		m_jscache->addFile("mootools", "js/mootools-core-1.5.0.js");
 		m_jscache->addFile("slider.js", "js/buildSlider.js");
@@ -184,6 +186,17 @@ void Punktd::loadPlaces() {
 	
 	PQclear(res);
 }
+/*
+void Punktd::getClickTemplates(const hiaux::hashtable<std::string,std::string> &_config) {
+	
+	hiaux::hashtable<std::string, std::string>::const_iterator it = _config.find("wikimart_click_template");
+	if (it != _config.end())
+		_click_templates[WIKIMART_ADVID] = it->second;
+	
+	it = _config.find("ozon_click_template");
+	if (it != _config.end())
+		_click_templates[OZON_ADVID] = it->second;
+}*/
 
 Punktd::Punktd(const std::string &_config_file) {
 	
@@ -213,7 +226,9 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_jscache.reset(new FileCache);
 	
 
-	m_punkt.reset(new Punkt( _config ["systemid"],  _config ["replid"]));
+	m_punkt.reset(new Punkt(_config ["systemid"],
+							_config ["replid"],
+							_config ["punkt_rsrc_url"]));
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
 	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));
@@ -230,7 +245,7 @@ Punktd::Punktd(const std::string &_config_file) {
 							boost::bind(&Punktd::connHandler, this, _1, _2)));
 
 	//m_punkt.reset(new Punkt(boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1)));
-							
+	
 	bindFormatters(_config["punkt_url"], _config ["punkt_rsrc_url"]);
 	std::cout << "Formatters binded\n";
 	loadAds();

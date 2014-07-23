@@ -29,13 +29,20 @@ private:
 
 	std::string m_systemid;
 	std::string m_replid;
+	const std::string m_punkt_rsrc_url;
 
 	void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-
+	
+//	void onVkProfile(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+//	void genVid(std::string &_vid) const;
+	
+	std::string getVkAuthCode(const std::string &_domain);
+	
 public:
 	
 	Punkt(const std::string &_systemid,
-		const std::string &_replid);
+		const std::string &_replid,
+		const std::string &_punkt_rsrc_url);
 	
 	void updateAd(AdPtr _ad);
 	void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);

@@ -23,12 +23,13 @@ public:
 	uint64_t shid;
 	int nitems;
 	hiaux::hashtable<std::string, std::string> partner_ids;
-	
+	hiaux::hashtable<std::string, std::string> click_templates;
 	std::string json_dump;
 	
 	ShowcaseSliderFormatterArgs(uint64_t _shid,
 								int _nitems,
-								hiaux::hashtable<std::string, std::string> _partner_ids,
+								const hiaux::hashtable<std::string, std::string> &_partner_ids,
+								const hiaux::hashtable<std::string, std::string> &_click_templates,
 								const std::string &_json_dump);
 };
 
@@ -50,7 +51,15 @@ class ShowcaseSliderFormatter : public Formatter {
 	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
-	void rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid);
+	void renderClickTemplate(const std::string &_advid,
+														uint64_t _pid,
+														uint64_t _adid,
+														uint64_t _itemid,
+														const std::string _itemurl,
+														const hiaux::hashtable<std::string, std::string> &_click_templates,
+														std::string &_target) const;
+	
+	void rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid, const hiaux::hashtable<std::string, std::string> &_click_templates);
 	
 public:
 	
