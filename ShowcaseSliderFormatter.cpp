@@ -143,10 +143,27 @@ void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,
 					uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_itemid) + "&aim=" + aim;
 }
 
+void ShowcaseSliderFormatter::getPartnerParameter(const std::string &_advid,
+												const hiaux::hashtable<std::string, std::string> &_partner_ids,
+												std::string &_partner_param) const {
+	
+	if (_advid == OZON_ADVID) {
+		
+		hiaux::hashtable<std::string, std::string>::const_iterator it = _partner_ids.find(OZON_ADVID);
+		if (it == _partner_ids.end()) {
+			std::cout << "ShowcaseSliderFormatter::getPartnerParameter " << _advid << " partnerid not set " << std::endl;
+			return;
+		}
+		// TODO: check for ? or &
+		_partner_param += "&partner=" + it->second;
+	}
+}
+
 void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 												uint64_t _pid,
 												uint64_t _adid,
-												const hiaux::hashtable<std::string, std::string> &_click_templates) {
+												const hiaux::hashtable<std::string, std::string> &_click_templates,
+												const hiaux::hashtable<std::string, std::string> &_partner_ids) {
 		
 	for (int i = 0; i<_show.items.size(); i++) {
 		
@@ -163,6 +180,11 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 		} else {
 		
 			std::string aim = _show.items[i].directurl;
+			std::string partner_param;
+			
+			getPartnerParameter(_show.items[i].advid, _partner_ids, partner_param);
+			aim += partner_param;
+
 			escapeUrl(aim);
 			_show.items[i].directurl = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
 				uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_show.items[i].id) + "&aim=" + aim;
@@ -172,9 +194,6 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 
 void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn,
 						uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
-
-
-	_conn->addHeader("Access-Control-Allow-Origin: http://localhost:8080");
 
 	if (!_success) {
 		
@@ -215,7 +234,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	//std::string punkt_url = "http://127.0.0.1:4249/";
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _pid, _adid, args->click_templates);
+	rebuildClickLinks(_show, _pid, _adid, args->click_templates, args->partner_ids);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \
@@ -274,7 +293,6 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	std::string slider;
 	
 	std::string format_files_path = m_punkt_rsrc_url + "sh_slider_240x400/";
-	//std::string punkt_url = "http://127.0.0.1:4249/";
 	
 	if (!m_jscache->getFile("ShowcaseSliderEvents.js", slider_events)) {
 		std::cout << "ShowcaseSliderFormatter::onCalledGeberOkDemo ShowcaseSliderEvents.js not loaded in cache  \n";
@@ -293,7 +311,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	}
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _pid, _adid, args->click_templates);
+	rebuildClickLinks(_show, _pid, _adid, args->click_templates, args->partner_ids);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \
@@ -326,5 +344,4 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	_conn->sendResponse(resp);
 	_conn->close();
 }
-
 

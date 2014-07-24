@@ -51,6 +51,10 @@ class ShowcaseSliderFormatter : public Formatter {
 	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
+	void getPartnerParameter(const std::string &_advid,
+							const hiaux::hashtable<std::string, std::string> &_partner_ids,
+							std::string &_partner_param) const;
+	
 	void renderClickTemplate(const std::string &_advid,
 														uint64_t _pid,
 														uint64_t _adid,
@@ -59,7 +63,11 @@ class ShowcaseSliderFormatter : public Formatter {
 														const hiaux::hashtable<std::string, std::string> &_click_templates,
 														std::string &_target) const;
 	
-	void rebuildClickLinks(ShowcaseInstance &_show, uint64_t _pid, uint64_t _adid, const hiaux::hashtable<std::string, std::string> &_click_templates);
+	void rebuildClickLinks(ShowcaseInstance &_show,
+							uint64_t _pid,
+							uint64_t _adid,
+							const hiaux::hashtable<std::string, std::string> &_click_templates,
+							const hiaux::hashtable<std::string, std::string> &_partner_ids);
 	
 public:
 	
