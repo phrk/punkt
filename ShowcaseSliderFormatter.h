@@ -48,7 +48,7 @@ class ShowcaseSliderFormatter : public Formatter {
 	std::string m_punkt_rsrc_url;
 	// Events
 	void handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleItemDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleConvEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	

@@ -6,7 +6,7 @@ owners:owner_ads-{ID}		:places_ad-{ID}		:disps		:place-{ID}
 							:items_ad-{ID}		:disps		:item-{ID}
 												:clicks		:item-{ID}
 												:convs		:item-{ID}
-						
+												:visitors	:place-{ID}
 
 owners:owner_places-{ID}	:ads_place-{ID} 	:disps		:ad-{ID}
 												:clicks		:ad-{ID} 
@@ -16,6 +16,7 @@ owners:owner_places-{ID}	:ads_place-{ID} 	:disps		:ad-{ID}
 							:items_place-{ID}	:disps		:item-{ID}
 												:clicks		:item-{ID}
 												:convs		:item-{ID}
+												:visitors	:place-{ID}
 
 owners:owner_items-{ID}		:disps				:item-{ID}
 							:clicks				:item-{ID}

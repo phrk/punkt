@@ -114,7 +114,6 @@ function buildSlider(pid, isdemo, punkturl, adid) {
 			onRightClick();
 		}, false);
 		
-		
 		function simulateRightClick() {
 			if (document.punkt_showcase_slider_clicked)
 				return;
