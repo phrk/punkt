@@ -1,0 +1,22 @@
+owners:owner_ads-{ID}		:places_ad-{ID}		:disps		:place-{ID}
+												:clicks		:place-{ID}									
+												:convs		:place-{ID}
+												:visitors	:place-{ID}
+						
+							:items_ad-{ID}		:disps		:item-{ID}
+												:clicks		:item-{ID}
+												:convs		:item-{ID}
+						
+
+owners:owner_places-{ID}	:ads_place-{ID} 	:disps		:ad-{ID}
+												:clicks		:ad-{ID} 
+												:convs		:ad-{ID}
+												:visitors	:ad-{ID}
+
+							:items_place-{ID}	:disps		:item-{ID}
+												:clicks		:item-{ID}
+												:convs		:item-{ID}
+
+owners:owner_items-{ID}		:disps				:item-{ID}
+							:clicks				:item-{ID}
+							:convs				:item-{ID}

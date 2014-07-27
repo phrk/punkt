@@ -50,6 +50,7 @@ class ShowcaseSliderFormatter : public Formatter {
 	void handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleItemsShowEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleConvEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
 	void getPartnerParameter(const std::string &_advid,
 							const hiaux::hashtable<std::string, std::string> &_partner_ids,
