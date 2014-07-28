@@ -15,6 +15,9 @@ function buildSlider(pid, isdemo, punkturl, adid) {
 	
 	function onItemsPageDisplayed(page) {
 		
+		if (isdemo)
+			return;
+		
 		for (i in page.items) {
 			if (page.items[i] == false) {
 				

@@ -261,7 +261,7 @@ Punktd::Punktd(const std::string &_config_file) {
 
 void Punktd::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	std::cout << "req path:" << _req->path << " url:" << _req->url << std::endl;
+//	std::cout << "req path:" << _req->path << " url:" << _req->url << std::endl;
 	
 	checkReload();
 	m_punkt->connHandler(_conn, _req);

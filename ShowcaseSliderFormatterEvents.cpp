@@ -17,10 +17,6 @@ void ShowcaseSliderFormatter::handleShowDispEvent(HttpSrv::ConnectionPtr _conn, 
 		return;
 	}
 	
-	if (!_req->getField("aim", aim)) {
-		return;
-	}
-	
 	try {
 		
 		ad_owner = m_getAdOwner(string_to_uint64(adid_str)) ;
@@ -42,6 +38,8 @@ void ShowcaseSliderFormatter::handleShowDispEvent(HttpSrv::ConnectionPtr _conn, 
 	// call zeit
 	m_zeit_acli->mergeCounter(owner_ads_place_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 	m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+	
+//	std::cout << owner_ads_place_counter << std::endl;
 	
 	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
 }
@@ -78,11 +76,11 @@ void ShowcaseSliderFormatter::handleItemDispEvent(HttpSrv::ConnectionPtr _conn, 
 	std::string owner_place_item_counter = "owners:owner_places-" + ad_owner_str + ":items_place-" + pid_str + ":disps:item-" + item_str;
 	std::string owner_item_counter = "owners:owner_items-" + ad_owner_str + ":disps:item-" + item_str;
 	
-	m_zeit_acli->mergeCounter(owner_ad_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-	m_zeit_acli->mergeCounter(owner_place_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-	m_zeit_acli->mergeCounter(owner_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+//	m_zeit_acli->mergeCounter(owner_ad_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+//	m_zeit_acli->mergeCounter(owner_place_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+//	m_zeit_acli->mergeCounter(owner_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 	
-	std::cout << owner_ads_counter << "\n" << owner_ads_place_counter << "\n" << owner_items_counter << "\n";
+//	std::cout << owner_ads_counter << "\n" << owner_ads_place_counter << "\n" << owner_items_counter << "\n";
 	
 	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleItemsShowEvent\" }");
 }
@@ -156,10 +154,10 @@ void ShowcaseSliderFormatter::handleClickEvent(HttpSrv::ConnectionPtr _conn, Htt
 	std::string owner_item_counter = "owners:owner_items-" + ad_owner_str + ":clicks:item-" + item_str;
 	
 	m_zeit_acli->mergeCounter(owner_ad_place_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-	m_zeit_acli->mergeCounter(owner_ad_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+//	m_zeit_acli->mergeCounter(owner_ad_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 	m_zeit_acli->mergeCounter(owner_place_ad_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-	m_zeit_acli->mergeCounter(owner_place_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-	m_zeit_acli->mergeCounter(owner_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+//	m_zeit_acli->mergeCounter(owner_place_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+//	m_zeit_acli->mergeCounter(owner_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 }
 
 void ShowcaseSliderFormatter::handleConvEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
@@ -175,7 +173,8 @@ void ShowcaseSliderFormatter::handleConvEvent(HttpSrv::ConnectionPtr _conn, Http
 	std::string pid;
 	std::string adid;
 	std::string itemid;
-	std::string ad_owner;
+	uint64_t ad_owner;
+	std::string ad_owner_str;
 	std::vector<std::string> strs;
 	split(clickid, '_', strs);
 	
@@ -189,16 +188,24 @@ void ShowcaseSliderFormatter::handleConvEvent(HttpSrv::ConnectionPtr _conn, Http
 		ad_owner = m_getAdOwner(string_to_uint64(adid));
 		
 	} catch (...) {
+		std::cout << "ShowcaseSliderFormatter::handleConvEvent no such ad_owner for ad: " << adid << std::endl; 
 		return;
 	}
 	
-	std::string owner_ads_counter = "owners:owner_ads-" + ad_owner + ":ad-" + adid + ":convs:place-" + pid;
+	ad_owner_str = uint64_to_string(ad_owner);
 	
-	m_zeit_acli->mergeCounter(owner_ads_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-	//std::cout << "conversion happened: pid: " << pid << " adid: " << adid << " itemid: " << itemid << std::endl; 
+	std::string owner_ad_place_counter = "owners:owner_ads-" + ad_owner_str + ":places_ad-" + adid + ":convs:place-" + pid;
+	std::string owner_place_ad_counter = "owners:owner_places-" + ad_owner_str + ":ads_place-" + pid + ":convs:ad-" + adid;
+	
+	m_zeit_acli->mergeCounter(owner_ad_place_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+	m_zeit_acli->mergeCounter(owner_place_ad_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
+
+//	std::cout << "conversion happened: pid: " << pid << " adid: " << adid << " itemid: " << itemid << std::endl; 	
+//	std::cout << "owner_ad_place_counter: " << owner_ad_place_counter << std::endl;
+//	std::cout << "owner_place_ad_counter: " << owner_place_ad_counter << std::endl;
 	
 	_conn->sendResponse("{ \"status\": \"ok\" }");
-	_conn->close();
+//	_conn->close();
 }
 
 void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {

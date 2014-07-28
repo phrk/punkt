@@ -4,9 +4,9 @@ function evShowcaseSliderDisp(punkturl, pid, adid) {
 	xmlHttp = new XMLHttpRequest();
 	xmlHttp.open( "GET", punkturl + "?evtype=fev&fid=1&ev=showdisp&pid=" + pid + "&adid=" + adid, true);
 	
-	xhr.onload = function (e) {
-		if (xhr.readyState === 4) {
-			if (xhr.status === 200) {
+	xmlHttp.onload = function (e) {
+		if (xmlHttp.readyState === 4) {
+			if (xmlHttp.status === 200) {
 			} else {
 			}
 		}
@@ -16,11 +16,12 @@ function evShowcaseSliderDisp(punkturl, pid, adid) {
 
 function evShowcaseSliderItemDisp(punkturl, pid, adid, itemid) {
 	
+	xmlHttp = new XMLHttpRequest();
 	xmlHttp.open( "GET", punkturl + "?evtype=fev&fid=1&ev=itemdisp&pid=" + pid + "&adid=" + adid + "&item=" + itemid, true);
 	
-	xhr.onload = function (e) {
-		if (xhr.readyState === 4) {
-			if (xhr.status === 200) {
+	xmlHttp.onload = function (e) {
+		if (xmlHttp.readyState === 4) {
+			if (xmlHttp.status === 200) {
 			} else {
 			}
 		}
