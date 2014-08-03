@@ -1,0 +1,13 @@
+
+{
+
+"_NAME" : "visitors_storage",
+
+"_CPPFILES" : [ { "type": "Glob", "mask": "*.cpp" },
+	 			{ "type": "Glob", "mask": "*.cc" }],
+
+"_LINKFLAGS": [ "-lprotobuf" ],
+
+"_DEPS" : [	"../../hiaux/strings/",
+			"../../zeit/cpp-client/"]
+}
