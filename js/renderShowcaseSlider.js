@@ -26,7 +26,7 @@ function renderShowcaseSlider (pid, show, formatter_args, format_files_path) {
 	
 		ret += '<tr>';
 		ret += '<td>';
-		ret += '<a href=' + show.items[i].directurl + '><img src=' + show.items[i].imgurl + ' width=100px height=100px target="_blank"></a>';
+		ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + show.items[i].imgurl + ' width=100px height=100px></a>';
 		ret += '</td>';
 		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:serif; font-size:12pt; color:' + formatter_args.textcolor 
 				+ ';  overflow-wrap: break-word;" target="_blank" >';
