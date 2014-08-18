@@ -322,10 +322,10 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	"if (document._punkt_codes_post == null)\n"
 	"	document._punkt_codes_post = {};\n"
 	"\n"
-	"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
+	"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function (click_url) {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
-	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "');\n"
+	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "', click_url);\n"
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"

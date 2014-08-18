@@ -1,5 +1,5 @@
 
-function renderShowcaseSlider (pid, show, formatter_args, format_files_path) {
+function renderShowcaseSlider (pid, show, formatter_args, format_files_path, click_url) {
 
 	var left_button_img = format_files_path+ 'left.png';
 	var right_button_img = format_files_path+ 'right.png';
@@ -26,10 +26,16 @@ function renderShowcaseSlider (pid, show, formatter_args, format_files_path) {
 	
 		ret += '<tr>';
 		ret += '<td>';
+		
+		if (click_url != null)
+			show.items[i].directurl = click_url + escape(show.items[i].directurl);
+		
 		ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + show.items[i].imgurl + ' width=100px height=100px></a>';
 		ret += '</td>';
 		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:serif; font-size:12pt; color:' + formatter_args.textcolor 
 				+ ';  overflow-wrap: break-word;" target="_blank" >';
+				
+		
 		ret += show.items[i].caption + "<br>";
 		ret += '<p style="color:' + formatter_args.pricecolor + '; text-decoration:none;">' + show.items[i].price + 'руб </p>';
 		ret += '</a></td>';
