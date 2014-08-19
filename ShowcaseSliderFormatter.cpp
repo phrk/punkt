@@ -107,10 +107,10 @@ void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::Requ
 	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _conn, _pid, _adid, _https, _args));
 }
 
-void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
-	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _conn, _pid, _adid, _args));
+	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _conn, _pid, _adid, _https, _args));
 }
 
 void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,
@@ -193,7 +193,7 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 }
 
 void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn,
-						uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args) {
+						uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args) {
 
 	if (!_success) {
 		
@@ -248,7 +248,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
-	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "');\n"
+	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "', null, " + booltostr(_https) + ");\n"
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"

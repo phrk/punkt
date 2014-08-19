@@ -63,6 +63,7 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	}
 	
 	uint64_t adid = string_to_uint64(ad_id_str);	
+	bool https;
 	
 	FormatterPtr formatter;
 	FormatterArgsPtr formatter_args;
@@ -93,7 +94,11 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 		formatter_args = ad_it->second->args;
 	}
 	
-	formatter->formatDemo(_conn, _req, 0, adid, formatter_args);
+	std::string bf;
+	if (_req->getField("https", bf))
+		https = true;
+	
+	formatter->formatDemo(_conn, _req, 0, adid, https, formatter_args);
 }
 
 void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
