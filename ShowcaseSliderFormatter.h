@@ -81,11 +81,11 @@ public:
 							ZeitClientAsyncPtr _zeit_acli,
 							boost::function<uint64_t(uint64_t)> _getAdOwner);
 	
-	void onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	void onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args);
 	void onGotShowcaseDemo(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
-	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args);
 	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
 	
 	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);

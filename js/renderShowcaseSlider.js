@@ -1,5 +1,14 @@
 
-function renderShowcaseSlider (pid, show, formatter_args, format_files_path, click_url) {
+function makeHttpsUrl(url) {
+	
+	return "https" + url.substring(4);
+}
+
+function renderShowcaseSlider (pid, show, formatter_args, format_files_path, click_url, https) {
+
+	if (https) {
+		format_files_path = makeHttpsUrl(format_files_path);
+	}
 
 	var left_button_img = format_files_path+ 'left.png';
 	var right_button_img = format_files_path+ 'right.png';
@@ -30,7 +39,11 @@ function renderShowcaseSlider (pid, show, formatter_args, format_files_path, cli
 		if (click_url != null)
 			show.items[i].directurl = click_url + escape(show.items[i].directurl);
 		
-		ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + show.items[i].imgurl + ' width=100px height=100px></a>';
+		if (https)
+			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + makeHttpsUrl(show.items[i].imgurl) + ' width=100px height=100px></a>';
+		else
+			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + show.items[i].imgurl + ' width=100px height=100px></a>';
+		
 		ret += '</td>';
 		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:serif; font-size:12pt; color:' + formatter_args.textcolor 
 				+ ';  overflow-wrap: break-word;" target="_blank" >';

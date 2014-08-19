@@ -102,6 +102,7 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	FormatterArgsPtr args;
 	
 	uint64_t adid;
+	bool https = false;
 	
 	{
 		hLockTicketPtr ticket = lock.lock();
@@ -135,7 +136,11 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 		adid = ad->id;
 	}
 	
-	formatter->format(_conn, _req, _pid, adid, args);
+	std::string bf;
+	if (_req->getField("https", bf))
+		https = true;
+	
+	formatter->format(_conn, _req, _pid, adid, https, args);
 }
 
 void Punkt::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
