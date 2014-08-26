@@ -101,16 +101,16 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, click_templates, _args_js));
 }
 
-void ShowcaseSliderFormatter::format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
-	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _conn, _pid, _adid, _https, _args));
+	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _ad_req, _args));
 }
 
-void ShowcaseSliderFormatter::formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
-	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _conn, _pid, _adid, _https, _args));
+	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _ad_req, _args));
 }
 
 void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,
@@ -192,19 +192,18 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 	}
 }
 
-void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn,
-						uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args) {
 
 	if (!_success) {
 		
-		_conn->close();
+		_ad_req->conn->close();
 		return;
 	}
 	
 	if (_show.items.size()<3) {
 		
-		_conn->sendResponse("<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>");
-		_conn->close();
+		_ad_req->conn->sendResponse("<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>");
+		_ad_req->conn->close();
 	}
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
@@ -234,7 +233,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	//std::string punkt_url = "http://127.0.0.1:4249/";
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _pid, _adid, args->click_templates, args->partner_ids);
+	rebuildClickLinks(_show, _ad_req->pid, _ad_req->adid, args->click_templates, args->partner_ids);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \
@@ -245,14 +244,14 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	"if (document._punkt_codes_post == null)\n"
 	"	document._punkt_codes_post = {};\n"
 	"\n"
-	"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function () {\n"
+	"document._punkt_codes[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
-	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "', null, " + booltostr(_https) + ");\n"
+	"	return renderShowcaseSlider(" + uint64_to_string(_ad_req->pid) +  ", show, formatter_args, '" + format_files_path + "', null, " + booltostr(_ad_req->https) + ");\n"
 	"}\n"
 	
-	"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"
-	"	buildSlider('" + uint64_to_string(_pid) + "', true, '" +m_punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
+	"document._punkt_codes_post[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () { \n"
+	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', true, '" +m_punkt_url+ "', " +uint64_to_string(_ad_req->adid)+ " ); \n"
 	"} \n";
 	
 	std::string resp = \		
@@ -272,16 +271,15 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		"document._punkt_codes_post[\"0\"]();\n"
 		"</script>";
 	
-	_conn->sendResponse(resp);
-	_conn->close();
+	_ad_req->conn->sendResponse(resp);
+	_ad_req->conn->close();
 }
 
-void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_show, HttpSrv::ConnectionPtr _conn, 
-								uint64_t _pid, uint64_t _adid, bool _https, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args) {
 	
 	if (!_success) {
 		
-		_conn->close();
+		_ad_req->conn->close();
 		return;
 	}
 	
@@ -311,7 +309,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	}
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _pid, _adid, args->click_templates, args->partner_ids);
+	rebuildClickLinks(_show, _ad_req->pid, _ad_req->adid, args->click_templates, args->partner_ids);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \
@@ -322,15 +320,15 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	"if (document._punkt_codes_post == null)\n"
 	"	document._punkt_codes_post = {};\n"
 	"\n"
-	"document._punkt_codes[\"" + uint64_to_string(_pid) + "\"] = function (click_url) {\n"
+	"document._punkt_codes[\"" + uint64_to_string(_ad_req->pid) + "\"] = function (click_url) {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
-	"	return renderShowcaseSlider(" + uint64_to_string(_pid) +  ", show, formatter_args, '" + format_files_path + "', click_url," 
-			+ booltostr(_https) + ");\n"
+	"	return renderShowcaseSlider(" + uint64_to_string(_ad_req->pid) +  ", show, formatter_args, '" + format_files_path + "', click_url," 
+			+ booltostr(_ad_req->https) + ");\n"
 	"}\n"
 	
-	"document._punkt_codes_post[\"" + uint64_to_string(_pid) + "\"] = function () { \n"
-	"	buildSlider('" + uint64_to_string(_pid) + "', false, '" +m_punkt_url+ "', " +uint64_to_string(_adid)+ " ); \n"
+	"document._punkt_codes_post[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () { \n"
+	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', false, '" +m_punkt_url+ "', " +uint64_to_string(_ad_req->adid)+ " ); \n"
 	"} \n";
 	
 	std::string resp;
@@ -342,7 +340,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	resp += slider;
 	resp += format_renderer_bind;
 	
-	_conn->sendResponse(resp);
-	_conn->close();
+	_ad_req->conn->sendResponse(resp);
+	_ad_req->conn->close();
 }
 

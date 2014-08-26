@@ -98,7 +98,9 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	if (_req->getField("https", bf))
 		https = true;
 	
-	formatter->formatDemo(_conn, _req, 0, adid, https, formatter_args);
+	AdRequestPtr ad_req (new AdRequest(_conn, _req, 0, adid, https));
+	
+	formatter->formatDemo(ad_req, formatter_args);
 }
 
 void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
@@ -145,7 +147,9 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	if (_req->getField("https", bf))
 		https = true;
 	
-	formatter->format(_conn, _req, _pid, adid, https, args);
+	AdRequestPtr ad_req (new AdRequest(_conn, _req, _pid, adid, https));
+	
+	formatter->format(ad_req, args);
 }
 
 void Punkt::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
