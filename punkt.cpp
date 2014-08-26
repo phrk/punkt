@@ -100,6 +100,11 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	AdRequestPtr ad_req (new AdRequest(_conn, _req, 0, adid, https));
 	
+	if (_req->getField("search", bf)) {
+		
+		ad_req->search_queries.push_back(bf); 
+	}
+	
 	formatter->formatDemo(ad_req, formatter_args);
 }
 

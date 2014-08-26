@@ -12,7 +12,7 @@ public:
 	uint64_t pid;
 	uint64_t adid;
 	bool https;
-	std::string search_query;
+	std::vector<std::string> search_queries;
 	
 	AdRequest(HttpSrv::ConnectionPtr _conn,
 						HttpSrv::RequestPtr _req,
