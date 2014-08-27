@@ -8,6 +8,8 @@
 #include "ad.h"
 #include "formatter.h"
 
+#include "hiaux/strings/RefParser.h"
+
 class Punkt {
 public:
 	

@@ -102,6 +102,9 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	if (_req->getField("search", bf)) {
 		
+		unescapeUrl(bf);
+		toLowerUtf8(bf);
+		std::cout << "query: " << bf << std::endl;
 		ad_req->search_queries.push_back(bf); 
 	}
 	
@@ -115,6 +118,15 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	
 	uint64_t adid;
 	bool https = false;
+	bool query_set = false;
+	std::string bf;
+	std::string query;
+	
+	if (_req->getField("ref", bf)) {
+		
+		if (RefParser::parse(bf, query))
+			query_set = true;
+	}
 	
 	{
 		hLockTicketPtr ticket = lock.lock();
@@ -148,11 +160,13 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 		adid = ad->id;
 	}
 	
-	std::string bf;
 	if (_req->getField("https", bf))
 		https = true;
 	
 	AdRequestPtr ad_req (new AdRequest(_conn, _req, _pid, adid, https));
+	
+	if (query_set)
+		ad_req->search_queries.push_back(query);
 	
 	formatter->format(ad_req, args);
 }
