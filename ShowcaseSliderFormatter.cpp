@@ -110,7 +110,13 @@ void ShowcaseSliderFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _arg
 void ShowcaseSliderFormatter::formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
-	m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _ad_req, _args));
+	
+	if (_ad_req->search_queries.size() != 0)
+		m_geber_acli->getShowcaseSearch(args->shid, args->nitems, _ad_req->search_queries,
+										boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _ad_req, _args));
+	else
+		m_geber_acli->getShowcase(args->shid, args->nitems,
+									boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _ad_req, _args));
 }
 
 void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,

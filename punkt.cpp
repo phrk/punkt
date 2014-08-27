@@ -32,9 +32,9 @@ void Punkt::updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targ
 	//std::cout << "Punkt::updatePlace " << _pid << std::endl;
 	hLockTicketPtr ticket = lock.lock();
 	
-	PlaceInfoPtr place = m_places[_pid];
+	PlaceTargetsPtr place = m_places[_pid];
 	if (!place) {
-		m_places[_pid].reset(new PlaceInfo);
+		m_places[_pid].reset(new PlaceTargets);
 		place = m_places[_pid];
 	}
 
@@ -104,7 +104,7 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 		
 		unescapeUrl(bf);
 		toLowerUtf8(bf);
-		std::cout << "query: " << bf << std::endl;
+		std::cout << "Punkt::handleDemo query: " << bf << std::endl;
 		ad_req->search_queries.push_back(bf); 
 	}
 	
@@ -131,7 +131,7 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	{
 		hLockTicketPtr ticket = lock.lock();
 	
-		hiaux::hashtable<uint64_t, PlaceInfoPtr>::iterator pit = m_places.find(_pid);
+		hiaux::hashtable<uint64_t, PlaceTargetsPtr>::iterator pit = m_places.find(_pid);
 		if (pit == m_places.end()) {
 			_conn->sendResponse("{ \"status\" : \"unknown pid\" }");
 			_conn->close();
