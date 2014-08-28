@@ -297,5 +297,5 @@ void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) 
 
 uint64_t Punkt::getAdOwner(uint64_t _adid) {
 	
-	m_targeter->getAdOwner(_adid);
+	return m_targeter->getAdOwner(_adid);
 }
