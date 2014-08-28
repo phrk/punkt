@@ -177,12 +177,12 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::C
 	
 	AdRequestPtr ad_req (new AdRequest(_conn, _req, _pid, adid, https));
 	
-	if (query_set)
+	if (query_set) {
 		ad_req->search_queries.push_back(query);
-	else {
-		_visitor->getQueries(ad_req->search_queries);
+		_visitor->addQuery(bf);
 	}
 	
+	_visitor->getQueries(ad_req->search_queries);
 	_visitor->save();
 	formatter->format(ad_req, args);
 }
