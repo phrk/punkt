@@ -26,12 +26,16 @@ void VisitorCookieOnly::save() {
 
 void VisitorCookieOnly::restore(const std::string &_dump) {
 	
-	std::string dump = base64_decode(_dump);
-	VisitorCookie pb;
-	pb.ParseFromString(dump);
-	for (int i = 0; i<pb.queries_size(); i++) {
-		m_queries.push_back(pb.queries(i));
-//		std::cout << "VisitorCookieOnly::restore q: " << m_queries[m_queries.size() - 1];
+	try {
+		std::string dump = base64_decode(_dump);
+		VisitorCookie pb;
+		pb.ParseFromString(dump);
+		for (int i = 0; i<pb.queries_size(); i++) {
+			m_queries.push_back(pb.queries(i));
+	//		std::cout << "VisitorCookieOnly::restore q: " << m_queries[m_queries.size() - 1];
+		}
+	} catch (...) {
+		
 	}
 }
 
