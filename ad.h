@@ -13,6 +13,7 @@ public:
 	FormatterArgsPtr args;
 	
 	Ad(uint64_t _id, uint64_t _format_id, uint64_t ownerid, const std::string &_formatter_args_str);
+	virtual ~Ad();
 };
 
 typedef boost::shared_ptr<Ad> AdPtr;

@@ -18,12 +18,13 @@ public:
 
 private:
 	
-	hiaux::hashtable<uint64_t, AdPtr> m_ads;
-	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
+//	hiaux::hashtable<uint64_t, AdPtr> m_ads;
+//	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
 	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
 	
 	hAutoLock lock;
-
+	
+	TargeterPtr m_targeter;
 	std::string m_systemid;
 	std::string m_replid;
 	const std::string m_punkt_rsrc_url;
@@ -37,7 +38,8 @@ private:
 	
 public:
 	
-	Punkt(const std::string &_systemid,
+	Punkt(TargeterPtr _targeter,
+		const std::string &_systemid,
 		const std::string &_replid,
 		const std::string &_punkt_rsrc_url);
 	
@@ -48,8 +50,13 @@ public:
 	uint64_t getAdOwner(uint64_t _adid);
 	
 	void handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_evtype_str);
+	
 	void handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	
 	void handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	
 	void connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 };
 

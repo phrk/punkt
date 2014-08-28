@@ -225,8 +225,9 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_jscache.reset(new FileCache);
 	
-
-	m_punkt.reset(new Punkt(_config ["systemid"],
+	m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
+	m_punkt.reset(new Punkt(m_targeter,
+							_config ["systemid"],
 							_config ["replid"],
 							_config ["punkt_rsrc_url"]));
 	

@@ -10,6 +10,8 @@
 
 #include "punkt_consts.h"
 
+#include "TargeterCookieOnly.h"
+
 #include "punkt.h"
 #include "formatter.h"
 #include "FileCache.h"
@@ -26,6 +28,8 @@ private:
 	hThreadPoolPtr m_pool;
 	TaskLauncherPtr m_srv_tasklauncher;
 	HttpSrvPtr m_srv;
+	
+	TargeterCookieOnlyPtr m_targeter;
 	PunktPtr m_punkt;
 	HttpOutRequestDispPtr m_req_disp;
 	//GeberdCliApiClientPtr m_geber_cli;

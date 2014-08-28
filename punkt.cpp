@@ -1,8 +1,10 @@
 #include "punkt.h"
 
-Punkt::Punkt(const std::string &_systemid,
+Punkt::Punkt(TargeterPtr _targeter,
+	const std::string &_systemid,
 	const std::string &_replid,
 	const std::string &_punkt_rsrc_url):
+	m_targeter(_targeter),
 	m_systemid(_systemid),
 	m_replid(_replid),
 	m_punkt_rsrc_url(_punkt_rsrc_url) {
@@ -25,12 +27,13 @@ void Punkt::updateAd(AdPtr _ad) {
 	} catch (...) {
 		std::cout << "Punkt::updateAd parseArgs exception\n";
 	}
-	m_ads[_ad->id] = _ad;
+
+	m_targeter->updateAd(_ad);
 }
 
 void Punkt::updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets) {
 	//std::cout << "Punkt::updatePlace " << _pid << std::endl;
-	hLockTicketPtr ticket = lock.lock();
+/*	hLockTicketPtr ticket = lock.lock();
 	
 	PlaceTargetsPtr place = m_places[_pid];
 	if (!place) {
@@ -44,7 +47,8 @@ void Punkt::updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targ
 		AdPtr ad = m_ads[ _targets[i] ];
 		if (ad)
 			place->ads.push_back(ad);
-	}
+	}*/
+	m_targeter->updatePlaceTargets(_pid, _targets);
 }
 
 void Punkt::updateFormatter(uint64_t _fid, FormatterPtr _formatter) {
@@ -53,6 +57,11 @@ void Punkt::updateFormatter(uint64_t _fid, FormatterPtr _formatter) {
 }
 
 void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	m_targeter->getVisitor(_conn, _req, boost::bind(&Punkt::handleDemoGotVisitor, this, _1, _conn, _req));
+}
+
+void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	std::string ad_id_str;
 	
@@ -70,9 +79,9 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	{
 		hLockTicketPtr ticket = lock.lock();
-		hiaux::hashtable<uint64_t, AdPtr>::iterator ad_it = m_ads.find(adid);
 		
-		if (ad_it == m_ads.end()) {
+		AdPtr ad = m_targeter->getAd(adid);
+		if (!ad) {
 		
 			std::cout << "Punkt::handleDemo unknown ad " << adid << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
@@ -80,18 +89,18 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 			return;
 		}
 		
-		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(ad_it->second->format_id);
+		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(ad->format_id);
 		
 		if (f_it == m_formatters.end()) {
 		
-			std::cout << "Punkt::handleDemo unknown format " << ad_it->second->format_id << std::endl;
+			std::cout << "Punkt::handleDemo unknown format " << ad->format_id << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
 			_conn->close();
 			return;
 		}
 		
 		formatter = f_it->second;
-		formatter_args = ad_it->second->args;
+		formatter_args = ad->args;
 	}
 	
 	std::string bf;
@@ -104,14 +113,23 @@ void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 		
 		unescapeUrl(bf);
 		toLowerUtf8(bf);
-		std::cout << "Punkt::handleDemo query: " << bf << std::endl;
+		std::cout << "Punkt::handleDemoGotVisitor query: " << bf << std::endl;
 		ad_req->search_queries.push_back(bf); 
+		_visitor->addQuery(bf);
+	} else {
+		_visitor->getQueries(ad_req->search_queries);
 	}
 	
+	_visitor->save();
 	formatter->formatDemo(ad_req, formatter_args);
 }
 
 void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	m_targeter->getVisitor(_conn, _req, boost::bind(&Punkt::handlePlaceGotVisitor, this, _pid, _1, _conn, _req));
+}
+
+void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	FormatterPtr formatter;
 	FormatterArgsPtr args;
@@ -121,6 +139,7 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	bool query_set = false;
 	std::string bf;
 	std::string query;
+	std::vector<std::string> queries;
 	
 	if (_req->getField("ref", bf)) {
 		
@@ -129,22 +148,10 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	}
 	
 	{
+				
+		AdPtr ad = m_targeter->getAdToShow(_pid, _visitor, queries);
+	
 		hLockTicketPtr ticket = lock.lock();
-	
-		hiaux::hashtable<uint64_t, PlaceTargetsPtr>::iterator pit = m_places.find(_pid);
-		if (pit == m_places.end()) {
-			_conn->sendResponse("{ \"status\" : \"unknown pid\" }");
-			_conn->close();
-			return;
-		}
-	
-		if (pit->second->ads.size()==0) {
-			_conn->sendResponse("{ \"status\" : \"no targets\" }");
-			_conn->close();
-			return;
-		}
-	
-		AdPtr ad = pit->second->ads[ rand() % pit->second->ads.size() ];
 	
 		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(ad->format_id);
 	
@@ -167,7 +174,11 @@ void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::Re
 	
 	if (query_set)
 		ad_req->search_queries.push_back(query);
+	else {
+		_visitor->getQueries(ad_req->search_queries);
+	}
 	
+	_visitor->save();
 	formatter->format(ad_req, args);
 }
 
@@ -281,16 +292,5 @@ void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) 
 
 uint64_t Punkt::getAdOwner(uint64_t _adid) {
 	
-	uint64_t ownerid;
-	{
-		hLockTicketPtr ticket = lock.lock();
-		hiaux::hashtable<uint64_t, AdPtr>::iterator it = m_ads.find(_adid);
-		if (it == m_ads.end()) {
-			std::cout << "Punkt::getAdOwner unknown ad: " << _adid << std::endl;
-			throw "Punkt::getAdOwner unknown ad"; 
-		}
-		
-		ownerid = it->second->ownerid;
-	}
-	return ownerid;
+	m_targeter->getAdOwner(_adid);
 }

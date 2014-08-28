@@ -7,21 +7,39 @@
 #include "ad.h"
 #include "PlaceTargets.h"
 
+class Visitor {
+	std::string m_vid;
+public:
+	
+	Visitor(const std::string &_vid);
+	void getId(std::string &_vid);
+	virtual void addQuery(const std::string &_q) = 0;
+	virtual void getQueries(std::vector<std::string> &_q) = 0;
+	virtual void save() = 0;
+	virtual ~Visitor();
+};
+
+typedef boost::shared_ptr<Visitor> VisitorPtr;
+
 class Targeter {
 	
 	std::string m_repl_id;
-	hiaux::hashtable<uint64_t, AdPtr> m_ads;
-	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
+
 public:
+		
+	typedef boost::shared_ptr<Visitor> VisitorPtr;
 	
 	Targeter(const std::string &_repl_id);
-	void getVisitorId(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, std::string &_vid) = 0;
 	
-	void updateAd(AdPtr _ad);
-	void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);
-
-	void addSearchQuery(const std::string &_vid, const std::string &_query) = 0;
-	AdPtr getAdToShow(uint64_t _pid, const std::string &_vid, std::vector<std::string> &_queries) = 0;
+	virtual void getVisitor(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, boost::function<void(VisitorPtr)> _onGot) = 0;
+	
+	virtual void updateAd(AdPtr _ad) = 0;
+	virtual void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets) = 0;
+	
+	virtual AdPtr getAd(uint64_t _adid) = 0;
+	virtual uint64_t getAdOwner(uint64_t _adid) = 0;
+	
+	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries) = 0;
 	
 	virtual ~Targeter();
 };

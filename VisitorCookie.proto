@@ -1,0 +1,4 @@
+
+message VisitorCookie {
+	repeated string queries = 1;
+};
