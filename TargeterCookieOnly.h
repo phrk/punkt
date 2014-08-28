@@ -1,5 +1,5 @@
 #ifndef _TARGETER_COOKIE_ONLY_H_
-#define _TARGETER_COOKIE_ONLY_H
+#define _TARGETER_COOKIE_ONLY_H_
 
 #include "Targeter.h"
 #include "VisitorCookieOnly.h"
