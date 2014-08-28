@@ -151,6 +151,11 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::C
 				
 		AdPtr ad = m_targeter->getAdToShow(_pid, _visitor, queries);
 	
+		if (!ad) {
+			std::cout << "not got ad\n";
+			return;
+		}
+		
 		hLockTicketPtr ticket = lock.lock();
 	
 		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(ad->format_id);
