@@ -4,14 +4,18 @@
 #include "hiconfig.h"
 #include "VkProfile.h"
 #include "VisitDevice.h"
-#include "Visitor.h"
+#include "VisitorHashd.h"
+
+#include "HashdClientAsync.h"
+
+#include <boost/function.hpp>
 
 class VisitorsStorage {
-	ZeitClientAsyncPtr m_zeit_acli;
+	HashdClientAsyncPtr m_hashd_acli;
 public:
 	
-	VisitorsStorage(ZeitClientAsyncPtr _zeit_acli);
-	void getVisitor(const std::string &_vdid, boost::function<void(VisitorPtr)> _onVisitor);
+	VisitorsStorage(HashdClientAsyncPtr _hashd_acli);
+	void getVisitor(const std::string &_vdid, boost::function<void(bool,VisitorPtr)> _onVisitor);
 	void saveVisitor(VisitorPtr _visitor);
 };
 

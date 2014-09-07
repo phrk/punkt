@@ -1,4 +1,6 @@
 
+package punkt;
+
 message VkProfile {
 	
 	required string id = 1;
@@ -18,7 +20,7 @@ message VkProfile {
 	
 	repeated string friends = 13;
 	repeated string groups = 14;
-}
+};
 
 message VisitDevice {
 	
@@ -34,10 +36,17 @@ message VisitDevice {
 	repeated int64 ads_clicked = 8;
 	repeated int64 items_clicked = 9;
 	repeated int64 items_bought = 10;
-}
+	
+};
+
+message VisitorExt {
+	required int32 extid = 1;
+	required string data = 2;
+};
 
 message Visitor {
 
 	required string id = 1;
 	repeated string devices = 2;
-}
+	repeated VisitorExt ext = 3;
+};

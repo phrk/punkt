@@ -27,7 +27,7 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 	m_geber_acli(_geber_acli),
 	m_zeit_acli(_zeit_acli),
 	m_getAdOwner(_getAdOwner) {
-	
+
 }
 
 FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js) {

@@ -1,11 +1,11 @@
 #include "VisitorsStorage.h"
 
-VisitorsStorage::VisitorsStorage(ZeitClientAsyncPtr _zeit_acli):
-	m_zeit_acli(_zeit_acli) {
+VisitorsStorage::VisitorsStorage(HashdClientAsyncPtr _hashd_acli):
+	m_hashd_acli(_hashd_acli) {
 	
 }
 
-void VisitorsStorage::getVisitor(const std::string &_vdid, boost::function<void(VisitorPtr)> _onVisitor) {
+void VisitorsStorage::getVisitor(const std::string &_vdid, boost::function<void(bool,VisitorPtr)> _onVisitor) {
 		
 }
 

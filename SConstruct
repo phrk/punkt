@@ -21,6 +21,11 @@ b.connectLib(hicore_path+"geber/")
 b.addPath(hicore_path+"zeit/cpp-client/")
 b.connectLib(hicore_path+"zeit/cpp-client/")
 
+b.connectLib("VisitorsStorage/")
+b.addPath("VisitorsStorage/")
+
+b.addPath("../hashd/cpp-client/")
+
 b.addPath("./")
 
 b.addPath(hiaux_path+"hiaux/structs/")

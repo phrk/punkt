@@ -1,6 +1,8 @@
 #ifndef _VISIT_DEVICE_
 #define _VISIT_DEVICE_
 
+#include "hiconfig.h"
+
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
