@@ -12,6 +12,9 @@
 
 #include "TargeterCookieOnly.h"
 
+#include "TargeterHashd.h"
+#include "VisitorsStorage/VisitorsStorage.h"
+
 #include "punkt.h"
 #include "formatter.h"
 #include "FileCache.h"
@@ -29,7 +32,12 @@ private:
 	TaskLauncherPtr m_srv_tasklauncher;
 	HttpSrvPtr m_srv;
 	
+	HashdClientAsyncPtr m_hashd_acli;
+	VisitorsStoragePtr m_visitors_storage;
+	TargeterHashdPtr m_targeter_hashd;
+	
 	TargeterCookieOnlyPtr m_targeter;
+	
 	PunktPtr m_punkt;
 	HttpOutRequestDispPtr m_req_disp;
 	//GeberdCliApiClientPtr m_geber_cli;

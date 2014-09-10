@@ -35,11 +35,11 @@ message VisitDevice {
 	repeated string domains_visited = 7;
 	repeated int64 ads_clicked = 8;
 	repeated int64 items_clicked = 9;
-	repeated int64 items_bought = 10;
-	
+	repeated int64 items_bought = 10;	
 };
 
 message VisitorExt {
+
 	required int32 extid = 1;
 	required string data = 2;
 };
@@ -49,4 +49,12 @@ message Visitor {
 	required string id = 1;
 	repeated string devices = 2;
 	repeated VisitorExt ext = 3;
+};
+
+message VisitorBuilded {
+	
+	required string id = 1;
+	repeated VisitDevice devices = 2;
+	optional VkProfile vkprofile = 3;
+	repeated VisitorExt ext = 4;
 };

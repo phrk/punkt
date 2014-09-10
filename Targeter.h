@@ -8,6 +8,7 @@
 #include "PlaceTargets.h"
 
 class Visitor {
+protected:
 	std::string m_vid;
 public:
 	

@@ -19,6 +19,7 @@ public:
 	TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage);
 	
 	virtual void getVisitor(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
+//	void onGotVisitor(const std::string &_vid, boost::function<void(VisitorPtr)> _onGot, bool _success, VisitorPtr _v);
 	
 	virtual void updateAd(AdPtr _ad);
 	virtual void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);

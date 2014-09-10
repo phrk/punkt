@@ -22,6 +22,7 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	required_params.push_back("punkt_rsrc_url");
 	required_params.push_back("geberd_url");
 	required_params.push_back("zeit_url");
+	required_params.push_back("hashd_url");
 	
 	required_params.push_back("reload_period");
 	
@@ -225,11 +226,6 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_jscache.reset(new FileCache);
 	
-	m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
-	m_punkt.reset(new Punkt(m_targeter,
-							_config ["systemid"],
-							_config ["replid"],
-							_config ["punkt_rsrc_url"]));
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
 	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));
@@ -237,6 +233,18 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 
 //	m_geber_cli.reset(new GeberdCliApiClient(_config["geberd_url"]));
+	
+	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
+	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));
+	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage));
+	
+	//m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
+	
+	m_punkt.reset(new Punkt(m_targeter_hashd,
+							_config ["systemid"],
+							_config ["replid"],
+							_config ["punkt_rsrc_url"]));
+	
 	
 	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
 	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));

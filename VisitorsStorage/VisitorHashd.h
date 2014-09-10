@@ -19,7 +19,6 @@ public:
 class VisitorHashd : public Visitor {
 	boost::function<void(VisitorHashd*)> m_onSave;
 public:
-	std::string id;
 	VkProfilePtr vk_profile;
 	std::vector<VisitDevice> devices;
 	
@@ -27,11 +26,10 @@ public:
 	
 	
 	VisitorHashd(const std::string &_vid,
-						boost::function<void(VisitorHashd*)> _onSave,
-						HttpSrv::ConnectionPtr _conn);
-	
+						boost::function<void(VisitorHashd*)> _onSave);
 	
 	void parseProtobuf(const std::string &_dump);
+	void dump(std::string &_dump);
 	
 	void getId(std::string &_vid);
 	virtual void addQuery(const std::string &_q);

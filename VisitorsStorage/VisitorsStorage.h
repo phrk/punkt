@@ -15,8 +15,11 @@ class VisitorsStorage {
 public:
 	
 	VisitorsStorage(HashdClientAsyncPtr _hashd_acli);
-	void getVisitor(const std::string &_vdid, boost::function<void(bool,VisitorPtr)> _onVisitor);
-	void saveVisitor(VisitorPtr _visitor);
+	void getVisitor(const std::string &_vdid, boost::function<void(VisitorPtr)> _onVisitor);
+	void saveVisitor(VisitorHashd *_visitor);
+	
+	void onSaved(bool _success);
+	void onGotVisitor(bool _success, bool _exists, const std::string &_dump, const std::string &_vid, boost::function<void(VisitorPtr)> _onVisitor);
 };
 
 typedef boost::shared_ptr<VisitorsStorage> VisitorsStoragePtr;
