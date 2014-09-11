@@ -4,6 +4,7 @@
 #include "Targeter.h"
 #include "VisitorHashd.h"
 #include "VisitorsStorage.h"
+#include "Visitor.h"
 
 class TargeterHashd : public Targeter {
 	
@@ -13,7 +14,7 @@ class TargeterHashd : public Targeter {
 	
 	VisitorsStoragePtr m_storage;
 	
-	void genVid(std::string &_vid) const;
+	void genVdid(std::string &_vdid) const;
 public:
 	
 	TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage);

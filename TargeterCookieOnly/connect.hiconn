@@ -1,0 +1,13 @@
+
+{
+
+"_NAME" : "targeter_cookie_only",
+
+"_CPPFILES" : [ { "type": "Glob", "mask": "*.cpp" },
+	 			{ "type": "Glob", "mask": "*.cc" }],
+
+"_LINKFLAGS": [ "-lprotobuf" ],
+
+"_DEPS" : [	"../../hiaux/strings/"]
+
+}

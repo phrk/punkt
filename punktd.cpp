@@ -232,13 +232,11 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 
-//	m_geber_cli.reset(new GeberdCliApiClient(_config["geberd_url"]));
-	
 	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
-	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));
+	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
 	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage));
 	
-	//m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
+	m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
 	
 	m_punkt.reset(new Punkt(m_targeter_hashd,
 							_config ["systemid"],

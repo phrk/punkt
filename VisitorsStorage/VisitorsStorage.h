@@ -12,6 +12,22 @@
 
 class VisitorsStorage {
 	HashdClientAsyncPtr m_hashd_acli;
+	
+	//uint64_t getUniquePropVid(const std::string &_prop);
+	//void onGotUniquePropVid(bool _success, bool _exists, const std::string &_vid);
+	
+	//void mergeVisitors(uint64_t _vid0, uint64_t _vid1);
+	
+	void genVid(std::string &_vid);
+	
+	void getVisitor_onGotDeviceVid (bool _success,
+									bool _exists,
+									const std::string &_vid,
+									const std::string &_vdid,
+									boost::function<void(VisitorPtr)> _onVisitor); 
+	
+	void saveVid(const std::string &_vdid, const std::string &_vid); 
+	
 public:
 	
 	VisitorsStorage(HashdClientAsyncPtr _hashd_acli);
@@ -19,7 +35,13 @@ public:
 	void saveVisitor(VisitorHashd *_visitor);
 	
 	void onSaved(bool _success);
-	void onGotVisitor(bool _success, bool _exists, const std::string &_dump, const std::string &_vid, boost::function<void(VisitorPtr)> _onVisitor);
+	void onGotVisitor(bool _success,
+						bool _exists,
+						const std::string &_dump,
+						bool _newdevice,
+						const std::string &_vid,
+						const std::string &_vdid,
+						boost::function<void(VisitorPtr)> _onVisitor);
 };
 
 typedef boost::shared_ptr<VisitorsStorage> VisitorsStoragePtr;

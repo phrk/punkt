@@ -23,7 +23,7 @@
 
 #include "libpq-fe.h"
 
-#define PUNKTD_NTHREADS 4
+#define PUNKTD_NTHREADS 8
 
 class Punktd {	
 	
@@ -40,7 +40,6 @@ private:
 	
 	PunktPtr m_punkt;
 	HttpOutRequestDispPtr m_req_disp;
-	//GeberdCliApiClientPtr m_geber_cli;
 	GeberdCliApiClientAsyncPtr m_geber_acli;
 	ZeitClientAsyncPtr m_zeit_acli;
 	

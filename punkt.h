@@ -18,8 +18,6 @@ public:
 
 private:
 	
-//	hiaux::hashtable<uint64_t, AdPtr> m_ads;
-//	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
 	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
 	
 	hAutoLock lock;
@@ -30,10 +28,7 @@ private:
 	const std::string m_punkt_rsrc_url;
 
 	void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-	
-//	void onVkProfile(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-//	void genVid(std::string &_vid) const;
-	
+		
 	std::string getVkAuthCode(const std::string &_domain);
 	
 public:

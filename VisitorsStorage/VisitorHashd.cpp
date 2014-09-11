@@ -1,15 +1,25 @@
 #include "VisitorHashd.h"
 
 VisitorHashd::VisitorHashd(const std::string &_vid,
-					boost::function<void(VisitorHashd*)> _onSave):
+						const std::string &_vdid,
+						boost::function<void(VisitorHashd*)> _onSave,
+						bool _newdevice):
+	cur_vdid(_vdid),
 	m_onSave(_onSave),
-	Visitor(_vid) {
+	Visitor(_vid),
+	newdevice(_newdevice) {
 	
 }
 
-void VisitorHashd::getId(std::string &_vid) {
+std::string& VisitorHashd::getId(std::string &_vid) {
 	
 	_vid = m_vid;
+	return _vid;
+}
+
+std::string VisitorHashd::getId() {
+	
+	return m_vid;
 }
 
 void VisitorHashd::dump(std::string &_dump) {

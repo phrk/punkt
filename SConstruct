@@ -24,6 +24,10 @@ b.connectLib(hicore_path+"zeit/cpp-client/")
 b.connectLib("VisitorsStorage/")
 b.addPath("VisitorsStorage/")
 
+
+b.connectLib("TargeterCookieOnly/")
+b.addPath("TargeterCookieOnly/")
+
 b.addPath("../hashd/cpp-client/")
 
 b.addPath("./")

@@ -47,14 +47,10 @@ message VisitorExt {
 message Visitor {
 
 	required string id = 1;
-	repeated string devices = 2;
-	repeated VisitorExt ext = 3;
-};
-
-message VisitorBuilded {
-	
-	required string id = 1;
 	repeated VisitDevice devices = 2;
-	optional VkProfile vkprofile = 3;
-	repeated VisitorExt ext = 4;
+	repeated string unique_props = 4;
+	
+	repeated VisitorExt ext = 3;
+	
+	optional VkProfile vk_profile = 5;
 };

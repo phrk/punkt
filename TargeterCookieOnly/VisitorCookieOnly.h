@@ -2,6 +2,7 @@
 #define _VISITOR_COOKIE_ONLY_H_
 
 #include "Targeter.h"
+#include "Visitor.h"
 #include "hiaux/crypt/base64.h"
 #include "VisitorCookie.pb.h"
 

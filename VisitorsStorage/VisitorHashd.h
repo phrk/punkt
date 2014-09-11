@@ -1,5 +1,5 @@
-#ifndef _VISITOR_H_
-#define _VISITOR_H_
+#ifndef _VISITOR_HASHD_H_
+#define _VISITOR_HASHD_H_
 
 #include "hiconfig.h"
 #include "VisitDevice.h"
@@ -8,6 +8,7 @@
 
 #include <boost/function.hpp>
 
+#include "Visitor.h"
 #include "Targeter.h"
 
 class VisitorExt {
@@ -21,17 +22,22 @@ class VisitorHashd : public Visitor {
 public:
 	VkProfilePtr vk_profile;
 	std::vector<VisitDevice> devices;
-	
 	std::vector<VisitorExt> ext;
 	
+	bool newdevice;
+	std::string cur_vdid;
 	
 	VisitorHashd(const std::string &_vid,
-						boost::function<void(VisitorHashd*)> _onSave);
+					const std::string &_vdid,
+						boost::function<void(VisitorHashd*)> _onSave,
+						bool _newdevice);
 	
 	void parseProtobuf(const std::string &_dump);
 	void dump(std::string &_dump);
 	
-	void getId(std::string &_vid);
+	std::string& getId(std::string &_vid);
+	std::string getId();
+	
 	virtual void addQuery(const std::string &_q);
 	virtual void getQueries(std::vector<std::string> &_q);
 	virtual void save();

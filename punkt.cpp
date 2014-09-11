@@ -232,18 +232,6 @@ std::string Punkt::getVkAuthCode(const std::string &_domain) {
 	"head.appendChild(script);\n";
 }
 
-/*
-void Punkt::genVid(std::string &_vid) const {
-	
-	char bf[128];
-	sprintf(bf, "v%llu_%llu",time(0), rand()%10000);
-	_vid = std::string(bf);
-}
-
-void Punkt::onVkProfile(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
-		
-}
-*/
 void Punkt::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_evtype_str) {
 	
 	// format event
@@ -258,18 +246,6 @@ void Punkt::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, 
 }
 
 void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
-	
-	//_conn->setCookie("punkt_systemid_vid", "zhi est'");
-	
-	/*
-	std::string vid;
-	if (!_req->getCookie("punkt_vdid", vid)) {
-		
-		genVid(vid);
-		_conn->setCookie("punkt_vdid", vid);
-	}*/
-	
-	//std::cout << "id: " << id << std::endl;
 	
 	std::string demo_str;
 	if (_req->getField("demo", demo_str)) {

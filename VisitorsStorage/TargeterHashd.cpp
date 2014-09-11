@@ -6,33 +6,32 @@ TargeterHashd::TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _st
 	
 }
 
-void TargeterHashd::genVid(std::string &_vid) const {
+void TargeterHashd::genVdid(std::string &_vdid) const {
 	
 	char bf[128];
-	sprintf(bf, "v%llu_%llu", time(0), rand()%10000);
-	_vid = std::string(bf);
+	sprintf(bf, "vd%llu_%llu", time(0), rand()%10000);
+	_vdid = std::string(bf);
 }
 
 void TargeterHashd::getVisitor(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, boost::function<void(VisitorPtr)> _onGot) {
 	
-	std::string vid;
+	std::string vdid;
 	std::string dump;
 //	bool new_visitor = true;
-	if (!_req->getCookie("punkt_vid", vid)) {
+	if (!_req->getCookie("punkt_vdid", vdid)) {
 		
-		genVid(vid);
-		_conn->setCookie("punkt_vid", vid);
+		genVdid(vdid);
+		_conn->setCookie("punkt_vdid", vdid);
 		
 //		VisitorHashdPtr visitor(new VisitorHashd(vid, boost::bind(&TargeterHashd::saveVisitor, this, _1)));
 //		_onGot(visitor);
 //		return;
-		
 	}
 	// else
 //		new_visitor = false;
 	
 //	std::cout << "TargeterHashd::getVisitor " << vid << std::endl;
-	m_storage->getVisitor(vid, _onGot);
+	m_storage->getVisitor(vdid, _onGot);
 	
 	//boost::bind(&TargeterHashd::onGotVisitor, this, vid, _onGot, _1, _2));
 }
@@ -109,7 +108,7 @@ AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector
 	if (pit == m_places.end())
 		return AdPtr();
 
-	if (pit->second->ads.size()==0)		
+	if (pit->second->ads.size()==0)
 		return AdPtr();
 
 	AdPtr ad = pit->second->ads[ rand() % pit->second->ads.size() ];

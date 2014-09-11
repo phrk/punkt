@@ -7,20 +7,7 @@
 #include "ad.h"
 #include "PlaceTargets.h"
 
-class Visitor {
-protected:
-	std::string m_vid;
-public:
-	
-	Visitor(const std::string &_vid);
-	void getId(std::string &_vid);
-	virtual void addQuery(const std::string &_q) = 0;
-	virtual void getQueries(std::vector<std::string> &_q) = 0;
-	virtual void save() = 0;
-	virtual ~Visitor();
-};
-
-typedef boost::shared_ptr<Visitor> VisitorPtr;
+#include "Visitor.h"
 
 class Targeter {
 	
