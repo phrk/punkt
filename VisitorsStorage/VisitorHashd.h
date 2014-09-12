@@ -11,13 +11,10 @@
 #include "Visitor.h"
 #include "Targeter.h"
 
-class VisitorExt {
-public:
-	uint32_t extid;
-	std::string data;
-};
+#include "hiaux/crypt/base64.h"
 
 class VisitorHashd : public Visitor {
+	
 	boost::function<void(VisitorHashd*)> m_onSave;
 public:
 	VkProfilePtr vk_profile;
@@ -26,12 +23,14 @@ public:
 	
 	bool newdevice;
 	std::string cur_vdid;
+	VisitDevice *cur_device;
 	
 	VisitorHashd(const std::string &_vid,
 					const std::string &_vdid,
 						boost::function<void(VisitorHashd*)> _onSave,
 						bool _newdevice);
 	
+	void initCurDevice(const std::string &_vdid, const std::string &_user_agent);
 	void parseProtobuf(const std::string &_dump);
 	void dump(std::string &_dump);
 	

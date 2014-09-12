@@ -13,6 +13,8 @@ public:
 	std::string id;
 	std::string first_name;
 	std::string last_name;
+	
+	bool has_sex;
 	bool sex;
 	std::string bdate;
 	
@@ -28,8 +30,11 @@ public:
 	std::vector<std::string> friends;
 	std::vector<std::string> groups;
 	
-	void parseProtobuf(const std::string &_dump);
-	void dumpProtobuf(std::string &_dump);
+	VkProfile(const punkt::VkProfile &_pb);
+	void dump(punkt::VkProfile *_pb);
+	
+	//void parseProtobuf(const std::string &_dump);
+	//void dump(std::string &_dump);
 };
 
 typedef boost::shared_ptr<VkProfile> VkProfilePtr;

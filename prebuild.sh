@@ -1,1 +1,1 @@
-protoc --cpp_out=. *.proto && protoc --cpp_out=. ./VisitorsStorage/*.proto
+./TargeterCookieOnly/prebuild.sh  && ./VisitorsStorage/prebuild.sh

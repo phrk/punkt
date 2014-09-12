@@ -4,14 +4,15 @@ package punkt;
 message VkProfile {
 	
 	required string id = 1;
-	optional string first_name = 2;
-	optional string last_name = 3;
+	required string first_name = 2;
+	required string last_name = 3;
+	
 	optional bool sex = 4;
 	optional string bdate = 5;
 	
-	optional int32 city = 6;
-	optional int32 country = 7;
-	optional int32 timezone = 8;
+	optional uint32 city = 6;
+	optional uint32 country = 7;
+	optional uint32 timezone = 8;
 	optional string photo_url = 9;
 	
 	optional string site = 10;
@@ -22,35 +23,46 @@ message VkProfile {
 	repeated string groups = 14;
 };
 
-message VisitDevice {
-	
-	required string id = 1;
-	required string visitorid = 2;
-	required int64 create_ts = 3;
-	required string user_agent = 4;
-	
-	optional string vkid = 5;
-	
-	repeated string search_queries = 6;
-	repeated string domains_visited = 7;
-	repeated int64 ads_clicked = 8;
-	repeated int64 items_clicked = 9;
-	repeated int64 items_bought = 10;	
-};
-
 message VisitorExt {
 
-	required int32 extid = 1;
+	required uint32 extid = 1;
 	required string data = 2;
+};
+
+message VisitDevice {
+	
+	required string vdid = 1;
+	required uint64 create_ts = 2;
+	required string user_agent = 3;
+	
+	repeated string search_queries = 4;
+	repeated string domains_visited = 5;
+	
+	message AdDisps {
+		
+		required uint64 adid = 1;
+		required uint64 n = 2;
+	};
+	
+	message AdClicks {
+		
+		required uint64 adid = 1;
+		required uint64 n = 2;
+	};
+	
+	repeated AdDisps ads_disped = 6;
+	repeated AdClicks ads_clicked = 7;
+	
+	repeated VisitorExt ext = 8;
 };
 
 message Visitor {
 
-	required string id = 1;
+	required string vid = 1;
 	repeated VisitDevice devices = 2;
-	repeated string unique_props = 4;
+	repeated string unique_props = 3;
 	
-	repeated VisitorExt ext = 3;
+	repeated VisitorExt ext = 4;
 	
 	optional VkProfile vk_profile = 5;
 };
