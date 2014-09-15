@@ -234,7 +234,7 @@ Punktd::Punktd(const std::string &_config_file) {
 
 	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
 	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
-	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage));
+	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"]));
 	
 	m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
 	
@@ -251,8 +251,6 @@ Punktd::Punktd(const std::string &_config_file) {
 							HttpSrv::ResponseInfo("text/html; charset=utf-8", "punktd"),
 							boost::bind(&Punktd::connHandler, this, _1, _2)));
 
-	//m_punkt.reset(new Punkt(boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1)));
-	
 	bindFormatters(_config["punkt_url"], _config ["punkt_rsrc_url"]);
 	std::cout << "Formatters binded\n";
 	loadAds();
@@ -267,8 +265,6 @@ Punktd::Punktd(const std::string &_config_file) {
 }
 
 void Punktd::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
-	
-//	std::cout << "req path:" << _req->path << " url:" << _req->url << std::endl;
 	
 	checkReload();
 	m_punkt->connHandler(_conn, _req);

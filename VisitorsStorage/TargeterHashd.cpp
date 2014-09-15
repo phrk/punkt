@@ -1,8 +1,10 @@
 #include "TargeterHashd.h"
 
-TargeterHashd::TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage):
+TargeterHashd::TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage,
+			const std::string &_punkt_rsrc_url):
 	 Targeter::Targeter(_repl_id),
-	 m_storage(_storage) {
+	 m_storage(_storage),
+	 m_punkt_rsrc_url(_punkt_rsrc_url) {
 	
 }
 
@@ -100,7 +102,7 @@ uint64_t TargeterHashd::getAdOwner(uint64_t _adid) {
 	return ownerid;
 }
 
-AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries) {
+AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode) {
 	
 	hLockTicketPtr ticket = lock.lock();
 	
@@ -113,6 +115,11 @@ AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector
 
 	AdPtr ad = pit->second->ads[ rand() % pit->second->ads.size() ];
 	return ad;
+}
+
+void TargeterHashd::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	
 }
 
 void TargeterHashd::saveVisitor(VisitorHashd *_v) {

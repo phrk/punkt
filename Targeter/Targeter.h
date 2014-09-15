@@ -12,7 +12,6 @@
 class Targeter {
 	
 	std::string m_repl_id;
-
 public:
 		
 	typedef boost::shared_ptr<Visitor> VisitorPtr;
@@ -27,7 +26,9 @@ public:
 	virtual AdPtr getAd(uint64_t _adid) = 0;
 	virtual uint64_t getAdOwner(uint64_t _adid) = 0;
 	
-	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries) = 0;
+	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode) = 0;
+	
+	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) = 0;
 	
 	virtual ~Targeter();
 };

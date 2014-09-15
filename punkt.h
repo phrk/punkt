@@ -11,6 +11,8 @@
 
 #include "hiaux/strings/RefParser.h"
 
+#include "EventsTree.h"
+
 class Punkt {
 public:
 	
@@ -27,8 +29,11 @@ private:
 	std::string m_replid;
 	const std::string m_punkt_rsrc_url;
 
-	void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-		
+	ETN *m_event_router;
+
+	void handleFormatEvent(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);	
+	void handleTargeterEvent(const std::string &_method, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	
 	std::string getVkAuthCode(const std::string &_domain);
 	
 public:
@@ -44,12 +49,10 @@ public:
 	
 	uint64_t getAdOwner(uint64_t _adid);
 	
-	void handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_evtype_str);
-	
-	void handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleDemo(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
-	void handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handlePlace(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	void handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
 	void connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);

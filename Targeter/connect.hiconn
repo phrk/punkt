@@ -1,0 +1,13 @@
+
+{
+
+"_NAME" : "punkt_targeter",
+
+"_CPPFILES" : [ { "type": "Glob", "mask": "*.cpp" },
+	 			{ "type": "Glob", "mask": "*.cc" }],
+
+"_LINKFLAGS": [ "-lprotobuf" ],
+
+"_DEPS" : [	"../../hiaux/strings/"]
+
+}

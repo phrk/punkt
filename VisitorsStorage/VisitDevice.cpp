@@ -77,7 +77,7 @@ VisitDevice::VisitDevice(const punkt::VisitDevice &_pb) {
 
 void VisitDevice::dump(punkt::VisitDevice *_pb) {
 	
-	std::cout << "VisitDevice::dump\n";
+//	std::cout << "VisitDevice::dump\n";
 	
 	_pb->set_vdid(vdid);
 	_pb->set_create_ts(create_ts);

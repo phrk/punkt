@@ -23,7 +23,9 @@ public:
 	virtual AdPtr getAd(uint64_t _adid);
 	virtual uint64_t getAdOwner(uint64_t _adid);
 
-	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries);
+	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode);
+	
+	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
 	void saveVisitor(VisitorCookieOnly *_v);
 	

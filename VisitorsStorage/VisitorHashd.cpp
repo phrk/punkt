@@ -13,16 +13,16 @@ VisitorHashd::VisitorHashd(const std::string &_vid,
 
 void VisitorHashd::initCurDevice(const std::string &_vdid, const std::string &_user_agent) {
 	
-	std::cout << "VisitorHashd::initCurDevice devices: " << devices.size() << std::endl;
+//	std::cout << "VisitorHashd::initCurDevice devices: " << devices.size() << std::endl;
 	
 	for (size_t i = 0; i<devices.size(); i++)
 		if (devices[i].vdid == _vdid) {
 			cur_device = &devices[i];
-			std::cout << "device already exists " << _vdid << std::endl;
+//			std::cout << "device already exists " << _vdid << std::endl;
 			return;
 		}
 	
-	std::cout << "adding new device " << _vdid << std::endl;
+//	std::cout << "adding new device " << _vdid << std::endl;
 	newdevice = true;
 	devices.push_back(VisitDevice(_vdid, _user_agent, time(0)));
 }
@@ -102,11 +102,15 @@ void VisitorHashd::parseProtobuf(const std::string &_dump) {
 
 void VisitorHashd::addQuery(const std::string &_q) {
 	
-	
+	cur_device->search_queries.push_back(_q);	
 }
 
 void VisitorHashd::getQueries(std::vector<std::string> &_q) {
 	
+	for (size_t i = 0; i<devices.size(); i++) {
+		for (size_t j = 0; j<devices[i].search_queries.size(); j++)
+			_q.push_back(devices[i].search_queries[j]);
+	}
 }
 
 void VisitorHashd::save() {

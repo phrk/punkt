@@ -25,8 +25,8 @@
 
 #define PUNKTD_NTHREADS 8
 
-class Punktd {	
-	
+class Punktd {
+
 private:
 	hThreadPoolPtr m_pool;
 	TaskLauncherPtr m_srv_tasklauncher;

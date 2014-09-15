@@ -14,10 +14,13 @@ class TargeterHashd : public Targeter {
 	
 	VisitorsStoragePtr m_storage;
 	
+	std::string m_punkt_rsrc_url;
+	
 	void genVdid(std::string &_vdid) const;
 public:
 	
-	TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage);
+	TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage,
+			const std::string &_punkt_rsrc_url);
 	
 	virtual void getVisitor(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
 //	void onGotVisitor(const std::string &_vid, boost::function<void(VisitorPtr)> _onGot, bool _success, VisitorPtr _v);
@@ -28,7 +31,9 @@ public:
 	virtual AdPtr getAd(uint64_t _adid);
 	virtual uint64_t getAdOwner(uint64_t _adid);
 
-	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries);
+	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode);
+	
+	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
 	void saveVisitor(VisitorHashd *_v);
 	

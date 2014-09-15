@@ -85,10 +85,16 @@ public:
 	void onGotShowcaseDemo(bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
-	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args);
+	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode);
 	virtual void formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args);
 	
 	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	virtual void handleTargeterEvent(const std::string &_method,
+									uint64_t _pid,
+									uint64_t _adid,
+									const std::map<std::string, std::string> &_params,
+									HttpSrv::ConnectionPtr _conn,
+									HttpSrv::RequestPtr _req);
 	
 	void onCalledZeit (bool _success);
 	

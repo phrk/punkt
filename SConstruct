@@ -21,9 +21,11 @@ b.connectLib(hicore_path+"geber/")
 b.addPath(hicore_path+"zeit/cpp-client/")
 b.connectLib(hicore_path+"zeit/cpp-client/")
 
+b.connectLib("Targeter/")
+b.addPath("Targeter/")
+
 b.connectLib("VisitorsStorage/")
 b.addPath("VisitorsStorage/")
-
 
 b.connectLib("TargeterCookieOnly/")
 b.addPath("TargeterCookieOnly/")

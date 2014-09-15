@@ -87,7 +87,7 @@ uint64_t TargeterCookieOnly::getAdOwner(uint64_t _adid) {
 	return ownerid;
 }
 
-AdPtr TargeterCookieOnly::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries) {
+AdPtr TargeterCookieOnly::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode) {
 	
 	hLockTicketPtr ticket = lock.lock();
 	
@@ -100,6 +100,10 @@ AdPtr TargeterCookieOnly::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::v
 
 	AdPtr ad = pit->second->ads[ rand() % pit->second->ads.size() ];
 	return ad;
+}
+
+void TargeterCookieOnly::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
 }
 
 void TargeterCookieOnly::saveVisitor(VisitorCookieOnly *_v) {

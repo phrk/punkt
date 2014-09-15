@@ -6,6 +6,8 @@
 #include "VisitDevice.h"
 #include "VisitorHashd.h"
 
+#include "VisitorsStorageConsts.h"
+
 #include "HashdClientAsync.h"
 
 #include <boost/function.hpp>

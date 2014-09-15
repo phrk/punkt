@@ -101,7 +101,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, click_templates, _args_js));
 }
 
-void ShowcaseSliderFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args) {
+void ShowcaseSliderFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode) {
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
 	
@@ -257,7 +257,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	"\n"
 	"document._punkt_codes[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
-	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
+	"	var formatter_args = JSON.parse(\'" + escape_quote(args->json_dump) + "\') \n"
 	"	return renderShowcaseSlider(" + uint64_to_string(_ad_req->pid) +  ", show, formatter_args, '" + format_files_path + "', null, " + booltostr(_ad_req->https) + ");\n"
 	"}\n"
 	
@@ -333,7 +333,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	"\n"
 	"document._punkt_codes[\"" + uint64_to_string(_ad_req->pid) + "\"] = function (click_url) {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
-	"	var formatter_args = JSON.parse(\'" + args->json_dump + "\') \n"
+	"	var formatter_args = JSON.parse(\'" + escape_quote(args->json_dump) + "\') \n"
 	"	return renderShowcaseSlider(" + uint64_to_string(_ad_req->pid) +  ", show, formatter_args, '" + format_files_path + "', click_url," 
 			+ booltostr(_ad_req->https) + ");\n"
 	"}\n"

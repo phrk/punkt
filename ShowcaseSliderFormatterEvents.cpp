@@ -218,7 +218,7 @@ void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, Ht
 		return;
 	}
 
-	if (ev_str == "showdisp") {
+	if (ev_str == "disp") {
 		
 		handleShowDispEvent(_conn, _req);
 
@@ -248,3 +248,11 @@ void ShowcaseSliderFormatter::onCalledZeit (bool _success) {
 		std::cout << "zeit call fail" << std::endl;
 }
 
+void ShowcaseSliderFormatter::handleTargeterEvent(const std::string &_method,
+								uint64_t _pid,
+								uint64_t _adid,
+								const std::map<std::string, std::string> &_params,
+								HttpSrv::ConnectionPtr _conn,
+								HttpSrv::RequestPtr _req) {
+									
+}

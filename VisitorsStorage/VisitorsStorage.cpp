@@ -24,14 +24,14 @@ void VisitorsStorage::getVisitor_onGotDeviceVid (bool _success,
 												const std::string &_vdid,
 												boost::function<void(VisitorPtr)> _onVisitor) {
 	
-	std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid _success: " << _success << " _exists:" << _exists << " _vid:" << _vid << "|" << std::endl;
+//	std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid _success: " << _success << " _exists:" << _exists << " _vid:" << _vid << "|" << std::endl;
 	
 	bool newdevice = false;
 	if (_success && !_exists)
 		newdevice =  true;
 	
 	if (_success && _exists) {
-		std::cout << "m_hashd_acli->get visitors " << _vid << std::endl;
+//		std::cout << "m_hashd_acli->get visitors " << _vid << std::endl;
 		m_hashd_acli->get("visitors", _vid, boost::bind(&VisitorsStorage::onGotVisitor, this, _1, _2, _3, newdevice, _vid, _vdid, _onVisitor));
 		return;
 	}
@@ -43,7 +43,7 @@ void VisitorsStorage::getVisitor_onGotDeviceVid (bool _success,
 
 void VisitorsStorage::saveVid(const std::string &_vdid, const std::string &_vid) {
 	
-	std::cout << "VisitorsStorage::saveVid " << _vdid << " " << _vid << std::endl;
+//	std::cout << "VisitorsStorage::saveVid " << _vdid << " " << _vid << std::endl;
 	m_hashd_acli->set("devicevids", _vdid, _vid, boost::bind(&VisitorsStorage::onSaved, this, _1));
 }
 
@@ -60,7 +60,7 @@ void VisitorsStorage::onGotVisitor(bool _success,
 									const std::string &_vdid,
 									boost::function<void(VisitorPtr)> _onVisitor) {
 	
-	std::cout << "VisitorsStorage::onGotVisitor _success:" << _success << " _exists:" << _exists << std::endl; 
+//	std::cout << "VisitorsStorage::onGotVisitor _success:" << _success << " _exists:" << _exists << std::endl; 
 	
 	std::string _user_agent = "_USER AGENT_";
 	
@@ -85,7 +85,7 @@ void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 	_visitor->dump(dump);
 	_visitor->getId(vid);
 	
-	std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
+//	std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
 	
 	m_hashd_acli->set("visitors", vid, dump, boost::bind(&VisitorsStorage::onSaved, this, _1));
 	
@@ -94,12 +94,12 @@ void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 		saveVid(_visitor->cur_vdid, _visitor->getId());
 	}
 	
-	std::cout << "devices: " << _visitor->devices.size() << std::endl;
+//	std::cout << "devices: " << _visitor->devices.size() << std::endl;
 	
 	//std::cout << "VisitorsStorage::saveVisitor NEW DEVICE=" << _visitor->newdevice << " " << _visitor->getId() << " " << _visitor->cur_vdid << " " << dump << std::endl;
 }
 
 void VisitorsStorage::onSaved(bool _success) {
 	
-	std::cout << "VisitorsStorage::onSaved " << _success << std::endl;
+//	std::cout << "VisitorsStorage::onSaved " << _success << std::endl;
 }

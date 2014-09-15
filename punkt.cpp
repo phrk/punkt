@@ -9,6 +9,30 @@ Punkt::Punkt(TargeterPtr _targeter,
 	m_replid(_replid),
 	m_punkt_rsrc_url(_punkt_rsrc_url) {
 		
+	ETN *evtype = 
+			new ETN(EVENT_EQUALS,
+					"fev",
+						new ETN ("fid",
+								new ETN (boost::bind(&Punkt::handleFormatEvent, this, _1, _2, _3))),
+					"tev",
+						new ETN ("fid",
+							new ETN ("disp",
+								 	new ETN ("pid",
+											new ETN ("adid",
+														new ETN (boost::bind(&Punkt::handleTargeterEvent, this, "disp", _1, _2, _3)))),
+									"click",
+									new ETN ("pid",
+											new ETN ("adid",
+														new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3)))))));
+
+	ETN *demo = new ETN(boost::bind(&Punkt::handleDemo, this, _1, _2, _3));
+
+	ETN *place = new ETN("pid",
+							new ETN(boost::bind(&Punkt::handlePlace, this, _1, _2, _3)));
+
+	m_event_router = new ETN ("demo", demo,
+								"evtype", evtype,
+								"pid", place);
 }
 
 void Punkt::updateAd(AdPtr _ad) {
@@ -56,7 +80,7 @@ void Punkt::updateFormatter(uint64_t _fid, FormatterPtr _formatter) {
 	m_formatters[_fid] = _formatter;
 }
 
-void Punkt::handleDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::handleDemo(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	m_targeter->getVisitor(_conn, _req, boost::bind(&Punkt::handleDemoGotVisitor, this, _1, _conn, _req));
 }
@@ -124,9 +148,15 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _co
 	formatter->formatDemo(ad_req, formatter_args);
 }
 
-void Punkt::handlePlace(uint64_t _pid, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::handlePlace(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	m_targeter->getVisitor(_conn, _req, boost::bind(&Punkt::handlePlaceGotVisitor, this, _pid, _1, _conn, _req));
+	uint64_t _pid;
+	std::string pid_str;
+	if (!_req->getField("pid", pid_str)) {
+		
+	}
+	
+	m_targeter->getVisitor(_conn, _req, boost::bind(&Punkt::handlePlaceGotVisitor, this, string_to_uint64(pid_str), _1, _conn, _req));
 }
 
 void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
@@ -140,6 +170,7 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::C
 	std::string bf;
 	std::string query;
 	std::vector<std::string> queries;
+	std::string extcode;
 	
 	if (_req->getField("ref", bf)) {
 		
@@ -149,7 +180,7 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::C
 	
 	{
 				
-		AdPtr ad = m_targeter->getAdToShow(_pid, _visitor, queries);
+		AdPtr ad = m_targeter->getAdToShow(_pid, _visitor, queries, extcode);
 	
 		if (!ad) {
 			std::cout << "not got ad\n";
@@ -184,20 +215,12 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::C
 	
 	_visitor->getQueries(ad_req->search_queries);
 	_visitor->save();
-	formatter->format(ad_req, args);
+	formatter->format(ad_req, args, extcode);
 }
 
-void Punkt::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
-	
-	std::string format_id_str;
-	
-	if (!_req->getField("fid", format_id_str)) {
-		_conn->sendResponse("{ \"status\" : \"fid not set\" }");
-		_conn->close();
-		return;
-	}
-	
-	uint64_t format_id = string_to_uint64(format_id_str);
+void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+		
+	uint64_t format_id = string_to_uint64(_params.at("fid"));
 	
 	FormatterPtr format;
 	
@@ -211,6 +234,32 @@ void Punkt::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr 
 		format = it->second;
 	}
 	format->handleFormatEvent(_conn, _req);
+}
+
+void Punkt::handleTargeterEvent(const std::string &_method,
+								const std::map<std::string, std::string> &_params,
+								HttpSrv::ConnectionPtr _conn,
+								HttpSrv::RequestPtr _req) {
+	
+	uint64_t pid = string_to_uint64(_params.at("pid"));
+	uint64_t adid = string_to_uint64(_params.at("adid"));
+	
+	m_targeter->handleEvent(_method, pid, adid, _params, _conn, _req);
+	
+	uint64_t format_id = string_to_uint64(_params.at("fid"));
+	
+	FormatterPtr format;
+	
+	{
+		hiaux::hashtable<uint64_t, FormatterPtr>::iterator it = m_formatters.find(format_id);
+		if (it == m_formatters.end()) {
+			_conn->sendResponse("{ \"status\" : \"unknown format\" }");
+			_conn->close();
+			return;
+		}
+		format = it->second;
+	}
+	format->handleTargeterEvent(_method, pid, adid, _params, _conn, _req);
 }
 
 std::string Punkt::getVkAuthCode(const std::string &_domain) {
@@ -232,43 +281,9 @@ std::string Punkt::getVkAuthCode(const std::string &_domain) {
 	"head.appendChild(script);\n";
 }
 
-void Punkt::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, const std::string &_evtype_str) {
-	
-	// format event
-	if (_evtype_str == "fev") {
-		
-		handleFormatEvent(_conn, _req);
-		
-	} else if (_evtype_str == "vkmatch") {
-		
-		
-	}
-}
-
 void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	std::string demo_str;
-	if (_req->getField("demo", demo_str)) {
-		
-		handleDemo(_conn, _req);
-		return;
-	}
-	
-	std::string evtype_str;
-	if (_req->getField("evtype", evtype_str)) {
-		
-		handleEvent(_conn, _req, evtype_str);
-		return;
-	}
-	
-	std::string pid_str;
-	if (!_req->getField("pid", pid_str)) {
-		_conn->sendResponse("{ \"status\" : \"pid not set\" }");
-		_conn->close();
-		return;
-	}
-	
-	handlePlace(string_to_uint64(pid_str), _conn, _req);
+	m_event_router->handleEvent(_conn, _req);
 }
 
 uint64_t Punkt::getAdOwner(uint64_t _adid) {
