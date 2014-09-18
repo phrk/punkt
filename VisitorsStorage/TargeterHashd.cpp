@@ -1,10 +1,12 @@
 #include "TargeterHashd.h"
 
 TargeterHashd::TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage,
-			const std::string &_punkt_rsrc_url):
+			const std::string &_punkt_rsrc_url,
+			ZeitClientAsyncPtr _zeit_acli):
 	 Targeter::Targeter(_repl_id),
 	 m_storage(_storage),
-	 m_punkt_rsrc_url(_punkt_rsrc_url) {
+	 m_punkt_rsrc_url(_punkt_rsrc_url),
+	 m_zeit_acli(_zeit_acli) {
 	
 }
 
@@ -119,7 +121,14 @@ AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector
 
 void TargeterHashd::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	
+	if (_method == "disp") {
+		
+		handleDispEvent(_pid, _adid, _params, _conn, _req);
+		
+	} else if (_method == "click") {
+		
+		handleClickEvent(_pid, _adid, _params, _conn, _req);
+	}
 }
 
 void TargeterHashd::saveVisitor(VisitorHashd *_v) {

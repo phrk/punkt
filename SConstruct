@@ -24,6 +24,9 @@ b.connectLib(hicore_path+"zeit/cpp-client/")
 b.connectLib("Targeter/")
 b.addPath("Targeter/")
 
+b.addPath("Formatters/")
+b.addCppGlob("Formatters/*.cpp")
+
 b.connectLib("VisitorsStorage/")
 b.addPath("VisitorsStorage/")
 

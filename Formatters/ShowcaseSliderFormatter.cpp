@@ -3,12 +3,14 @@
 ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems,
 	 const hiaux::hashtable<std::string, std::string> &_partner_ids,
 	 const hiaux::hashtable<std::string, std::string> &_click_templates,
+	 const std::string &_type,
 	 const std::string &_json_dump):
 	shid(_shid),
 	nitems(_nitems),
 	partner_ids(_partner_ids),
 	click_templates(_click_templates),
-	json_dump(_json_dump) {
+	json_dump(_json_dump),
+	type(_type) {
 }
 
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
@@ -38,6 +40,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	int nitems;
 	hiaux::hashtable<std::string, std::string> partner_ids;
 	hiaux::hashtable<std::string, std::string> click_templates;
+	std::string type;
 	
 	json_error_t error;
 	json_t *root = json_loads(_args_js.c_str(), 0, &error);
@@ -48,6 +51,14 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	} else {
 		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse shid\n";
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse shid";
+	}
+	
+	json_t *j_type = json_object_get(root, "type");
+	if (json_is_string(j_type)) {
+		type = std::string(json_string_value(j_type));
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse type\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse type";
 	}
 	
 	json_t *j_nitems = json_object_get(root, "nitems");
@@ -98,7 +109,7 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	
 	json_decref(root);
 	
-	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, click_templates, _args_js));
+	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, click_templates, type, _args_js));
 }
 
 void ShowcaseSliderFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode) {
@@ -150,7 +161,7 @@ void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,
 	replaceSubstring(aim, "{clickid}", clickid_c);
 	
 	escapeUrl(aim);
-	_target = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
+	_target = m_punkt_url + "?evtype=tev&fid=1&ev=click&pid=" + 
 					uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_itemid) + "&aim=" + aim;
 }
 
@@ -197,7 +208,7 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 			aim += partner_param;
 
 			escapeUrl(aim);
-			_show.items[i].directurl = m_punkt_url + "?evtype=fev&fid=1&ev=click&pid=" + 
+			_show.items[i].directurl = m_punkt_url + "?evtype=tev&fid=1&ev=click&pid=" + 
 				uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_show.items[i].id) + "&aim=" + aim;
 		}
 	}
@@ -258,11 +269,12 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	"document._punkt_codes[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () {\n"
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 	"	var formatter_args = JSON.parse(\'" + escape_quote(args->json_dump) + "\') \n"
-	"	return renderShowcaseSlider(" + uint64_to_string(_ad_req->pid) +  ", show, formatter_args, '" + format_files_path + "', null, " + booltostr(_ad_req->https) + ");\n"
+	"	return renderShowcaseSlider(" + uint64_to_string(_ad_req->pid) +  ", show, formatter_args, '" 
+									+ format_files_path + "', null, " + booltostr(_ad_req->https) + ", '" + args->type +"');\n"
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () { \n"
-	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', true, '" +m_punkt_url+ "', " +uint64_to_string(_ad_req->adid)+ " ); \n"
+	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', true, '" +m_punkt_url+ "', " +uint64_to_string(_ad_req->adid)+ ", '" + args->type + "' ); \n"
 	"} \n";
 	
 	std::string resp = \		

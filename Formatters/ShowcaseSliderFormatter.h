@@ -25,11 +25,13 @@ public:
 	hiaux::hashtable<std::string, std::string> partner_ids;
 	hiaux::hashtable<std::string, std::string> click_templates;
 	std::string json_dump;
+	std::string type;
 	
 	ShowcaseSliderFormatterArgs(uint64_t _shid,
 								int _nitems,
 								const hiaux::hashtable<std::string, std::string> &_partner_ids,
 								const hiaux::hashtable<std::string, std::string> &_click_templates,
+								const std::string &_type,
 								const std::string &_json_dump);
 };
 

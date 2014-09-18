@@ -70,7 +70,10 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 													boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1) ));
 																								
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);
+		m_punkt->updateFormatter(SHOWCASE_SLIDER_304_224_FORMATTER_ID, f);
+		
 		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_FORMATTER_ID, f));
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_304_224_FORMATTER_ID, f));
 	}
 }
 
@@ -232,9 +235,13 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 
+	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
+	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
+
 	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
 	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
-	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"]));
+	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
+							m_zeit_acli));
 	
 	m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
 	
@@ -242,10 +249,6 @@ Punktd::Punktd(const std::string &_config_file) {
 							_config ["systemid"],
 							_config ["replid"],
 							_config ["punkt_rsrc_url"]));
-	
-	
-	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
-	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
 	
 	m_srv.reset(new HttpSrv(m_srv_tasklauncher,
 							HttpSrv::ResponseInfo("text/html; charset=utf-8", "punktd"),

@@ -11,7 +11,9 @@
 
 class Targeter {
 	
+protected:
 	std::string m_repl_id;
+	boost::function<uint64_t(uint64_t)> m_getAdOwner;
 public:
 		
 	typedef boost::shared_ptr<Visitor> VisitorPtr;

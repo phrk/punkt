@@ -76,7 +76,7 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 	if (_req->getField(parent_name, parent_value)) {
 		
 	}
-	
+		
 	std::string bf;
 	std::map<std::string, EventsTreeNode*>::iterator it = m_children.begin();
 	std::map<std::string, EventsTreeNode*>::iterator end = m_children.end();
@@ -87,15 +87,16 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 			
 			if (it->first == parent_value) {
 				
-				_params[ parent_name ] = parent_value;
+				//_params[ parent_name ] = parent_value;
 				it->second->doHandleEvent(_params, _conn, _req);
 				return;
 			}
 			
 		} else {
 		
+		
 			if (_req->getField(it->first, bf)) {
-			
+							
 				_params[ it->first ] = bf;
 				it->second->doHandleEvent(_params, _conn, _req);
 				return;

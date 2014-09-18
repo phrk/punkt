@@ -16,14 +16,16 @@ Punkt::Punkt(TargeterPtr _targeter,
 								new ETN (boost::bind(&Punkt::handleFormatEvent, this, _1, _2, _3))),
 					"tev",
 						new ETN ("fid",
-							new ETN ("disp",
-								 	new ETN ("pid",
-											new ETN ("adid",
-														new ETN (boost::bind(&Punkt::handleTargeterEvent, this, "disp", _1, _2, _3)))),
-									"click",
-									new ETN ("pid",
-											new ETN ("adid",
-														new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3)))))));
+							new ETN ("ev",
+								new ETN (EVENT_EQUALS,
+											"disp",
+										 	new ETN ("pid",
+													new ETN ("adid",
+																new ETN (boost::bind(&Punkt::handleTargeterEvent, this, "disp", _1, _2, _3)))),
+											"click",
+											new ETN ("pid",
+													new ETN ("adid",
+																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3))))))));
 
 	ETN *demo = new ETN(boost::bind(&Punkt::handleDemo, this, _1, _2, _3));
 
@@ -245,7 +247,7 @@ void Punkt::handleTargeterEvent(const std::string &_method,
 	uint64_t adid = string_to_uint64(_params.at("adid"));
 	
 	m_targeter->handleEvent(_method, pid, adid, _params, _conn, _req);
-	
+	/*
 	uint64_t format_id = string_to_uint64(_params.at("fid"));
 	
 	FormatterPtr format;
@@ -259,7 +261,7 @@ void Punkt::handleTargeterEvent(const std::string &_method,
 		}
 		format = it->second;
 	}
-	format->handleTargeterEvent(_method, pid, adid, _params, _conn, _req);
+	format->handleTargeterEvent(_method, pid, adid, _params, _conn, _req);*/
 }
 
 std::string Punkt::getVkAuthCode(const std::string &_domain) {

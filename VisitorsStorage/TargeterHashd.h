@@ -1,10 +1,13 @@
 #ifndef _TARGETER_HASHD_H_
 #define _TARGETER_HASHD_H_
 
+#include "hiconfig.h"
 #include "Targeter.h"
 #include "VisitorHashd.h"
 #include "VisitorsStorage.h"
 #include "Visitor.h"
+
+#include "zeit_client_async.h"
 
 class TargeterHashd : public Targeter {
 	
@@ -13,14 +16,18 @@ class TargeterHashd : public Targeter {
 	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
 	
 	VisitorsStoragePtr m_storage;
+	ZeitClientAsyncPtr m_zeit_acli;
 	
 	std::string m_punkt_rsrc_url;
 	
 	void genVdid(std::string &_vdid) const;
+	void handleClickEvent(uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleDispEvent(uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 public:
 	
 	TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage,
-			const std::string &_punkt_rsrc_url);
+			const std::string &_punkt_rsrc_url,
+			ZeitClientAsyncPtr _zeit_acli);
 	
 	virtual void getVisitor(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
 //	void onGotVisitor(const std::string &_vid, boost::function<void(VisitorPtr)> _onGot, bool _success, VisitorPtr _v);
@@ -36,6 +43,7 @@ public:
 	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
 	
 	void saveVisitor(VisitorHashd *_v);
+	void onCalledZeit (bool _success);
 	
 	virtual ~TargeterHashd();
 };

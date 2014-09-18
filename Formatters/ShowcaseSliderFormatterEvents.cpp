@@ -210,6 +210,7 @@ void ShowcaseSliderFormatter::handleConvEvent(HttpSrv::ConnectionPtr _conn, Http
 
 void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 
+	/*
 	std::string ev_str;
 	if (!_req->getField("ev", ev_str)) {
 		
@@ -239,7 +240,7 @@ void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, Ht
 	}
 
 	//_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleFormatEvent called\" }");
-	_conn->close();
+	_conn->close();*/
 }
 
 void ShowcaseSliderFormatter::onCalledZeit (bool _success) {

@@ -1,8 +1,10 @@
 #ifndef _TARGETER_COOKIE_ONLY_H_
 #define _TARGETER_COOKIE_ONLY_H_
 
+#include "hiconfig.h"
 #include "Targeter.h"
 #include "VisitorCookieOnly.h"
+#include <math.h>
 
 class TargeterCookieOnly : public Targeter {
 	

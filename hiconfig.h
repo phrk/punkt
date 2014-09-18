@@ -14,6 +14,7 @@
 
 #define __STDC_LIMIT_MACROS
 #include <stdint.h>
+#include <string.h>
 //#define NO_STD_TR1
 
 #else
