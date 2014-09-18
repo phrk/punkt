@@ -14,6 +14,9 @@ hithird_path = "../"
 b.addPath(hicore_path)
 b.addPath(hiaux_path)
 
+b.addPath("/usr/local/include")
+
+
 b.connectLib(hicore_path+"geber/cpp-client/")
 b.addPath(hicore_path+"geber/")
 b.connectLib(hicore_path+"geber/")
