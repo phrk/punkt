@@ -39,10 +39,18 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 		if (click_url != null)
 			show.items[i].directurl = click_url + escape(show.items[i].directurl);
 		
+		var imgurl;
+		if (formatter_args.imgq == "1")
+			imgurl = show.items[i].imgurl_q1;
+		else if (formatter_args.imgq == "2")
+			imgurl = show.items[i].imgurl_q2;
+		else if (formatter_args.imgq == "3")
+			imgurl = show.items[i].imgurl_q3;	
+		
 		if (https)
-			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + makeHttpsUrl(show.items[i].imgurl) + ' class="oshop_240_400_slider_img"></a>';
+			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + makeHttpsUrl(imgurl) + ' class="oshop_240_400_slider_img"></a>';
 		else
-			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + show.items[i].imgurl + ' class="oshop_240_400_slider_img"></a>';
+			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + imgurl + ' class="oshop_240_400_slider_img"></a>';
 		
 		ret += '</td>';
 		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:' + formatter_args.textfont + ' ; font-size:12pt; color:' + formatter_args.textcolor 
@@ -140,10 +148,18 @@ function renderShowcaseSlider304x224x1 (pid, show, formatter_args, format_files_
 		if (click_url != null)
 			show.items[i].directurl = click_url + escape(show.items[i].directurl);
 		
+		var imgurl;
+		if (formatter_args.imgq == "1")
+			imgurl = show.items[i].imgurl_q1;
+		else if (formatter_args.imgq == "2")
+			imgurl = show.items[i].imgurl_q2;
+		else if (formatter_args.imgq == "3")
+			imgurl = show.items[i].imgurl_q3;	
+		
 		if (https)
-			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + makeHttpsUrl(show.items[i].imgurl) + ' class="oshop_304_224_slider_img"></a>';
+			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + makeHttpsUrl(imgurl) + ' class="oshop_304_224_slider_img"></a>';
 		else
-			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + show.items[i].imgurl + ' class="oshop_304_224_slider_img"></a>';
+			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + imgurl + ' class="oshop_304_224_slider_img"></a>';
 		
 		ret += '</td>';
 		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:' + formatter_args.textfont + ' ; font-size:12pt; color:' + formatter_args.textcolor 
