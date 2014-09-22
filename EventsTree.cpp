@@ -99,6 +99,7 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 							
 				_params[ it->first ] = bf;
 				it->second->doHandleEvent(_params, _conn, _req);
+				_conn->close();
 				return;
 			}
 		}

@@ -286,6 +286,7 @@ std::string Punkt::getVkAuthCode(const std::string &_domain) {
 void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
 	m_event_router->handleEvent(_conn, _req);
+	_conn->close();
 }
 
 uint64_t Punkt::getAdOwner(uint64_t _adid) {

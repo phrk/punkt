@@ -88,12 +88,33 @@ void Punktd::checkReload() {
 	m_last_reload_ts = time(0);
 }
 
+bool Punktd::doCheckDbConn(size_t _attempt) {
+	
+	if (_attempt > 10)
+		return false;
+	
+	if (PQstatus(m_pg) != CONNECTION_OK) {
+		
+		std::cout << "Reseting connection to PostgreSQL\n;";
+		PQreset(m_pg);
+		return doCheckDbConn(_attempt + 1);
+	}
+	return true;
+}
+
+bool Punktd::checkDbConn() {
+	
+	return doCheckDbConn(0);
+}
+
 void Punktd::loadAds() {
 	std::string query("SELECT * FROM punkt.ads");
 	PGresult *res = PQexec(m_pg, query.c_str());
 	
 	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
 		std::cout << "Punktd::loadAds !PGRES_TUPLES_OK\n";
+		
+		//checkDbConn();
 		return;
 	}
 	
@@ -182,7 +203,6 @@ void Punktd::loadPlaces() {
 			continue;
 		}
 		
-		
 		std::vector<uint64_t> ads_ids;
 		loadPlaceTarges(id, ads_ids);
 		m_punkt->updatePlaceTargets(id, ads_ids);
@@ -245,7 +265,7 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
 	
-	m_punkt.reset(new Punkt(m_targeter_hashd,
+	m_punkt.reset(new Punkt(m_targeter,
 							_config ["systemid"],
 							_config ["replid"],
 							_config ["punkt_rsrc_url"]));
@@ -268,6 +288,10 @@ Punktd::Punktd(const std::string &_config_file) {
 }
 
 void Punktd::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+	
+	_conn->sendResponse("_finished_");
+	_conn->close();
+	return;
 	
 	checkReload();
 	m_punkt->connHandler(_conn, _req);

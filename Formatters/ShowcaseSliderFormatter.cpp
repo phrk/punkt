@@ -34,7 +34,7 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 
 FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js) {
 
-	std::cout << "ShowcaseSliderFormatter::parseArgs " <<  _args_js << std::endl;
+	//std::cout << "ShowcaseSliderFormatter::parseArgs " <<  _args_js << std::endl;
 
 	uint64_t shid;
 	int nitems;

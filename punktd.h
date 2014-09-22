@@ -62,6 +62,9 @@ private:
 	void loadAds();
 	
 	void checkReload();
+	
+	bool doCheckDbConn(size_t _attempt);
+	bool checkDbConn();
 public:
 	
 	void onFinished();
