@@ -1,7 +1,6 @@
 #include "AdRequest.h"
 
-AdRequest::AdRequest(HttpSrv::ConnectionPtr _conn,
-					HttpSrv::RequestPtr _req,
+AdRequest::AdRequest(HttpConnectionPtr _conn, HttpRequestPtr _req,
 					uint64_t _pid,
 					uint64_t _adid,
 					bool _https):

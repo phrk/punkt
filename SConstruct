@@ -43,6 +43,7 @@ b.addPath("./")
 b.addPath(hiaux_path+"hiaux/structs/")
 b.connectLib(hiaux_path+"hiaux/loadconf/")
 b.connectLib(hiaux_path+"hiaux/network/")
+b.connectLib(hiaux_path+"hiaux/network/HttpServer/")
 b.connectLib(hiaux_path+"hiaux/crypt/")
 
 b.addPath(hithird_path+"thirdparty/http-parser/")

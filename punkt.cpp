@@ -82,18 +82,18 @@ void Punkt::updateFormatter(uint64_t _fid, FormatterPtr _formatter) {
 	m_formatters[_fid] = _formatter;
 }
 
-void Punkt::handleDemo(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::handleDemo(const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	m_targeter->getVisitor(_conn, _req, boost::bind(&Punkt::handleDemoGotVisitor, this, _1, _conn, _req));
 }
 
-void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	std::string ad_id_str;
 	
 	if (!_req->getField("adid", ad_id_str)) {
 		_conn->sendResponse("{ \"status\" : \"wrong params\" }");
-		_conn->close();
+	//	_conn->close();
 		return;
 	}
 	
@@ -111,7 +111,7 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _co
 		
 			std::cout << "Punkt::handleDemo unknown ad " << adid << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
-			_conn->close();
+	//		_conn->close();
 			return;
 		}
 		
@@ -121,7 +121,7 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _co
 		
 			std::cout << "Punkt::handleDemo unknown format " << ad->format_id << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
-			_conn->close();
+	//		_conn->close();
 			return;
 		}
 		
@@ -150,7 +150,7 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _co
 	formatter->formatDemo(ad_req, formatter_args);
 }
 
-void Punkt::handlePlace(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::handlePlace(const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	uint64_t _pid;
 	std::string pid_str;
@@ -161,7 +161,7 @@ void Punkt::handlePlace(const std::map<std::string, std::string> &_params, HttpS
 	m_targeter->getVisitor(_conn, _req, boost::bind(&Punkt::handlePlaceGotVisitor, this, string_to_uint64(pid_str), _1, _conn, _req));
 }
 
-void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	FormatterPtr formatter;
 	FormatterArgsPtr args;
@@ -196,7 +196,7 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::C
 		if (f_it == m_formatters.end()) {
 			std::cout << "Punkt::connHandler unknown formatter " << ad->format_id << " fid: " << ad->format_id << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
-			_conn->close();
+	//		_conn->close();
 			return;
 		}
 	
@@ -220,7 +220,7 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::C
 	formatter->format(ad_req, args, extcode);
 }
 
-void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 		
 	uint64_t format_id = string_to_uint64(_params.at("fid"));
 	
@@ -230,7 +230,6 @@ void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params,
 		hiaux::hashtable<uint64_t, FormatterPtr>::iterator it = m_formatters.find(format_id);
 		if (it == m_formatters.end()) {
 			_conn->sendResponse("{ \"status\" : \"unknown format\" }");
-			_conn->close();
 			return;
 		}
 		format = it->second;
@@ -240,8 +239,7 @@ void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params,
 
 void Punkt::handleTargeterEvent(const std::string &_method,
 								const std::map<std::string, std::string> &_params,
-								HttpSrv::ConnectionPtr _conn,
-								HttpSrv::RequestPtr _req) {
+								HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	uint64_t pid = string_to_uint64(_params.at("pid"));
 	uint64_t adid = string_to_uint64(_params.at("adid"));
@@ -283,10 +281,9 @@ std::string Punkt::getVkAuthCode(const std::string &_domain) {
 	"head.appendChild(script);\n";
 }
 
-void Punkt::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punkt::connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	m_event_router->handleEvent(_conn, _req);
-	_conn->close();
 }
 
 uint64_t Punkt::getAdOwner(uint64_t _adid) {

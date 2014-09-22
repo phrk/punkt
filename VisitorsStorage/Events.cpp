@@ -3,8 +3,8 @@
 void TargeterHashd::handleClickEvent(uint64_t _pid,
 									uint64_t _adid,
 									const std::map<std::string, std::string> &_params,
-									HttpSrv::ConnectionPtr _conn,
-									HttpSrv::RequestPtr _req) {
+									HttpConnectionPtr _conn,
+									HttpRequestPtr _req) {
 
 	std::string aim;
 
@@ -76,8 +76,8 @@ void TargeterHashd::handleClickEvent(uint64_t _pid,
 void TargeterHashd::handleDispEvent(uint64_t _pid,
 									uint64_t _adid,
 									const std::map<std::string, std::string> &_params,
-									HttpSrv::ConnectionPtr _conn,
-									HttpSrv::RequestPtr _req) {
+									HttpConnectionPtr _conn,
+									HttpRequestPtr _req) {
 	
 	std::string pid_str = _params.at("pid");
 	std::string adid_str = _params.at("adid");

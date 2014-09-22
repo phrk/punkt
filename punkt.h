@@ -2,7 +2,7 @@
 #define _PUNKT_H_
 
 #include "hiconfig.h"
-#include "hiaux/network/HttpSrv.h"
+#include "hiaux/network/HttpServer/HttpServer.h"
 
 #include "punkt_consts.h"
 #include "ad.h"
@@ -16,7 +16,7 @@
 class Punkt {
 public:
 	
-	typedef boost::function<void(HttpSrv::ConnectionPtr, HttpSrv::RequestPtr, FormatterArgsPtr)> FormatterFun;
+	typedef boost::function<void(HttpConnectionPtr, HttpRequestPtr, FormatterArgsPtr)> FormatterFun;
 
 private:
 	
@@ -31,8 +31,8 @@ private:
 
 	ETN *m_event_router;
 
-	void handleFormatEvent(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);	
-	void handleTargeterEvent(const std::string &_method, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleFormatEvent(const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);	
+	void handleTargeterEvent(const std::string &_method, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
 	std::string getVkAuthCode(const std::string &_domain);
 	
@@ -49,13 +49,13 @@ public:
 	
 	uint64_t getAdOwner(uint64_t _adid);
 	
-	void handleDemo(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-	void handleDemoGotVisitor(VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleDemo(const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
+	void handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
-	void handlePlace(const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-	void handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handlePlace(const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
+	void handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
-	void connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req);
 };
 
 typedef boost::shared_ptr<Punkt> PunktPtr;

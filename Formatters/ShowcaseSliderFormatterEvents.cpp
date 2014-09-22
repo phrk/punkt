@@ -1,7 +1,7 @@
 #include "ShowcaseSliderFormatter.h"
 
 
-void ShowcaseSliderFormatter::handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void ShowcaseSliderFormatter::handleShowDispEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 		
 	std::string pid_str;
 	std::string adid_str;
@@ -44,7 +44,7 @@ void ShowcaseSliderFormatter::handleShowDispEvent(HttpSrv::ConnectionPtr _conn, 
 	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
 }
 
-void ShowcaseSliderFormatter::handleItemDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void ShowcaseSliderFormatter::handleItemDispEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	std::string pid_str;
 	std::string adid_str;
@@ -85,7 +85,7 @@ void ShowcaseSliderFormatter::handleItemDispEvent(HttpSrv::ConnectionPtr _conn, 
 	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleItemsShowEvent\" }");
 }
 
-void ShowcaseSliderFormatter::handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void ShowcaseSliderFormatter::handleClickEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	std::string aim;
 	
@@ -160,13 +160,12 @@ void ShowcaseSliderFormatter::handleClickEvent(HttpSrv::ConnectionPtr _conn, Htt
 //	m_zeit_acli->mergeCounter(owner_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 }
 
-void ShowcaseSliderFormatter::handleConvEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void ShowcaseSliderFormatter::handleConvEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	std::string clickid;
 	if (!_req->getField("clickid", clickid)) {
 		
 		_conn->sendResponse("{ \"status\" : \"clickid not set\" }");
-		_conn->close();
 		return;
 	}
 	
@@ -208,7 +207,7 @@ void ShowcaseSliderFormatter::handleConvEvent(HttpSrv::ConnectionPtr _conn, Http
 //	_conn->close();
 }
 
-void ShowcaseSliderFormatter::handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void ShowcaseSliderFormatter::handleFormatEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 
 	/*
 	std::string ev_str;
@@ -253,7 +252,7 @@ void ShowcaseSliderFormatter::handleTargeterEvent(const std::string &_method,
 								uint64_t _pid,
 								uint64_t _adid,
 								const std::map<std::string, std::string> &_params,
-								HttpSrv::ConnectionPtr _conn,
-								HttpSrv::RequestPtr _req) {
+								HttpConnectionPtr _conn,
+								HttpRequestPtr _req) {
 									
 }

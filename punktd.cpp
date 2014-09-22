@@ -64,7 +64,6 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 													m_jscache,
 													_punkt_url,
 													_punkt_rsrc_url,
-													boost::bind(&HttpSrv::getHttpConnConst, m_srv.get(), _1),
 													m_geber_acli,
 													m_zeit_acli,
 													boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1) ));
@@ -270,9 +269,10 @@ Punktd::Punktd(const std::string &_config_file) {
 							_config ["replid"],
 							_config ["punkt_rsrc_url"]));
 	
-	m_srv.reset(new HttpSrv(m_srv_tasklauncher,
-							HttpSrv::ResponseInfo("text/html; charset=utf-8", "punktd"),
-							boost::bind(&Punktd::connHandler, this, _1, _2)));
+	m_srv.reset(new HttpServer(m_srv_tasklauncher,
+							ResponseInfo("text/html; charset=utf-8", "punktd"),
+							boost::bind(&Punktd::connHandler, this, _1, _2),
+							strtoint(_config["listen_port"])));
 
 	bindFormatters(_config["punkt_url"], _config ["punkt_rsrc_url"]);
 	std::cout << "Formatters binded\n";
@@ -282,12 +282,11 @@ Punktd::Punktd(const std::string &_config_file) {
 	std::cout << "Places loaded\n";
 	
 	std::cout << "All loaded\n";
-	
-	m_srv->start(strtoint(_config["listen_port"]));
+
 	m_pool->run();
 }
 
-void Punktd::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void Punktd::connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 //	_conn->sendResponse("_finished_");
 //	_conn->close();

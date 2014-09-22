@@ -1,8 +1,7 @@
 #include "EventsTree.h"
 
 EventsTreeNode::EventsTreeNode(boost::function<void(std::map<std::string, std::string> _params,
-													HttpSrv::ConnectionPtr _conn,
-													HttpSrv::RequestPtr _req)> _handler):
+													HttpConnectionPtr _conn, HttpRequestPtr _req)> _handler):
 	m_handler(_handler),
 	m_handler_set(true),
 	m_event_equals(false) {
@@ -63,7 +62,7 @@ EventsTreeNode::EventsTreeNode( bool _equals,
 	_child1->parent_name = _arg1;
 }
 
-void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	if (m_handler_set) {
 		
@@ -99,18 +98,15 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 							
 				_params[ it->first ] = bf;
 				it->second->doHandleEvent(_params, _conn, _req);
-				_conn->close();
 				return;
 			}
 		}
 		
 		it++;
 	}
-	
-	_conn->close();
 }
 
-void EventsTreeNode::handleEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void EventsTreeNode::handleEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	std::map<std::string, std::string> params;
 	this->doHandleEvent(params, _conn, _req);

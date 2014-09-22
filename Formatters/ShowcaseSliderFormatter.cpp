@@ -17,7 +17,6 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 						FileCachePtr _jscache,
 						const std::string &_punkt_url,
 						const std::string &_punkt_rsrc_url,
-						boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 						GeberdCliApiClientAsyncPtr _geber_acli,
 						ZeitClientAsyncPtr _zeit_acli,
 						boost::function<uint64_t(uint64_t)> _getAdOwner):
@@ -25,7 +24,7 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 	m_jscache(_jscache),
 	m_punkt_url(_punkt_url),
 	m_punkt_rsrc_url(_punkt_rsrc_url),
-	m_getConnById(_getConnById),
+//	m_getConnById(_getConnById),
 	m_geber_acli(_geber_acli),
 	m_zeit_acli(_zeit_acli),
 	m_getAdOwner(_getAdOwner) {
@@ -218,14 +217,12 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 
 	if (!_success) {
 		
-		_ad_req->conn->close();
 		return;
 	}
 	
 	if (_show.items.size()<3) {
 		
 		_ad_req->conn->sendResponse("<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>");
-		_ad_req->conn->close();
 	}
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
@@ -295,14 +292,12 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		"</script>";
 	
 	_ad_req->conn->sendResponse(resp);
-	_ad_req->conn->close();
 }
 
 void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args) {
 	
 	if (!_success) {
 		
-		_ad_req->conn->close();
 		return;
 	}
 	
@@ -364,6 +359,5 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	resp += format_renderer_bind;
 	
 	_ad_req->conn->sendResponse(resp);
-	_ad_req->conn->close();
 }
 

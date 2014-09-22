@@ -11,11 +11,11 @@ class VisitorCookieOnly : public Visitor {
 public:
 	
 	std::vector<std::string> m_queries;
-	HttpSrv::ConnectionPtr m_conn;
+	HttpConnectionPtr m_conn;
 
 	VisitorCookieOnly(const std::string &_vid,
 						boost::function<void(VisitorCookieOnly*)> _onSave,
-						HttpSrv::ConnectionPtr _conn);
+						HttpConnectionPtr _conn);
 	
 	virtual void addQuery(const std::string &_q);
 	virtual void getQueries(std::vector<std::string> &_q);

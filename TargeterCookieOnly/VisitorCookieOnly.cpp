@@ -2,7 +2,7 @@
 
 VisitorCookieOnly::VisitorCookieOnly(const std::string &_vid,
 									boost::function<void(VisitorCookieOnly*)> _onSave,
-									HttpSrv::ConnectionPtr _conn):
+									HttpConnectionPtr _conn):
 	Visitor::Visitor(_vid),
 	m_onSave(_onSave),
 	m_conn(_conn) {

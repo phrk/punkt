@@ -3,7 +3,7 @@
 
 #include "hiconfig.h"
 #include <boost/shared_ptr.hpp>
-#include "hiaux/network/HttpSrv.h"
+#include "hiaux/network/HttpServer/HttpServer.h"
 
 #include "AdRequest.h"
 
@@ -20,14 +20,14 @@ public:
 	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode) = 0;
 	virtual void formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args) = 0;
 	
-	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) = 0;
+	virtual void handleFormatEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) = 0;
 	
 	virtual void handleTargeterEvent(const std::string &_method,
 									uint64_t _pid,
 									uint64_t _adid,
 									const std::map<std::string, std::string> &_params,
-									HttpSrv::ConnectionPtr _conn,
-									HttpSrv::RequestPtr _req) = 0;
+									HttpConnectionPtr _conn,
+									HttpRequestPtr _req) = 0;
 };
 
 typedef boost::shared_ptr<Formatter> FormatterPtr;

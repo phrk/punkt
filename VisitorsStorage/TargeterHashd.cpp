@@ -17,7 +17,7 @@ void TargeterHashd::genVdid(std::string &_vdid) const {
 	_vdid = std::string(bf);
 }
 
-void TargeterHashd::getVisitor(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, boost::function<void(VisitorPtr)> _onGot) {
+void TargeterHashd::getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boost::function<void(VisitorPtr)> _onGot) {
 	
 	std::string vdid;
 	std::string dump;
@@ -119,7 +119,7 @@ AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector
 	return ad;
 }
 
-void TargeterHashd::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
+void TargeterHashd::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	if (_method == "disp") {
 		

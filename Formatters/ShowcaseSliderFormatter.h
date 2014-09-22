@@ -39,7 +39,7 @@ class ShowcaseSliderFormatter : public Formatter {
 	HttpOutRequestDispPtr m_req_disp;
 	FileCachePtr m_jscache;
 	std::string m_punkt_url;
-	boost::function<HttpSrv::ConnectionPtr(int)> m_getConnById;
+//	boost::function<HttpConnectionPtr(int)> m_getConnById;
 	//GeberdCliApiClientPtr m_geber_cli;
 
 	GeberdCliApiClientAsyncPtr m_geber_acli;
@@ -49,10 +49,10 @@ class ShowcaseSliderFormatter : public Formatter {
 	
 	std::string m_punkt_rsrc_url;
 	// Events
-	void handleShowDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-	void handleItemDispEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-	void handleClickEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
-	void handleConvEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	void handleShowDispEvent(HttpConnectionPtr _conn, HttpRequestPtr _req);
+	void handleItemDispEvent(HttpConnectionPtr _conn, HttpRequestPtr _req);
+	void handleClickEvent(HttpConnectionPtr _conn, HttpRequestPtr _req);
+	void handleConvEvent(HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
 	void getPartnerParameter(const std::string &_advid,
 							const hiaux::hashtable<std::string, std::string> &_partner_ids,
@@ -78,7 +78,6 @@ public:
 							FileCachePtr _jscache,
 							const std::string &_punkt_url,
 							const std::string &_punkt_rsrc_url,
-							boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
 							GeberdCliApiClientAsyncPtr _geber_acli,
 							ZeitClientAsyncPtr _zeit_acli,
 							boost::function<uint64_t(uint64_t)> _getAdOwner);
@@ -90,13 +89,13 @@ public:
 	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode);
 	virtual void formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args);
 	
-	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	virtual void handleFormatEvent(HttpConnectionPtr _conn, HttpRequestPtr _req);
 	virtual void handleTargeterEvent(const std::string &_method,
 									uint64_t _pid,
 									uint64_t _adid,
 									const std::map<std::string, std::string> &_params,
-									HttpSrv::ConnectionPtr _conn,
-									HttpSrv::RequestPtr _req);
+									HttpConnectionPtr _conn,
+									HttpRequestPtr _req);
 	
 	void onCalledZeit (bool _success);
 	

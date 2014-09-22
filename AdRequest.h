@@ -2,20 +2,19 @@
 #define _AD_REQUEST_H_
 
 #include "hiconfig.h"
-#include "hiaux/network/HttpSrv.h"
+#include "hiaux/network/HttpServer/HttpServer.h"
 #include <boost/shared_ptr.hpp>
 
 class AdRequest {
 public:
-	HttpSrv::ConnectionPtr conn;
-	HttpSrv::RequestPtr req;
+	HttpConnectionPtr conn;
+	HttpRequestPtr req;
 	uint64_t pid;
 	uint64_t adid;
 	bool https;
 	std::vector<std::string> search_queries;
 	
-	AdRequest(HttpSrv::ConnectionPtr _conn,
-						HttpSrv::RequestPtr _req,
+	AdRequest(HttpConnectionPtr _conn, HttpRequestPtr _req,
 						uint64_t _pid,
 						uint64_t _adid,
 						bool _https);

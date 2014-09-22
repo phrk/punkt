@@ -2,7 +2,7 @@
 #define _PUNKTD_H_
 
 #include "hiconfig.h"
-#include "hiaux/network/HttpSrv.h"
+#include "hiaux/network/HttpServer/HttpServer.h"
 #include "hiaux/network/HttpOutReqDisp.h"
 #include "hiaux/loadconf/loadconf.h"
 
@@ -30,7 +30,7 @@ class Punktd {
 private:
 	hThreadPoolPtr m_pool;
 	TaskLauncherPtr m_srv_tasklauncher;
-	HttpSrvPtr m_srv;
+	HttpServerPtr m_srv;
 	
 	HashdClientAsyncPtr m_hashd_acli;
 	VisitorsStoragePtr m_visitors_storage;
@@ -70,7 +70,7 @@ public:
 	void onFinished();
 	Punktd(const std::string &_config_file);
 	
-	void connHandler(HttpSrv::ConnectionPtr, HttpSrv::RequestPtr);
+	void connHandler(HttpConnectionPtr, HttpRequestPtr);
 	void join();
 };
 

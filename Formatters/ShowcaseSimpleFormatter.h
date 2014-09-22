@@ -18,18 +18,18 @@ public:
 
 class ShowcaseSimpleFormatter : public Formatter {
 	HttpOutRequestDispPtr m_req_disp;
-	boost::function<HttpSrv::ConnectionPtr(int)> m_getConnById;
+	boost::function<HttpConnectionPtr(int)> m_getConnById;
 	GeberdCliApiClientPtr m_geber_cli;
 public:
 	
 	ShowcaseSimpleFormatter(HttpOutRequestDispPtr _req_disp,
-							boost::function<HttpSrv::ConnectionPtr(int)> _getConnById,
+							boost::function<HttpConnectionPtr(int)> _getConnById,
 							GeberdCliApiClientPtr _geber_cli);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
-	virtual void format(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
-	virtual void formatDemo(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
-	virtual void handleFormatEvent(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req);
+	virtual void format(HttpConnectionPtr _conn, HttpRequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	virtual void formatDemo(HttpConnectionPtr _conn, HttpRequestPtr _req, uint64_t _pid, uint64_t _adid, FormatterArgsPtr _args);
+	virtual void handleFormatEvent(HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
 	void onCalledGeberOk (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
 	void onCalledGeberOkDemo (int _connid, uint64_t _pid, uint64_t _adid, const std::string &_resp);
