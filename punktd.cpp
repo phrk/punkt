@@ -289,9 +289,9 @@ Punktd::Punktd(const std::string &_config_file) {
 
 void Punktd::connHandler(HttpSrv::ConnectionPtr _conn, HttpSrv::RequestPtr _req) {
 	
-	_conn->sendResponse("_finished_");
-	_conn->close();
-	return;
+//	_conn->sendResponse("_finished_");
+//	_conn->close();
+//	return;
 	
 	checkReload();
 	m_punkt->connHandler(_conn, _req);
