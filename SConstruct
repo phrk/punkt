@@ -49,7 +49,7 @@ b.connectLib(hiaux_path+"hiaux/crypt/")
 b.addPath(hithird_path+"thirdparty/http-parser/")
 b.connectLib(hithird_path+"thirdparty/http-parser/")
 
-b.addCCFlags(["-Wno-return-type"])
+b.addCCFlags([])
 b.addCppGlob("*.cpp")
 b.addCppGlob("*.pb.cc")
 

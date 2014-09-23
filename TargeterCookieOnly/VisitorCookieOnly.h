@@ -5,6 +5,7 @@
 #include "Visitor.h"
 #include "hiaux/crypt/base64.h"
 #include "VisitorCookie.pb.h"
+#include <math.h>
 
 class VisitorCookieOnly : public Visitor {
 	boost::function<void(VisitorCookieOnly*)> m_onSave;
