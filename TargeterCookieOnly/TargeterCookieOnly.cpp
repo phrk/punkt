@@ -1,7 +1,8 @@
 #include "TargeterCookieOnly.h"
 
-TargeterCookieOnly::TargeterCookieOnly(const std::string &_repl_id):
-	 Targeter::Targeter(_repl_id) {
+TargeterCookieOnly::TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli):
+	 Targeter::Targeter(_repl_id),
+	 m_zeit_acli(_zeit_acli) {
 	
 }
 
@@ -102,9 +103,6 @@ AdPtr TargeterCookieOnly::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::v
 	return ad;
 }
 
-void TargeterCookieOnly::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
-	
-}
 
 void TargeterCookieOnly::saveVisitor(VisitorCookieOnly *_v) {
 	

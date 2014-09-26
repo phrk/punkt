@@ -10,10 +10,14 @@
 
 #include "punkt_consts.h"
 
-#include "TargeterCookieOnly.h"
+#ifdef PUNKT_TARGETER_COOKIE_ONLY
+	#include "TargeterCookieOnly.h"
+#endif
 
-//#include "TargeterHashd.h"
-//#include "VisitorsStorage/VisitorsStorage.h"
+#ifdef PUNKT_TARGETER_HASHD
+	#include "TargeterHashd.h"
+	#include "VisitorsStorage/VisitorsStorage.h"
+#endif
 
 #include "punkt.h"
 #include "formatter.h"

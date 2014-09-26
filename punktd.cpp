@@ -262,7 +262,7 @@ Punktd::Punktd(const std::string &_config_file) {
 //	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
 //							m_zeit_acli));
 	
-	m_targeter.reset(new TargeterCookieOnly(_config ["replid"]));
+	m_targeter.reset(new TargeterCookieOnly(_config ["replid"], m_zeit_acli));
 	
 	m_punkt.reset(new Punkt(m_targeter,
 							_config ["systemid"],

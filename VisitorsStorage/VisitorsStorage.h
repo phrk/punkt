@@ -22,8 +22,7 @@ class VisitorsStorage {
 	
 	void genVid(std::string &_vid);
 	
-	void getVisitor_onGotDeviceVid (bool _success,
-									bool _exists,
+	void getVisitor_onGotDeviceVid (int _err,
 									const std::string &_vid,
 									const std::string &_vdid,
 									boost::function<void(VisitorPtr)> _onVisitor); 
@@ -36,9 +35,8 @@ public:
 	void getVisitor(const std::string &_vdid, boost::function<void(VisitorPtr)> _onVisitor);
 	void saveVisitor(VisitorHashd *_visitor);
 	
-	void onSaved(bool _success);
-	void onGotVisitor(bool _success,
-						bool _exists,
+	void onSaved(int _err);
+	void onGotVisitor(int _err,
 						const std::string &_dump,
 						bool _newdevice,
 						const std::string &_vid,

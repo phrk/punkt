@@ -119,18 +119,6 @@ AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector
 	return ad;
 }
 
-void TargeterHashd::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
-	
-	if (_method == "disp") {
-		
-		handleDispEvent(_pid, _adid, _params, _conn, _req);
-		
-	} else if (_method == "click") {
-		
-		handleClickEvent(_pid, _adid, _params, _conn, _req);
-	}
-}
-
 void TargeterHashd::saveVisitor(VisitorHashd *_v) {
 	
 	m_storage->saveVisitor(_v);

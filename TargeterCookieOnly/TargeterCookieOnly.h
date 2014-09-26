@@ -5,6 +5,7 @@
 #include "Targeter.h"
 #include "VisitorCookieOnly.h"
 #include <math.h>
+#include "zeit_client_async.h"
 
 class TargeterCookieOnly : public Targeter {
 	
@@ -12,10 +13,12 @@ class TargeterCookieOnly : public Targeter {
 	hiaux::hashtable<uint64_t, AdPtr> m_ads;
 	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
 	
+	ZeitClientAsyncPtr m_zeit_acli;
+	
 	void genVid(std::string &_vid) const;
 public:
 	
-	TargeterCookieOnly(const std::string &_repl_id);
+	TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli);
 	
 	virtual void getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
 	
@@ -30,6 +33,20 @@ public:
 	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
 	void saveVisitor(VisitorCookieOnly *_v);
+	
+	void handleDispEvent(uint64_t _pid,
+										uint64_t _adid,
+										const std::map<std::string, std::string> &_params,
+										HttpConnectionPtr _conn,
+										HttpRequestPtr _req);
+	
+	void handleClickEvent(uint64_t _pid,
+									uint64_t _adid,
+									const std::map<std::string, std::string> &_params,
+									HttpConnectionPtr _conn,
+									HttpRequestPtr _req);
+	
+	void onCalledZeit (bool _success);
 	
 	virtual ~TargeterCookieOnly();
 };

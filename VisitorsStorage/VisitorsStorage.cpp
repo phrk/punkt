@@ -18,27 +18,24 @@ void VisitorsStorage::genVid(std::string &_vid) {
 	_vid = std::string(bf);
 }
 
-void VisitorsStorage::getVisitor_onGotDeviceVid (bool _success,
-												bool _exists,
+void VisitorsStorage::getVisitor_onGotDeviceVid (int _err,
 												const std::string &_vid,
 												const std::string &_vdid,
 												boost::function<void(VisitorPtr)> _onVisitor) {
 	
-//	std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid _success: " << _success << " _exists:" << _exists << " _vid:" << _vid << "|" << std::endl;
 	
 	bool newdevice = false;
-	if (_success && !_exists)
+	if (_err == E_HC_KEY_DONT_EXISTS) // (_success && !_exists)
 		newdevice =  true;
 	
-	if (_success && _exists) {
-//		std::cout << "m_hashd_acli->get visitors " << _vid << std::endl;
-		m_hashd_acli->get("visitors", _vid, boost::bind(&VisitorsStorage::onGotVisitor, this, _1, _2, _3, newdevice, _vid, _vdid, _onVisitor));
+	if (_err == E_HC_OK) { //(_success && _exists) {
+		m_hashd_acli->get("visitors", _vid, boost::bind(&VisitorsStorage::onGotVisitor, this, _1, _2, newdevice, _vid, _vdid, _onVisitor));
 		return;
 	}
 	
 	std::string vid;
 	genVid(vid);
-	onGotVisitor(false, false, "", newdevice, vid, _vdid, _onVisitor);
+	onGotVisitor(E_HC_KEY_DONT_EXISTS, "", newdevice, vid, _vdid, _onVisitor);
 }
 
 void VisitorsStorage::saveVid(const std::string &_vdid, const std::string &_vid) {
@@ -49,24 +46,22 @@ void VisitorsStorage::saveVid(const std::string &_vdid, const std::string &_vid)
 
 void VisitorsStorage::getVisitor(const std::string &_vdid, boost::function<void(VisitorPtr)> _onVisitor) {
 	
-	m_hashd_acli->get("devicevids", _vdid, boost::bind(&VisitorsStorage::getVisitor_onGotDeviceVid, this, _1, _2, _3, _vdid, _onVisitor));
+	m_hashd_acli->get("devicevids", _vdid, boost::bind(&VisitorsStorage::getVisitor_onGotDeviceVid, this, _1, _2, _vdid, _onVisitor));
 }
 
-void VisitorsStorage::onGotVisitor(bool _success,
-									bool _exists,
+void VisitorsStorage::onGotVisitor(int _err,
 									const std::string &_dump,
 									bool _newdevice,
 									const std::string &_vid,
 									const std::string &_vdid,
 									boost::function<void(VisitorPtr)> _onVisitor) {
 	
-//	std::cout << "VisitorsStorage::onGotVisitor _success:" << _success << " _exists:" << _exists << std::endl; 
-	
+
 	std::string _user_agent = "_USER AGENT_";
 	
 	VisitorHashdPtr v(new VisitorHashd(_vid, _vdid, boost::bind(&VisitorsStorage::saveVisitor, this, _1), _newdevice));
 	
-	if (!_success || !_exists) {
+	if (_err != E_HC_OK) {
 		
 		
 		v->initCurDevice(_vdid, _user_agent);
@@ -99,7 +94,7 @@ void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 	//std::cout << "VisitorsStorage::saveVisitor NEW DEVICE=" << _visitor->newdevice << " " << _visitor->getId() << " " << _visitor->cur_vdid << " " << dump << std::endl;
 }
 
-void VisitorsStorage::onSaved(bool _success) {
+void VisitorsStorage::onSaved(int _err) {
 	
 //	std::cout << "VisitorsStorage::onSaved " << _success << std::endl;
 }
