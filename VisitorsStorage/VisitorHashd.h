@@ -25,6 +25,8 @@ public:
 	std::string cur_vdid;
 	VisitDevice *cur_device;
 	
+	uint64_t ttl_inc;
+	
 	VisitorHashd(const std::string &_vid,
 					const std::string &_vdid,
 						boost::function<void(VisitorHashd*)> _onSave,

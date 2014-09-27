@@ -8,7 +8,16 @@ Punkt::Punkt(TargeterPtr _targeter,
 	m_systemid(_systemid),
 	m_replid(_replid),
 	m_punkt_rsrc_url(_punkt_rsrc_url) {
-		
+	
+	//ETN *targeter_custom_events = m_targeter->getCustomEventsRouter();
+	
+		/*
+											"cus",
+											new ETN ("pid",
+													new ETN ("adid",
+																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "tm", _1, _2, _3))))
+		*/
+	
 	ETN *evtype = 
 			new ETN(EVENT_EQUALS,
 					"fev",
@@ -25,7 +34,9 @@ Punkt::Punkt(TargeterPtr _targeter,
 											"click",
 											new ETN ("pid",
 													new ETN ("adid",
-																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3))))))));
+																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3)))) 
+																	
+																	))));
 
 	ETN *demo = new ETN(boost::bind(&Punkt::handleDemo, this, _1, _2, _3));
 

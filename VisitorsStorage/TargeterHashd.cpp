@@ -7,7 +7,7 @@ TargeterHashd::TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _st
 	 m_storage(_storage),
 	 m_punkt_rsrc_url(_punkt_rsrc_url),
 	 m_zeit_acli(_zeit_acli) {
-	
+		
 }
 
 void TargeterHashd::genVdid(std::string &_vdid) const {
@@ -122,6 +122,11 @@ AdPtr TargeterHashd::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector
 void TargeterHashd::saveVisitor(VisitorHashd *_v) {
 	
 	m_storage->saveVisitor(_v);
+}
+
+ETN* TargeterHashd::getCustomEventsRouter() {
+	
+	throw "TargeterHashd::getCustomEventsRouter";
 }
 
 TargeterHashd::~TargeterHashd() {

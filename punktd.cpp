@@ -257,12 +257,16 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
 	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
 
-//	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
-//	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
-//	m_targeter_hashd.reset(new TargeterHashd(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
-//							m_zeit_acli));
+#ifdef PUNKT_TARGETER_HASHD
+	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
+	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
+	m_targeter.reset(new TargeterHashd(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
+							m_zeit_acli));
+#endif
 	
+#ifdef PUNKT_TARGETER_COOKIE_ONLY
 	m_targeter.reset(new TargeterCookieOnly(_config ["replid"], m_zeit_acli));
+#endif
 	
 	m_punkt.reset(new Punkt(m_targeter,
 							_config ["systemid"],

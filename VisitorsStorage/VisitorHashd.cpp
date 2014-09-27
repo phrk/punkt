@@ -7,7 +7,8 @@ VisitorHashd::VisitorHashd(const std::string &_vid,
 	cur_vdid(_vdid),
 	m_onSave(_onSave),
 	Visitor(_vid),
-	newdevice(_newdevice) {
+	newdevice(_newdevice),
+	ttl_inc(0) {
 	
 }
 

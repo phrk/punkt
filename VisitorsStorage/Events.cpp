@@ -124,5 +124,9 @@ void TargeterHashd::handleEvent(const std::string &_method, uint64_t _pid, uint6
 	} else if (_method == "click") {
 		
 		handleClickEvent(_pid, _adid, _params, _conn, _req);
+	
+	} else if (_method == "tm") {
+		
+		
 	}
 }

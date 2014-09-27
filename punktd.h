@@ -36,11 +36,15 @@ private:
 	TaskLauncherPtr m_srv_tasklauncher;
 	HttpServerPtr m_srv;
 	
-//	HashdClientAsyncPtr m_hashd_acli;
-//	VisitorsStoragePtr m_visitors_storage;
-//	TargeterHashdPtr m_targeter_hashd;
-	
+#ifdef PUNKT_TARGETER_HASHD
+	HashdClientAsyncPtr m_hashd_acli;
+	VisitorsStoragePtr m_visitors_storage;
+	TargeterHashdPtr m_targeter;
+#endif
+		
+#ifdef PUNKT_TARGETER_COOKIE_ONLY
 	TargeterCookieOnlyPtr m_targeter;
+#endif
 	
 	PunktPtr m_punkt;
 	HttpOutRequestDispPtr m_req_disp;

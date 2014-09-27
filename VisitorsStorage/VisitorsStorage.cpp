@@ -3,6 +3,19 @@
 VisitorsStorage::VisitorsStorage(HashdClientAsyncPtr _hashd_acli):
 	m_hashd_acli(_hashd_acli) {
 	
+	std::map<std::string, std::string> opts;
+	opts["type"] = "ttl";
+	opts["default_ttl"] = "86400"; // 24 hours
+	opts["cleanup_period"] = "25";
+	opts["cleanup_check_size"] = "2000";
+	
+	m_hashd_acli->createHash("visitors", opts, boost::bind(&VisitorsStorage::onSaved, this, _1));
+	
+	opts["type"] = "ttl";
+	opts["default_ttl"] = "43200"; // 12 hours
+	opts["cleanup_period"] = "25";
+	opts["cleanup_check_size"] = "2000";
+	m_hashd_acli->createHash("devicevids", opts, boost::bind(&VisitorsStorage::onSaved, this, _1));
 }
 
 /*
@@ -82,7 +95,7 @@ void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 	
 //	std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
 	
-	m_hashd_acli->set("visitors", vid, dump, boost::bind(&VisitorsStorage::onSaved, this, _1));
+	m_hashd_acli->setAndIncTtl("visitors", vid, dump, _visitor->ttl_inc, boost::bind(&VisitorsStorage::onSaved, this, _1));
 	
 	if (_visitor->newdevice) {
 

@@ -16,6 +16,8 @@ class TargeterCookieOnly : public Targeter {
 	ZeitClientAsyncPtr m_zeit_acli;
 	
 	void genVid(std::string &_vid) const;
+	
+	void saveVisitor(VisitorCookieOnly *_v);
 public:
 	
 	TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli);
@@ -30,9 +32,9 @@ public:
 
 	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode);
 	
-	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
+	virtual ETN* getCustomEventsRouter();
 	
-	void saveVisitor(VisitorCookieOnly *_v);
+	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
 	void handleDispEvent(uint64_t _pid,
 										uint64_t _adid,

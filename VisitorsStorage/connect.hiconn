@@ -12,6 +12,7 @@
 
 "_DEPS" : [	"../../hiaux/strings/",
 			"../../zeit/cpp-client/",
-			"../../hashd/cpp-client/"]
+			"../../hashd/cpp-client/",
+			"../Targeter/"]
 
 }
