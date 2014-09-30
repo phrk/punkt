@@ -24,6 +24,9 @@ public:
 	int nitems;
 	hiaux::hashtable<std::string, std::string> partner_ids;
 	hiaux::hashtable<std::string, std::string> click_templates;
+	std::string system_url;
+	std::string system_rsrc_url;
+	std::string system_depot_url_prefix;
 	std::string json_dump;
 	std::string type;
 	
@@ -31,6 +34,9 @@ public:
 								int _nitems,
 								const hiaux::hashtable<std::string, std::string> &_partner_ids,
 								const hiaux::hashtable<std::string, std::string> &_click_templates,
+								const std::string &_system_url,
+								const std::string &_system_rsrc_url,
+								const std::string &_system_depot_url_prefix,
 								const std::string &_type,
 								const std::string &_json_dump);
 };
@@ -64,13 +70,17 @@ class ShowcaseSliderFormatter : public Formatter {
 														uint64_t _itemid,
 														const std::string _itemurl,
 														const hiaux::hashtable<std::string, std::string> &_click_templates,
+														const std::string &_system_url,
 														std::string &_target) const;
 	
 	void rebuildClickLinks(ShowcaseInstance &_show,
 							uint64_t _pid,
 							uint64_t _adid,
 							const hiaux::hashtable<std::string, std::string> &_click_templates,
-							const hiaux::hashtable<std::string, std::string> &_partner_ids);
+							const hiaux::hashtable<std::string, std::string> &_partner_ids,
+							const std::string &_system_url);
+							
+	void rebuildImageLinks(ShowcaseInstance &_show, const std::string &_system_depot_url_prefix);
 	
 public:
 	

@@ -3,12 +3,18 @@
 ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _nitems,
 	 const hiaux::hashtable<std::string, std::string> &_partner_ids,
 	 const hiaux::hashtable<std::string, std::string> &_click_templates,
+	 const std::string &_system_url,
+	 const std::string &_system_rsrc_url,
+	 const std::string &_system_depot_url_prefix,
 	 const std::string &_type,
 	 const std::string &_json_dump):
 	shid(_shid),
 	nitems(_nitems),
 	partner_ids(_partner_ids),
 	click_templates(_click_templates),
+	system_url(_system_url),
+	system_rsrc_url(_system_rsrc_url),
+	system_depot_url_prefix(_system_depot_url_prefix),
 	json_dump(_json_dump),
 	type(_type) {
 }
@@ -40,6 +46,9 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 	hiaux::hashtable<std::string, std::string> partner_ids;
 	hiaux::hashtable<std::string, std::string> click_templates;
 	std::string type;
+	std::string system_url;
+	std::string system_rsrc_url;
+	std::string system_depot_url_prefix;
 	
 	json_error_t error;
 	json_t *root = json_loads(_args_js.c_str(), 0, &error);
@@ -106,9 +115,33 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 		throw "ShowcaseSimpleFormatter::parseArgs could not parse click_templates";
 	}
 	
+	json_t *j_system_url = json_object_get(root, "system_url");
+	if (json_is_string(j_system_url)) {
+		system_url = json_string_value(j_system_url);
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse system_url\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse system_url";
+	}
+	
+	json_t *j_system_rsrc_url = json_object_get(root, "system_rsrc_url");
+	if (json_is_string(j_system_rsrc_url)) {
+		system_rsrc_url = json_string_value(j_system_rsrc_url);
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse system_rsrc_url\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse system_rsrc_url";
+	}
+	
+	json_t *j_system_depot_url_prefix = json_object_get(root, "system_depot_url_prefix");
+	if (json_is_string(j_system_depot_url_prefix)) {
+		system_depot_url_prefix = json_string_value(j_system_depot_url_prefix);
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse system_depot_url_prefix\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse system_depot_url_prefix";
+	}
+
 	json_decref(root);
 	
-	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, click_templates, type, _args_js));
+	return FormatterArgsPtr(new ShowcaseSliderFormatterArgs(shid, nitems, partner_ids, click_templates, system_url, system_rsrc_url, system_depot_url_prefix, type, _args_js));
 }
 
 void ShowcaseSliderFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode) {
@@ -140,6 +173,7 @@ void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,
 													uint64_t _itemid,
 													const std::string _itemurl,
 													const hiaux::hashtable<std::string, std::string> &_click_templates,
+													const std::string &_system_url,
 													std::string &_target) const {
 	
 	char clickid_c[256];
@@ -184,7 +218,8 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 												uint64_t _pid,
 												uint64_t _adid,
 												const hiaux::hashtable<std::string, std::string> &_click_templates,
-												const hiaux::hashtable<std::string, std::string> &_partner_ids) {
+												const hiaux::hashtable<std::string, std::string> &_partner_ids,
+												const std::string &_system_url) {
 		
 	for (int i = 0; i<_show.items.size(); i++) {
 		
@@ -196,6 +231,7 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 								_show.items[i].id,
 								_show.items[i].directurl,
 								_click_templates,
+								_system_url,
 								_show.items[i].directurl);
 			
 		} else {
@@ -207,9 +243,19 @@ void ShowcaseSliderFormatter::rebuildClickLinks(ShowcaseInstance &_show,
 			aim += partner_param;
 
 			escapeUrl(aim);
-			_show.items[i].directurl = m_punkt_url + "?evtype=tev&fid=1&ev=click&pid=" + 
+			_show.items[i].directurl = _system_url + "?evtype=tev&fid=1&ev=click&pid=" + 
 				uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_show.items[i].id) + "&aim=" + aim;
 		}
+	}
+}
+
+void ShowcaseSliderFormatter::rebuildImageLinks(ShowcaseInstance &_show, const std::string &_system_depot_url_prefix) {
+	
+	for (int i = 0; i< _show.items.size(); i++) {
+		
+		_show.items[i].imgname_q1 = _system_depot_url_prefix + _show.items[i].imgname_q1;
+		_show.items[i].imgname_q2 = _system_depot_url_prefix + _show.items[i].imgname_q2;
+		_show.items[i].imgname_q3 = _system_depot_url_prefix + _show.items[i].imgname_q3;
 	}
 }
 
@@ -248,11 +294,12 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		
 	}
 	
-	std::string format_files_path = m_punkt_rsrc_url + "sh_slider_240x400/";
+	std::string format_files_path = args->system_rsrc_url + "sh_slider_240x400/";
 	//std::string punkt_url = "http://127.0.0.1:4249/";
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _ad_req->pid, _ad_req->adid, args->click_templates, args->partner_ids);
+	rebuildClickLinks(_show, _ad_req->pid, _ad_req->adid, args->click_templates, args->partner_ids, args->system_url);
+	rebuildImageLinks(_show, args->system_depot_url_prefix);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \
@@ -271,7 +318,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () { \n"
-	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', true, '" +m_punkt_url+ "', " +uint64_to_string(_ad_req->adid)+ ", '" + args->type + "' ); \n"
+	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', true, '" + args->system_url + "', " +uint64_to_string(_ad_req->adid)+ ", '" + args->type + "' ); \n"
 	"} \n";
 	
 	std::string resp = \		
@@ -285,7 +332,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	resp += mootools;
 	resp += slider;
 	resp += format_renderer_bind + 
-		"document.punkt_rsrc_url = \"" + m_punkt_rsrc_url + "\";\n"
+		"document.punkt_rsrc_url = \"" + args->system_rsrc_url + "\";\n"
 		"var place = document.getElementById(\"punkt_place_0\");\n"
 		"place.innerHTML = document._punkt_codes[\"0\"]();\n"
 		"document._punkt_codes_post[\"0\"]();\n"
@@ -308,7 +355,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	std::string mootools;
 	std::string slider;
 	
-	std::string format_files_path = m_punkt_rsrc_url + "sh_slider_240x400/";
+	std::string format_files_path = args->system_rsrc_url + "sh_slider_240x400/";
 	
 	if (!m_jscache->getFile("ShowcaseSliderEvents.js", slider_events)) {
 		std::cout << "ShowcaseSliderFormatter::onCalledGeberOkDemo ShowcaseSliderEvents.js not loaded in cache  \n";
@@ -327,7 +374,8 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	}
 	
 	std::string showcase_dump;
-	rebuildClickLinks(_show, _ad_req->pid, _ad_req->adid, args->click_templates, args->partner_ids);
+	rebuildClickLinks(_show, _ad_req->pid, _ad_req->adid, args->click_templates, args->partner_ids, args->system_url);
+	rebuildImageLinks(_show, args->system_depot_url_prefix);
 	_show.dumpJson(showcase_dump);
 	
 	std::string format_renderer_bind = \
@@ -346,7 +394,7 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () { \n"
-	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', false, '" +m_punkt_url+ "', " +uint64_to_string(_ad_req->adid)+ " ); \n"
+	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', false, '" +args->system_url+ "', " +uint64_to_string(_ad_req->adid)+ " ); \n"
 	"} \n";
 	
 	std::string resp;

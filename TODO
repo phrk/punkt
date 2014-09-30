@@ -3,4 +3,6 @@
 
 [DONE] ShowcaseSliderFormatter Implement conversion saving
 
+[FIXED] When change partner_ids its not changing in formatter_args
+
 [*] Implement embedding place to flash file

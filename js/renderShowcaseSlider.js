@@ -41,11 +41,11 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 		
 		var imgurl;
 		if (formatter_args.imgq == "1")
-			imgurl = show.items[i].imgurl_q1;
+			imgurl = show.items[i].imgname_q1;
 		else if (formatter_args.imgq == "2")
-			imgurl = show.items[i].imgurl_q2;
+			imgurl = show.items[i].imgname_q2;
 		else if (formatter_args.imgq == "3")
-			imgurl = show.items[i].imgurl_q3;	
+			imgurl = show.items[i].imgname_q3;	
 		
 		if (https)
 			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + makeHttpsUrl(imgurl) + ' class="oshop_240_400_slider_img"></a>';
@@ -150,11 +150,11 @@ function renderShowcaseSlider304x224x1 (pid, show, formatter_args, format_files_
 		
 		var imgurl;
 		if (formatter_args.imgq == "1")
-			imgurl = show.items[i].imgurl_q1;
+			imgurl = show.items[i].imgname_q1;
 		else if (formatter_args.imgq == "2")
-			imgurl = show.items[i].imgurl_q2;
+			imgurl = show.items[i].imgname_q2;
 		else if (formatter_args.imgq == "3")
-			imgurl = show.items[i].imgurl_q3;	
+			imgurl = show.items[i].imgname_q3;	
 		
 		if (https)
 			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + makeHttpsUrl(imgurl) + ' class="oshop_304_224_slider_img"></a>';
