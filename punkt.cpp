@@ -62,7 +62,8 @@ void Punkt::updateAd(AdPtr _ad) {
 	try {
 		_ad->args = f_it->second->parseArgs(_ad->formatter_args_str);
 	} catch (...) {
-		std::cout << "Punkt::updateAd parseArgs exception\n";
+		std::cout << "Punkt::updateAd parseArgs exception " << _ad->id << std::endl;
+		return;
 	}
 
 	m_targeter->updateAd(_ad);
