@@ -48,48 +48,8 @@ Punkt::Punkt(TargeterPtr _targeter,
 								"pid", place);
 }
 
-void Punkt::updateAd(AdPtr _ad) {
-	
-	hLockTicketPtr ticket = lock.lock();
-		
-	hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(_ad->format_id);
-	
-	if (f_it == m_formatters.end()) {
-		std::cout << "Punkt::updateAd cannot load Ad. Unknown format " << _ad->format_id << std::endl;
-		return;
-	}
-	
-	try {
-		_ad->args = f_it->second->parseArgs(_ad->formatter_args_str);
-	} catch (...) {
-		std::cout << "Punkt::updateAd parseArgs exception " << _ad->id << std::endl;
-		return;
-	}
-
-	m_targeter->updateAd(_ad);
-}
-
-void Punkt::updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets) {
-	//std::cout << "Punkt::updatePlace " << _pid << std::endl;
-/*	hLockTicketPtr ticket = lock.lock();
-	
-	PlaceTargetsPtr place = m_places[_pid];
-	if (!place) {
-		m_places[_pid].reset(new PlaceTargets);
-		place = m_places[_pid];
-	}
-
-	place->ads.clear();
-	for (int i = 0; i<_targets.size(); i++) {
-		
-		AdPtr ad = m_ads[ _targets[i] ];
-		if (ad)
-			place->ads.push_back(ad);
-	}*/
-	m_targeter->updatePlaceTargets(_pid, _targets);
-}
-
 void Punkt::updateFormatter(uint64_t _fid, FormatterPtr _formatter) {
+	
 	hLockTicketPtr ticket = lock.lock();
 	m_formatters[_fid] = _formatter;
 }
@@ -104,8 +64,8 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 	std::string ad_id_str;
 	
 	if (!_req->getField("adid", ad_id_str)) {
+
 		_conn->sendResponse("{ \"status\" : \"wrong params\" }");
-	//	_conn->close();
 		return;
 	}
 	
@@ -123,7 +83,6 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		
 			std::cout << "Punkt::handleDemo unknown ad " << adid << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
-	//		_conn->close();
 			return;
 		}
 		
@@ -133,7 +92,6 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		
 			std::cout << "Punkt::handleDemo unknown format " << ad->format_id << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
-	//		_conn->close();
 			return;
 		}
 		
@@ -206,9 +164,9 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnec
 		hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(ad->format_id);
 	
 		if (f_it == m_formatters.end()) {
+
 			std::cout << "Punkt::connHandler unknown formatter " << ad->format_id << " fid: " << ad->format_id << std::endl;
 			_conn->sendResponse("{ \"status\" : \"internal error\" }");
-	//		_conn->close();
 			return;
 		}
 	
@@ -257,21 +215,6 @@ void Punkt::handleTargeterEvent(const std::string &_method,
 	uint64_t adid = string_to_uint64(_params.at("adid"));
 	
 	m_targeter->handleEvent(_method, pid, adid, _params, _conn, _req);
-	/*
-	uint64_t format_id = string_to_uint64(_params.at("fid"));
-	
-	FormatterPtr format;
-	
-	{
-		hiaux::hashtable<uint64_t, FormatterPtr>::iterator it = m_formatters.find(format_id);
-		if (it == m_formatters.end()) {
-			_conn->sendResponse("{ \"status\" : \"unknown format\" }");
-			_conn->close();
-			return;
-		}
-		format = it->second;
-	}
-	format->handleTargeterEvent(_method, pid, adid, _params, _conn, _req);*/
 }
 
 std::string Punkt::getVkAuthCode(const std::string &_domain) {

@@ -14,8 +14,8 @@
 	#include "TargeterCookieOnly.h"
 #endif
 
-#ifdef PUNKT_TARGETER_HASHD
-	#include "TargeterHashd.h"
+#ifdef PUNKT_TARGETER_FULL
+	#include "TargeterFull.h"
 	#include "VisitorsStorage/VisitorsStorage.h"
 #endif
 
@@ -36,10 +36,10 @@ private:
 	TaskLauncherPtr m_srv_tasklauncher;
 	HttpServerPtr m_srv;
 	
-#ifdef PUNKT_TARGETER_HASHD
+#ifdef PUNKT_TARGETER_FULL
 	HashdClientAsyncPtr m_hashd_acli;
 	VisitorsStoragePtr m_visitors_storage;
-	TargeterHashdPtr m_targeter;
+	TargeterFullPtr m_targeter;
 #endif
 		
 #ifdef PUNKT_TARGETER_COOKIE_ONLY
@@ -74,6 +74,8 @@ private:
 	bool doCheckDbConn(size_t _attempt);
 	bool checkDbConn();
 public:
+	
+	FormatterArgsPtr parseFormatterArgs(uint64_t _format_id, const std::string &_args);
 	
 	void onFinished();
 	Punktd(const std::string &_config_file);

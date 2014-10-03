@@ -9,11 +9,14 @@
 
 #include "zeit_client_async.h"
 
-class TargeterHashd : public Targeter {
+#include "Place.h"
+
+class TargeterFull : public Targeter {
 	
 	hAutoLock lock;
 	hiaux::hashtable<uint64_t, AdPtr> m_ads;
-	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
+	hiaux::hashtable<uint64_t, PlacePtr> m_places;
+	//hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
 	
 	VisitorsStoragePtr m_storage;
 	ZeitClientAsyncPtr m_zeit_acli;
@@ -25,16 +28,29 @@ class TargeterHashd : public Targeter {
 	void handleDispEvent(uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	void saveVisitor(VisitorHashd *_v);
 	void onCalledZeit (bool _success);
+	
+	AdTargeterArgsPtr parseAdTargeterArgs(const std::string &_targeter_args_str);
+	
 public:
 	
-	TargeterHashd(const std::string &_repl_id, VisitorsStoragePtr _storage,
+	TargeterFull(const std::string &_repl_id, VisitorsStoragePtr _storage,
 			const std::string &_punkt_rsrc_url,
-			ZeitClientAsyncPtr _zeit_acli);
+			ZeitClientAsyncPtr _zeit_acli,
+			boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs);
 	
 	virtual void getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
 	
-	virtual void updateAd(AdPtr _ad);
-	virtual void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);
+	virtual void updateAd(uint64_t _id,
+							uint64_t _format_id,
+							uint64_t _ownerid,
+							const std::string &_formatter_args_str,
+							const std::string &_targeter_args_str);
+	
+	virtual void updatePlace(uint64_t _pid, const std::string &_targeter_args, const std::vector<uint64_t> &_targets);
+	
+	virtual void updateCampaign(uint64_t _cid,
+								const std::string &_targeter_args,
+								const std::vector<uint64_t> &_ads);
 
 	virtual AdPtr getAd(uint64_t _adid);
 	virtual uint64_t getAdOwner(uint64_t _adid);
@@ -44,9 +60,9 @@ public:
 	virtual ETN* getCustomEventsRouter();
 	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
-	virtual ~TargeterHashd();
+	virtual ~TargeterFull();
 };
 
-typedef boost::shared_ptr<TargeterHashd> TargeterHashdPtr;
+typedef boost::shared_ptr<TargeterFull> TargeterFullPtr;
 
 #endif

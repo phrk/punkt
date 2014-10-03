@@ -390,11 +390,11 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success, ShowcaseInstance &_sh
 	"	var show = JSON.parse(\'" + showcase_dump + "\');\n"
 	"	var formatter_args = JSON.parse(\'" + escape_quote(args->json_dump) + "\') \n"
 	"	return renderShowcaseSlider(" + uint64_to_string(_ad_req->pid) +  ", show, formatter_args, '" + format_files_path + "', click_url," 
-			+ booltostr(_ad_req->https) + ");\n"
+			+ booltostr(_ad_req->https) + ", '" + args->type + "'  );\n"
 	"}\n"
 	
 	"document._punkt_codes_post[\"" + uint64_to_string(_ad_req->pid) + "\"] = function () { \n"
-	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', false, '" +args->system_url+ "', " +uint64_to_string(_ad_req->adid)+ " ); \n"
+	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', false, '" +args->system_url+ "', " +uint64_to_string(_ad_req->adid)+ ", '" + args->type + "'); \n"
 	"} \n";
 	
 	std::string resp;

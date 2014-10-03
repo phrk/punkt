@@ -1,6 +1,6 @@
-#include "TargeterHashd.h"
+#include "TargeterFull.h"
 
-void TargeterHashd::handleClickEvent(uint64_t _pid,
+void TargeterFull::handleClickEvent(uint64_t _pid,
 									uint64_t _adid,
 									const std::map<std::string, std::string> &_params,
 									HttpConnectionPtr _conn,
@@ -65,15 +65,15 @@ void TargeterHashd::handleClickEvent(uint64_t _pid,
 
 //	std::string owner_item_counter = "owners:owner_items-" + ad_owner_str + ":clicks:item-" + item_str;
 
-	m_zeit_acli->mergeCounter(owner_ad_place_counter, time(0), 1, boost::bind(&TargeterHashd::onCalledZeit, this, _1));
+	m_zeit_acli->mergeCounter(owner_ad_place_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 //	m_zeit_acli->mergeCounter(owner_ad_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-	m_zeit_acli->mergeCounter(owner_place_ad_counter, time(0), 1, boost::bind(&TargeterHashd::onCalledZeit, this, _1));
+	m_zeit_acli->mergeCounter(owner_place_ad_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 //	m_zeit_acli->mergeCounter(owner_place_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 //	m_zeit_acli->mergeCounter(owner_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 
 }
 
-void TargeterHashd::handleDispEvent(uint64_t _pid,
+void TargeterFull::handleDispEvent(uint64_t _pid,
 									uint64_t _adid,
 									const std::map<std::string, std::string> &_params,
 									HttpConnectionPtr _conn,
@@ -103,19 +103,19 @@ void TargeterHashd::handleDispEvent(uint64_t _pid,
 										+ ":disps:ad-" + adid_str;
 
 	// call zeit
-	m_zeit_acli->mergeCounter(owner_ads_place_counter, time(0), 1, boost::bind(&TargeterHashd::onCalledZeit, this, _1));
-	m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&TargeterHashd::onCalledZeit, this, _1));
+	m_zeit_acli->mergeCounter(owner_ads_place_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
+	m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 
 //	std::cout << owner_ads_place_counter << std::endl;
 
 	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
 }
 
-void TargeterHashd::onCalledZeit (bool _success) {
+void TargeterFull::onCalledZeit (bool _success) {
 	
 }
 
-void TargeterHashd::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
+void TargeterFull::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	if (_method == "disp") {
 		

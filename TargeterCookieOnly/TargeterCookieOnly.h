@@ -20,12 +20,22 @@ class TargeterCookieOnly : public Targeter {
 	void saveVisitor(VisitorCookieOnly *_v);
 public:
 	
-	TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli);
+	TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli,
+			boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs);
 	
 	virtual void getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
 	
-	virtual void updateAd(AdPtr _ad);
-	virtual void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);
+	virtual void updateAd(uint64_t _id,
+							uint64_t _format_id,
+							uint64_t _ownerid,
+							const std::string &_formatter_args_str,
+							const std::string &_targeter_args_str);
+	
+	virtual void updatePlace(uint64_t _pid, const std::string &_targeter_args, const std::vector<uint64_t> &_targets);
+
+	virtual void updateCampaign(uint64_t _cid,
+								const std::string &_targeter_args,
+								const std::vector<uint64_t> &_ads);
 
 	virtual AdPtr getAd(uint64_t _adid);
 	virtual uint64_t getAdOwner(uint64_t _adid);

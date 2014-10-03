@@ -1,10 +1,11 @@
 
 {
 
-"_NAME" : "visitors_storage",
+"_NAME" : "targeter_full",
 
 "_CPPFILES" : [ { "type": "Glob", "mask": "*.cpp" },
 	 			{ "type": "Glob", "mask": "*.cc" },
+				{ "type": "Glob", "mask": "../Targeter.cpp" },
 				{ "type": "Glob", "mask": "../Visitor.cpp" } ],
 
 "_LINKFLAGS": [ "-lprotobuf" ],
@@ -12,6 +13,7 @@
 "_DEPS" : [	"../../hiaux/strings/",
 			"../../zeit/cpp-client/",
 			"../../hashd/cpp-client/",
-			"../Targeter/"]
+			"../Targeter/",
+			"../VisitorsStorage/"]
 
 }

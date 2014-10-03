@@ -30,7 +30,9 @@ b.addPath("Targeter/")
 b.addPath("Formatters/")
 b.addCppGlob("Formatters/*.cpp")
 
-b.connectLib("VisitorsStorage/")
+b.connectLib("TargeterFull/")
+b.addPath("TargeterFull/")
+
 b.addPath("VisitorsStorage/")
 
 b.connectLib("TargeterCookieOnly/")

@@ -13,6 +13,7 @@
 #include <boost/function.hpp>
 
 class VisitorsStorage {
+	
 	HashdClientAsyncPtr m_hashd_acli;
 	
 	//uint64_t getUniquePropVid(const std::string &_prop);

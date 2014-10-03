@@ -43,8 +43,6 @@ public:
 		const std::string &_replid,
 		const std::string &_punkt_rsrc_url);
 	
-	void updateAd(AdPtr _ad);
-	void updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets);
 	void updateFormatter(uint64_t _fid, FormatterPtr _formatter);
 	
 	uint64_t getAdOwner(uint64_t _adid);

@@ -10,4 +10,8 @@
 #define OZON_ADVID "ozon"
 #define WIKIMART_ADVID "wikimart"
 
+#define CAMPAIGN_MODE_STUB 0
+#define CAMPAIGN_MODE_STANDART 1
+#define CAMPAIGN_MODE_CUSTOM 2
+
 #endif

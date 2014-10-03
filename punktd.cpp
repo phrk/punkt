@@ -123,6 +123,7 @@ void Punktd::loadAds() {
 	uint64_t id;
 	uint64_t format_id;
 	std::string formatter_args;
+	std::string targeter_args;
 	uint64_t ad_owner;
 	
 	for (int t = 0; t<ntuples; t++) {	
@@ -142,9 +143,14 @@ void Punktd::loadAds() {
 			if (std::string("formatter_args") == PQfname(res, c)) {
 				formatter_args = PQgetvalue(res, t, c);
 			}
+			
+			if (std::string("targeter_args") == PQfname(res, c)) {
+				targeter_args = PQgetvalue(res, t, c);
+			}
 		}
-		AdPtr ad (new Ad(id, format_id, ad_owner, formatter_args));
-		m_punkt->updateAd(ad);
+		//AdPtr ad (new Ad(id, format_id, ad_owner, formatter_args, targeter_args));
+		
+		m_targeter->updateAd(id, format_id, ad_owner, formatter_args, targeter_args);
 	}
 	
 }
@@ -186,25 +192,32 @@ void Punktd::loadPlaces() {
 	int ncols = PQnfields(res);
 	
 	uint64_t id;
-	bool readok = false;
+	std::string targeter_args;
+	//bool readok = false;
 	
 	for (int t = 0; t<ntuples; t++) {	
-		readok = false;
+		//readok = false;
 		for (int c = 0; c < ncols; c++) {
 			if (std::string("id") == PQfname(res, c)) {
 				id = string_to_uint64(PQgetvalue(res, t, c));
-				readok = true;
-			}		
+				//readok = true;
+			}
+			
+			if (std::string("targeter_args") == PQfname(res, c)) {
+				
+				targeter_args = std::string(PQgetvalue(res, t, c));
+			}
+			
 		}
 		
-		if (!readok) {
-			std::cout << "Punktd::loadPlaces could not load place id\n";
-			continue;
-		}
+//		if (!readok) {
+//			std::cout << "Punktd::loadPlaces could not load place id\n";
+//			continue;
+//		}
 		
 		std::vector<uint64_t> ads_ids;
 		loadPlaceTarges(id, ads_ids);
-		m_punkt->updatePlaceTargets(id, ads_ids);
+		m_targeter->updatePlace(id, targeter_args, ads_ids);
 	}
 	
 	PQclear(res);
@@ -220,6 +233,26 @@ void Punktd::getClickTemplates(const hiaux::hashtable<std::string,std::string> &
 	if (it != _config.end())
 		_click_templates[OZON_ADVID] = it->second;
 }*/
+
+FormatterArgsPtr Punktd::parseFormatterArgs(uint64_t _format_id, const std::string &_args) {
+		
+	FormatterArgsPtr ret;
+	
+	hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(_format_id);
+	
+	if (f_it == m_formatters.end()) {
+		std::cout << "Punkt::parseFormatterArgs Unknown format " << _format_id << std::endl;
+		return ret;
+	}
+	
+	try {
+		ret = f_it->second->parseArgs(_args);
+	} catch (...) {
+		std::cout << "Punkt::parseFormatterArgs parseArgs exception format " << _format_id << std::endl;
+	}
+	
+	return ret;
+}
 
 Punktd::Punktd(const std::string &_config_file) {
 	
@@ -257,15 +290,18 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
 	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
 
-#ifdef PUNKT_TARGETER_HASHD
+#ifdef PUNKT_TARGETER_FULL
 	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
 	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
-	m_targeter.reset(new TargeterHashd(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
-							m_zeit_acli));
+	m_targeter.reset(new TargeterFull(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
+							m_zeit_acli,
+							boost::bind(&Punktd::parseFormatterArgs, this, _1, _2)));
+
 #endif
 	
 #ifdef PUNKT_TARGETER_COOKIE_ONLY
-	m_targeter.reset(new TargeterCookieOnly(_config ["replid"], m_zeit_acli));
+	m_targeter.reset(new TargeterCookieOnly(_config ["replid"], m_zeit_acli,
+											boost::bind(&Punktd::parseFormatterArgs, this, _1, _2)));
 #endif
 	
 	m_punkt.reset(new Punkt(m_targeter,

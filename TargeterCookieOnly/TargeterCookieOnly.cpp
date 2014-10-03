@@ -1,7 +1,8 @@
 #include "TargeterCookieOnly.h"
 
-TargeterCookieOnly::TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli):
-	 Targeter::Targeter(_repl_id),
+TargeterCookieOnly::TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli,
+		boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs):
+	 Targeter::Targeter(_repl_id, _parseFormatterArgs),
 	 m_zeit_acli(_zeit_acli) {
 	
 }
@@ -37,13 +38,23 @@ void TargeterCookieOnly::getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req
 	_onGot(visitor);
 }
 
-void TargeterCookieOnly::updateAd(AdPtr _ad) {
+void TargeterCookieOnly::updateAd(uint64_t _id,
+							uint64_t _format_id,
+							uint64_t _ownerid,
+							const std::string &_formatter_args_str,
+							const std::string &_targeter_args_str) {
 	
 	hLockTicketPtr ticket = lock.lock();
-	m_ads[_ad->id] = _ad;
+	
+	AdPtr ad(new Ad(_id, _format_id, _ownerid, _formatter_args_str, _targeter_args_str));
+	
+	ad->args = m_parseFormatterArgs(_format_id, _formatter_args_str);
+	
+	if (ad->args)
+		m_ads[_id] = ad;
 }
 
-void TargeterCookieOnly::updatePlaceTargets(uint64_t _pid, const std::vector<uint64_t> &_targets) {
+void TargeterCookieOnly::updatePlace(uint64_t _pid, const std::string &_targeter_args, const std::vector<uint64_t> &_targets) {
 	
 	hLockTicketPtr ticket = lock.lock();
 	
@@ -60,6 +71,12 @@ void TargeterCookieOnly::updatePlaceTargets(uint64_t _pid, const std::vector<uin
 		if (ad)
 			place->ads.push_back(ad);
 	}
+}
+
+void TargeterCookieOnly::updateCampaign(uint64_t _cid,
+							const std::string &_targeter_args,
+							const std::vector<uint64_t> &_ads) {
+								
 }
 
 AdPtr TargeterCookieOnly::getAd(uint64_t _adid) {

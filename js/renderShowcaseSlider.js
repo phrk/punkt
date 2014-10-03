@@ -106,10 +106,12 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 
 function renderShowcaseSlider (pid, show, formatter_args, format_files_path, click_url, https, type) {
 	
-	if (type === '240-400-3') {
+	if (type === "240-400-3") {
 		return renderShowcaseSlider240x400x3(pid, show, formatter_args, format_files_path, click_url, https);
-	} else if (type === '304-224-1') {
+	} else if (type === "304-224-1") {
 		return renderShowcaseSlider304x224x1(pid, show, formatter_args, format_files_path, click_url, https);
+	} else {
+		return "unknown slider type: " + type;
 	}
 }
 
