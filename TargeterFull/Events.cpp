@@ -78,7 +78,7 @@ void TargeterFull::handleDispEvent(uint64_t _pid,
 									const std::map<std::string, std::string> &_params,
 									HttpConnectionPtr _conn,
 									HttpRequestPtr _req) {
-	
+
 	std::string pid_str = _params.at("pid");
 	std::string adid_str = _params.at("adid");
 
@@ -127,6 +127,6 @@ void TargeterFull::handleEvent(const std::string &_method, uint64_t _pid, uint64
 	
 	} else if (_method == "tm") {
 		
-		
+		 
 	}
 }

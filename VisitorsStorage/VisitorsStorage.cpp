@@ -70,6 +70,8 @@ void VisitorsStorage::onGotVisitor(int _err,
 									boost::function<void(VisitorPtr)> _onVisitor) {
 	
 
+	std::cout << "VisitorsStorage::onGotVisitor err:" << _err << " _newdevice:" << _newdevice << std::endl;
+
 	std::string _user_agent = "_USER AGENT_";
 	
 	VisitorHashdPtr v(new VisitorHashd(_vid, _vdid, boost::bind(&VisitorsStorage::saveVisitor, this, _1), _newdevice));
@@ -89,11 +91,12 @@ void VisitorsStorage::onGotVisitor(int _err,
 
 void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 	
+	
 	std::string dump, vid;
 	_visitor->dump(dump);
 	_visitor->getId(vid);
 	
-//	std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
+	std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
 	
 	m_hashd_acli->setAndIncTtl("visitors", vid, dump, _visitor->ttl_inc, boost::bind(&VisitorsStorage::onSaved, this, _1));
 	

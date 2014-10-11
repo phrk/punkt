@@ -170,7 +170,7 @@ void TargeterFull::saveVisitor(VisitorHashd *_v) {
 
 ETN* TargeterFull::getCustomEventsRouter() {
 	
-	throw "TargeterHashd::getCustomEventsRouter";
+	return NULL;
 }
 
 TargeterFull::~TargeterFull() {

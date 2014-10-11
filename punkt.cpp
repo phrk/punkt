@@ -185,6 +185,7 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnec
 		_visitor->addQuery(bf);
 	}
 	
+
 	_visitor->getQueries(ad_req->search_queries);
 	_visitor->save();
 	formatter->format(ad_req, args, extcode);
@@ -210,7 +211,9 @@ void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params,
 void Punkt::handleTargeterEvent(const std::string &_method,
 								const std::map<std::string, std::string> &_params,
 								HttpConnectionPtr _conn, HttpRequestPtr _req) {
-	
+
+	std::cout << "Punkt::handleTargeterEvent\n";
+		
 	uint64_t pid = string_to_uint64(_params.at("pid"));
 	uint64_t adid = string_to_uint64(_params.at("adid"));
 	
