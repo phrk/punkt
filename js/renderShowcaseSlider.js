@@ -17,9 +17,23 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 		right_button_img = format_files_path+ 'right_w.png';
 	}
 
+	var bgimage = "none";
+	
+	if (formatter_args.bgimage != null) {
+	
+		if (formatter_args.bgimage == "atomic_explosion_240")
+			bgimage = format_files_path + 'atomic_explosion_240.jpg';
+	
+		if (formatter_args.bgimage == "pale_blue_dot_240")
+			bgimage = format_files_path + 'pale_blue_dot_240.jpg';
+	}
+	
+	if (bgimage != "none")
+		bgimage = 'background=' + bgimage;
+
 	var ret = '<link rel="stylesheet" type="text/css" href="' +format_files_path+ 'slider.css"> \
 		<div class="oshop_240_400_slider"> \
-		<table bgcolor=' + formatter_args.bgcolor + '><tr><td> \
+		<table bgcolor=' + formatter_args.bgcolor + ' ' + bgimage +  ' ><tr><td> \
 		<img id="punkt_place_' + pid + '_goLeft" src=' + left_button_img + ' class="oshop_240_400_slider_goleft"/> \
 		<img id="punkt_place_' + pid + '_goRight" src=' + right_button_img + ' class="oshop_240_400_slider_goright"/> \
 		<div id="punkt_place_' + pid + '_oshop_240_400_slider_container" class="oshop_240_400_slider_container">';
