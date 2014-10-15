@@ -299,7 +299,7 @@ function buildSlider(pid, isdemo, punkturl, adid, type) {
 		buildSlider240x400x3(pid, isdemo, punkturl, adid);
 	} else if (type === '304-224-1') {
 		buildSlider304x224x1(pid, isdemo, punkturl, adid);
-	} else if (type === '4') {
+	} else if (type === '520-250-4') {
 		buildSlider4(pid, isdemo, punkturl, adid);
 	}
 }
