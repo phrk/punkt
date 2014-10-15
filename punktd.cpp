@@ -70,9 +70,11 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 																								
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_304_224_FORMATTER_ID, f);
+		m_punkt->updateFormatter(SHOWCASE_SLIDER_520_250_4_ITEMS_FORMATTER_ID, f);
 		
 		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_FORMATTER_ID, f));
 		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_304_224_FORMATTER_ID, f));
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_520_250_4_ITEMS_FORMATTER_ID, f));
 	}
 }
 

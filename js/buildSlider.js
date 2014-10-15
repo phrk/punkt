@@ -287,11 +287,17 @@ function buildSlider304x224x1(pid, isdemo, punkturl, adid) {
 								document.getElementById('punkt_place_' + pid + '_goRight'));
 }
 
+function buildSlider4(pid, isdemo, punkturl, adid) {
+	
+}
+
 function buildSlider(pid, isdemo, punkturl, adid, type) {
 	
 	if (type === '240-400-3') {
 		buildSlider240x400x3(pid, isdemo, punkturl, adid);
 	} else if (type === '304-224-1') {
 		buildSlider304x224x1(pid, isdemo, punkturl, adid);
+	} else if (type === '4') {
+		buildSlider4(pid, isdemo, punkturl, adid);
 	}
 }
