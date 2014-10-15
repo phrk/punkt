@@ -289,6 +289,8 @@ function buildSlider304x224x1(pid, isdemo, punkturl, adid) {
 
 function buildSlider4(pid, isdemo, punkturl, adid) {
 	
+	if (!isdemo)
+		evShowcaseSliderDisp(punkturl, pid, adid);
 }
 
 function buildSlider(pid, isdemo, punkturl, adid, type) {
