@@ -157,14 +157,14 @@ void Punktd::loadAds() {
 	
 }
 
-void Punktd::loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids) {
+bool Punktd::loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids) {
 	
 	std::string query("SELECT ad_id FROM punkt.targets WHERE place_id=" + uint64_to_string(_place));
 	PGresult *res = PQexec(m_pg, query.c_str());
 	
 	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
 		std::cout << "Punktd::loadPlaceTarges !PGRES_TUPLES_OK _place: " << _place << std::endl;
-		return;
+		return false;
 	}
 	
 	int ntuples = PQntuples(res);
@@ -178,6 +178,7 @@ void Punktd::loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids) {
 		}
 	}
 	PQclear(res);
+	return true;
 }
 
 void Punktd::loadPlaces() {
@@ -218,8 +219,9 @@ void Punktd::loadPlaces() {
 //		}
 		
 		std::vector<uint64_t> ads_ids;
-		loadPlaceTarges(id, ads_ids);
-		m_targeter->updatePlace(id, targeter_args, ads_ids);
+		if (loadPlaceTarges(id, ads_ids)) {
+			m_targeter->updatePlace(id, targeter_args, ads_ids);
+		}
 	}
 	
 	PQclear(res);

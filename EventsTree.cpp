@@ -66,7 +66,7 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 	
 	if (m_handler_set) {
 		
-		std::cout << "EventsTreeNode::doHandleEvent calling handler\n";
+		//std::cout << "EventsTreeNode::doHandleEvent calling handler\n";
 		m_handler(_params, _conn, _req);
 		return;
 	}
@@ -85,10 +85,10 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 		
 		if (m_event_equals) {			
 			
-			std::cout << "EventsTreeNode::doHandleEvent m_event_equals\n";
+			//std::cout << "EventsTreeNode::doHandleEvent m_event_equals\n";
 			if (it->first == parent_value) {
 			
-				std::cout << "EventsTreeNode::doHandleEvent" << it->first << " == parent_value\n";
+				//std::cout << "EventsTreeNode::doHandleEvent" << it->first << " == parent_value\n";
 				
 				//_params[ parent_name ] = parent_value;
 				it->second->doHandleEvent(_params, _conn, _req);
@@ -101,7 +101,7 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 		
 			if (_req->getField(it->first, bf)) {
 				
-				std::cout << "EventsTreeNode::doHandleEvent got field " << it->first << " == " << bf << std::endl;
+				//std::cout << "EventsTreeNode::doHandleEvent got field " << it->first << " == " << bf << std::endl;
 				
 				_params[ it->first ] = bf;
 				it->second->doHandleEvent(_params, _conn, _req);

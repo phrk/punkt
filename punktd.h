@@ -65,7 +65,7 @@ private:
 	void bindFormatters(const std::string &_punkt_url,
 						const std::string &_punkt_rsrc_url);
 	
-	void loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids);
+	bool loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids);
 	void loadPlaces();
 	void loadAds();
 	

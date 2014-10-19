@@ -110,14 +110,17 @@ AdPtr TargeterCookieOnly::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::v
 	hLockTicketPtr ticket = lock.lock();
 	
 	hiaux::hashtable<uint64_t, PlaceTargetsPtr>::iterator pit = m_places.find(_pid);
-	if (pit == m_places.end())
+	if (pit == m_places.end()) {
+		std::cout << "TargeterCookieOnly::getAdToShow pit == m_places.end()\n";
 		return AdPtr();
+	}
 
-	if (pit->second->ads.size()==0)		
+	if (pit->second->ads.size()==0)	{
+		std::cout << "TargeterCookieOnly::getAdToShow pit->second->ads.size()==0 pid: " << _pid << std::endl;
 		return AdPtr();
+	}
 
-	AdPtr ad = pit->second->ads[ rand() % pit->second->ads.size() ];
-	return ad;
+	return pit->second->ads[ rand() % pit->second->ads.size() ];
 }
 
 
