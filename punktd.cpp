@@ -55,13 +55,8 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 	}
 	{
 		
-		m_jscache->addFile("renderShowcaseSlider.js", "js/renderShowcaseSlider.js");
-		m_jscache->addFile("mootools", "js/mootools-core-1.5.0.js");
-		m_jscache->addFile("slider.js", "js/buildSlider.js");
-		m_jscache->addFile("ShowcaseSliderEvents.js", "js/ShowcaseSliderEvents.js");
-		
 		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp,
-													m_jscache,
+													m_files_cache,
 													_punkt_url,
 													_punkt_rsrc_url,
 													m_geber_acli,
@@ -240,7 +235,11 @@ void Punktd::getClickTemplates(const hiaux::hashtable<std::string,std::string> &
 
 FormatterArgsPtr Punktd::parseFormatterArgs(uint64_t _format_id, const std::string &_args) {
 		
+	std::cout << "Punktd::parseFormatterArgs\n";
+	
 	FormatterArgsPtr ret;
+	
+	hLockTicketPtr ticket = lock.lock();
 	
 	hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(_format_id);
 	
@@ -254,6 +253,8 @@ FormatterArgsPtr Punktd::parseFormatterArgs(uint64_t _format_id, const std::stri
 	} catch (...) {
 		std::cout << "Punkt::parseFormatterArgs parseArgs exception format " << _format_id << std::endl;
 	}
+	
+	std::cout << "Punktd::parseFormatterArgs finished\n";
 	
 	return ret;
 }
@@ -283,8 +284,15 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	std::cout << "Connected to db\n";
 	
-	m_jscache.reset(new FileCache);
-	
+	m_files_cache.reset(new FileCache);
+	m_files_cache->addFile("renderShowcaseSlider.js", "js/renderShowcaseSlider.js");
+	m_files_cache->addFile("mootools", "js/mootools-core-1.5.0.js");
+	m_files_cache->addFile("slider.js", "js/buildSlider.js");
+	m_files_cache->addFile("ShowcaseSliderEvents.js", "js/ShowcaseSliderEvents.js");
+	m_files_cache->addFile("vkauth.html", "TargeterFull/vkauth.html");
+	m_files_cache->apply("vkauth.html", boost::bind(&escape_symbol, _1, '\"'));
+	m_files_cache->apply("vkauth.html", boost::bind(&add_newline_backslash, _1));
+	m_files_cache->addFile("vkauth.js", "TargeterFull/vkauth.js");
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
 	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));
@@ -294,11 +302,13 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
 	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
 
+
 #ifdef PUNKT_TARGETER_FULL
 	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
 	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
 	m_targeter.reset(new TargeterFull(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
 							m_zeit_acli,
+							m_files_cache,
 							boost::bind(&Punktd::parseFormatterArgs, this, _1, _2)));
 
 #endif

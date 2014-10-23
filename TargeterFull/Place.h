@@ -16,7 +16,9 @@ public:
 
 	uint64_t id;
 	PlaceTargets targeted_ads;
-	bool match_vk;
+	bool vk_match;
+	
+	std::string m_targeter_args;
 	
 	Place(uint64_t _id, const std::string &_targeter_args, const PlaceTargets &_targeted_ads);
 };

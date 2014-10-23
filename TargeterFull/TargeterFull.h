@@ -8,6 +8,7 @@
 #include "Visitor.h"
 
 #include "zeit_client_async.h"
+#include "FileCache.h"
 
 #include "Place.h"
 
@@ -22,6 +23,9 @@ class TargeterFull : public Targeter {
 	ZeitClientAsyncPtr m_zeit_acli;
 	
 	std::string m_punkt_rsrc_url;
+	FileCachePtr m_files_cache;
+	// domain / app_id
+	hiaux::hashtable<std::string, std::string> m_vk_app_ids;
 	
 	void genVdid(std::string &_vdid) const;
 	void handleClickEvent(uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
@@ -31,11 +35,14 @@ class TargeterFull : public Targeter {
 	
 	AdTargeterArgsPtr parseAdTargeterArgs(const std::string &_targeter_args_str);
 	
+	void getVkMatchCode(const std::string &_domain, uint64_t _pid, std::string &_exthtml, std::string &_extjs) const;
+	
 public:
 	
 	TargeterFull(const std::string &_repl_id, VisitorsStoragePtr _storage,
 			const std::string &_punkt_rsrc_url,
 			ZeitClientAsyncPtr _zeit_acli,
+			FileCachePtr _files_cache,
 			boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs);
 	
 	virtual void getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
@@ -55,9 +62,9 @@ public:
 	virtual AdPtr getAd(uint64_t _adid);
 	virtual uint64_t getAdOwner(uint64_t _adid);
 
-	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode);
+	virtual AdPtr getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_exthtml, std::string &_extjs);
 	
-	virtual ETN* getCustomEventsRouter();
+	virtual ETN* getCustomMethodsRouter();
 	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
 	virtual ~TargeterFull();

@@ -40,7 +40,7 @@ public:
 	virtual AdPtr getAd(uint64_t _adid);
 	virtual uint64_t getAdOwner(uint64_t _adid);
 
-	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode);
+	virtual AdPtr getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_exthtml, std::string &_extjs);
 	
 	virtual ETN* getCustomEventsRouter();
 	

@@ -7,7 +7,8 @@
 
 class PlaceTargets {
 public:
-	std::vector<AdPtr> ads;
+	//std::vector<AdPtr> ads;
+	std::vector<uint64_t> ads;
 };
 
 typedef boost::shared_ptr<PlaceTargets> PlaceTargetsPtr;

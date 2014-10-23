@@ -92,11 +92,12 @@ public:
 							ZeitClientAsyncPtr _zeit_acli,
 							boost::function<uint64_t(uint64_t)> _getAdOwner);
 	
-	void onGotShowcase(bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args);
+	void onGotShowcase(bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_exthtml,
+											const std::string &_extjs);
 	void onGotShowcaseDemo(bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);
-	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode);
+	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_exthtml, const std::string &_extjs);
 	virtual void formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args);
 	
 	virtual void handleFormatEvent(HttpConnectionPtr _conn, HttpRequestPtr _req);

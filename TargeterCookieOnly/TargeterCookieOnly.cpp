@@ -46,12 +46,24 @@ void TargeterCookieOnly::updateAd(uint64_t _id,
 	
 	hLockTicketPtr ticket = lock.lock();
 	
-	AdPtr ad(new Ad(_id, _format_id, _ownerid, _formatter_args_str, _targeter_args_str));
+	Ad *ad = new Ad(_id, _format_id, _ownerid, _formatter_args_str, _targeter_args_str);
 	
 	ad->args = m_parseFormatterArgs(_format_id, _formatter_args_str);
 	
-	if (ad->args)
-		m_ads[_id] = ad;
+	if (ad->args) {
+		
+		m_ads[_id] = AdPtr(ad);
+		return;
+		hiaux::hashtable<uint64_t, AdPtr>::iterator it = m_ads.find(_id);
+		if (it != m_ads.end()) {
+			
+			//delete (it->second);
+			*(it->second.get()) = *ad;
+			delete ad;
+		} else {
+			m_ads.insert(std::pair<uint64_t, AdPtr>(_id, AdPtr(ad)));
+		}
+	}
 }
 
 void TargeterCookieOnly::updatePlace(uint64_t _pid, const std::string &_targeter_args, const std::vector<uint64_t> &_targets) {
@@ -67,9 +79,11 @@ void TargeterCookieOnly::updatePlace(uint64_t _pid, const std::string &_targeter
 	place->ads.clear();
 	for (int i = 0; i<_targets.size(); i++) {
 		
-		AdPtr ad = m_ads[ _targets[i] ];
-		if (ad)
-			place->ads.push_back(ad);
+		
+		//AdPtr ad = m_ads[ _targets[i] ];
+		//if (ad)
+		//	place->ads.push_back(ad);
+		place->ads.push_back( _targets[i] );
 	}
 }
 
@@ -105,22 +119,29 @@ uint64_t TargeterCookieOnly::getAdOwner(uint64_t _adid) {
 	return ownerid;
 }
 
-AdPtr TargeterCookieOnly::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode) {
+AdPtr TargeterCookieOnly::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_exthtml, std::string &_extjs) {
 	
 	hLockTicketPtr ticket = lock.lock();
 	
-	hiaux::hashtable<uint64_t, PlaceTargetsPtr>::iterator pit = m_places.find(_pid);
+	hiaux::hashtable<uint64_t, PlaceTargetsPtr>::iterator pit = m_places.find(_ad_req->pid);
 	if (pit == m_places.end()) {
 		std::cout << "TargeterCookieOnly::getAdToShow pit == m_places.end()\n";
 		return AdPtr();
 	}
 
 	if (pit->second->ads.size()==0)	{
-		std::cout << "TargeterCookieOnly::getAdToShow pit->second->ads.size()==0 pid: " << _pid << std::endl;
+		std::cout << "TargeterCookieOnly::getAdToShow pit->second->ads.size()==0 pid: " << _ad_req->pid << std::endl;
 		return AdPtr();
 	}
 
-	return pit->second->ads[ rand() % pit->second->ads.size() ];
+	hiaux::hashtable<uint64_t, AdPtr>::iterator it = m_ads.find( pit->second->ads[ rand() % pit->second->ads.size() ] );
+
+	if (it != m_ads.end())
+		return it->second;
+	else {
+		std::cout << "TargeterCookieOnly::getAdToShow no such ad\n";
+		return AdPtr();
+	}
 }
 
 

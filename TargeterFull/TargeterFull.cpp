@@ -3,12 +3,16 @@
 TargeterFull::TargeterFull(const std::string &_repl_id, VisitorsStoragePtr _storage,
 			const std::string &_punkt_rsrc_url,
 			ZeitClientAsyncPtr _zeit_acli,
+			FileCachePtr _files_cache,
 			boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs):
 	 Targeter::Targeter(_repl_id, _parseFormatterArgs),
 	 m_storage(_storage),
 	 m_punkt_rsrc_url(_punkt_rsrc_url),
-	 m_zeit_acli(_zeit_acli) {
-		
+	 m_zeit_acli(_zeit_acli),
+	 m_files_cache(_files_cache) {
+	
+	m_vk_app_ids["localhost"] = "4601879";
+	m_vk_app_ids["melook.in"] = "4602113";
 }
 
 void TargeterFull::genVdid(std::string &_vdid) const {
@@ -96,9 +100,10 @@ void TargeterFull::updatePlace(uint64_t _pid, const std::string &_targeter_args,
 	
 	for (int i = 0; i<_targets.size(); i++) {
 		
-		AdPtr ad = m_ads[ _targets[i] ];
-		if (ad)
-			place_targets.ads.push_back(ad);
+		//AdPtr ad = m_ads[ _targets[i] ];
+		//if (ad)
+		//	place_targets.ads.push_back(ad);
+		place_targets.ads.push_back( _targets[i] );
 	}
 	
 	hiaux::hashtable<uint64_t, PlacePtr>::iterator it = m_places.find(_pid);
@@ -148,18 +153,74 @@ uint64_t TargeterFull::getAdOwner(uint64_t _adid) {
 	return ownerid;
 }
 
-AdPtr TargeterFull::getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode) {
+void TargeterFull::getVkMatchCode(const std::string &_domain, uint64_t _pid, std::string &_exthtml, std::string &_extjs) const {
+	
+	std::cout << "TargeterFull::getVkMatchCode " << _domain << std::endl;
+	
+	hiaux::hashtable<std::string, std::string>::const_iterator it = m_vk_app_ids.find(_domain);
+	
+	if (it == m_vk_app_ids.end())
+		return;
+	
+	if (!m_files_cache->getFile("vkauth.html", _exthtml)) {
+		std::cout << "TargeterFull::getVkMatchCode file vkauth.html not loaded\n"; 
+		return;
+	}
+	
+	if (!m_files_cache->getFile("vkauth.js", _extjs)) {
+		std::cout << "TargeterFull::getVkMatchCode file vkauth.js not loaded\n"; 
+		return;
+	}
+	
+	_extjs += "\n"
+		"authVk("+ it->second +", true, null, true, function (profile) {"
+		"	alert(JSON.stringify(profile));"	
+		"	});\n";
+	
+	//_exthtml = ;
+	/*
+	_code = "\n"
+	"var xmlHttp = new XMLHttpRequest();\n"
+	"xmlHttp.open(\"GET\", \""+ m_punkt_rsrc_url +"vkauth.html\", false);\n"
+	"xmlHttp.send(null);\n"
+	"var au = document.createElement('div');\n"
+	"au.innerHTML = xmlHttp.responseText;\n"
+	"var place = document.getElementById(\"punkt_place_" + uint64_to_string(_pid) + "\");\n"
+	"place.appendChild(au);\n"
+	"\n"
+	"var head = document.getElementsByTagName('head')[0];\n"
+	"var script = document.createElement('script');\n"
+	"script.type = 'text/javascript';\n"
+	"script.onload = function () {\n"
+	"	//authVk(\""+ it->second +"\", true, null, true, function (profile) {"
+	"	//	alert(JSON.stringify(profile));"	
+	"	});\n"
+	""
+	"}\n"
+	"script.src =\"" + m_punkt_rsrc_url + "vkauth.js\";\n"
+	"head.appendChild(script);\n";*/
+}
+
+AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_exthtml, std::string &_extjs) {
 	
 	hLockTicketPtr ticket = lock.lock();
 	
-	hiaux::hashtable<uint64_t, PlacePtr>::iterator pit = m_places.find(_pid);
+	VisitorHashd* visitor = (VisitorHashd*)_visitor.get();
+	
+	hiaux::hashtable<uint64_t, PlacePtr>::iterator pit = m_places.find(_ad_req->pid);
 	if (pit == m_places.end())
 		return AdPtr();
+
+	if (pit->second->vk_match) {
+		
+		//if (!visitor->vk_profile)
+		getVkMatchCode (_ad_req->domain, _ad_req->pid, _exthtml, _extjs);
+	}
 
 	if (pit->second->targeted_ads.ads.size()==0)
 		return AdPtr();
 
-	AdPtr ad = pit->second->targeted_ads.ads [ rand() % pit->second->targeted_ads.ads.size() ];
+	AdPtr ad = m_ads [ pit->second->targeted_ads.ads [ rand() % pit->second->targeted_ads.ads.size() ] ];
 	return ad;
 }
 
@@ -168,9 +229,9 @@ void TargeterFull::saveVisitor(VisitorHashd *_v) {
 	m_storage->saveVisitor(_v);
 }
 
-ETN* TargeterFull::getCustomEventsRouter() {
+ETN* TargeterFull::getCustomMethodsRouter() {
 	
-	return NULL;
+	return new ETN();
 }
 
 TargeterFull::~TargeterFull() {

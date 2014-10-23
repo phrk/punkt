@@ -9,7 +9,7 @@ Punkt::Punkt(TargeterPtr _targeter,
 	m_replid(_replid),
 	m_punkt_rsrc_url(_punkt_rsrc_url) {
 	
-	//ETN *targeter_custom_events = m_targeter->getCustomEventsRouter();
+	ETN *targeter_custom_methods = m_targeter->getCustomMethodsRouter();
 	
 		/*
 											"cus",
@@ -34,14 +34,16 @@ Punkt::Punkt(TargeterPtr _targeter,
 											"click",
 											new ETN ("pid",
 													new ETN ("adid",
-																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3)))) 
-																	
-																	))));
+																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3)))), 
+											"tm",						
+											targeter_custom_methods		))));
 
 	ETN *demo = new ETN(boost::bind(&Punkt::handleDemo, this, _1, _2, _3));
 
 	ETN *place = new ETN("pid",
-							new ETN(boost::bind(&Punkt::handlePlace, this, _1, _2, _3)));
+						new ETN("loc",
+							new ETN("d",
+								new ETN(boost::bind(&Punkt::handlePlace, this, _1, _2, _3)))));
 
 	m_event_router = new ETN ("demo", demo,
 								"evtype", evtype,
@@ -62,6 +64,11 @@ void Punkt::handleDemo(const std::map<std::string, std::string> &_params, HttpCo
 void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	std::string ad_id_str;
+	std::string location;
+	std::string domain;
+	
+	_req->getField("loc", location);
+	_req->getField("d", domain);
 	
 	if (!_req->getField("adid", ad_id_str)) {
 
@@ -69,11 +76,20 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		return;
 	}
 	
+	
+	
+	
 	uint64_t adid = string_to_uint64(ad_id_str);	
 	bool https;
 	
 	FormatterPtr formatter;
 	FormatterArgsPtr formatter_args;
+	
+	std::string bf;
+	if (_req->getField("https", bf))
+		https = true;
+	
+	AdRequestPtr ad_req (new AdRequest(_conn, _req, location, domain, 0, https));
 	
 	{
 		hLockTicketPtr ticket = lock.lock();
@@ -98,12 +114,8 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		formatter = f_it->second;
 		formatter_args = ad->args;
 	}
-	
-	std::string bf;
-	if (_req->getField("https", bf))
-		https = true;
-	
-	AdRequestPtr ad_req (new AdRequest(_conn, _req, 0, adid, https));
+
+	ad_req->adid = adid;
 	
 	if (_req->getField("search", bf)) {
 		
@@ -142,7 +154,13 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnec
 	std::string bf;
 	std::string query;
 	std::vector<std::string> queries;
-	std::string extcode;
+	std::string exthtml, extjs;
+	
+	std::string location;
+	std::string domain;
+	
+	_req->getField("loc", location);
+	_req->getField("d", domain);
 	
 	if (_req->getField("ref", bf)) {
 		
@@ -150,14 +168,21 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnec
 			query_set = true;
 	}
 	
+	if (_req->getField("https", bf))
+		https = true;
+	
+	AdRequestPtr ad_req (new AdRequest(_conn, _req, location, domain, _pid, https));
+	
 	{
 				
-		AdPtr ad = m_targeter->getAdToShow(_pid, _visitor, queries, extcode);
+		AdPtr ad = m_targeter->getAdToShow(ad_req, _visitor, queries, exthtml, extjs);
 	
 		if (!ad) {
 			std::cout << "not got ad\n";
 			return;
 		}
+		
+		std::cout << "got ad\n";
 		
 		hLockTicketPtr ticket = lock.lock();
 	
@@ -175,20 +200,16 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnec
 		adid = ad->id;
 	}
 	
-	if (_req->getField("https", bf))
-		https = true;
-	
-	AdRequestPtr ad_req (new AdRequest(_conn, _req, _pid, adid, https));
+	ad_req->adid = adid;
 	
 	if (query_set) {
 		ad_req->search_queries.push_back(query);
 		_visitor->addQuery(bf);
 	}
-	
 
 	_visitor->getQueries(ad_req->search_queries);
 	_visitor->save();
-	formatter->format(ad_req, args, extcode);
+	formatter->format(ad_req, args, exthtml, extjs);
 }
 
 void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
@@ -212,31 +233,10 @@ void Punkt::handleTargeterEvent(const std::string &_method,
 								const std::map<std::string, std::string> &_params,
 								HttpConnectionPtr _conn, HttpRequestPtr _req) {
 
-	std::cout << "Punkt::handleTargeterEvent\n";
-		
 	uint64_t pid = string_to_uint64(_params.at("pid"));
 	uint64_t adid = string_to_uint64(_params.at("adid"));
 	
 	m_targeter->handleEvent(_method, pid, adid, _params, _conn, _req);
-}
-
-std::string Punkt::getVkAuthCode(const std::string &_domain) {
-	return "\n"
-	"xmlHttp = new XMLHttpRequest();\n"
-	"xmlHttp.open(\"GET\", \""+ m_punkt_rsrc_url +"vkauth.html\", false);\n"
-	"xmlHttp.send(null);\n"
-	"var au = document.createElement('div');\n"
-	"au.innerHTML = xmlHttp.responseText;\n"
-	"place.appendChild(au);\n"
-	"\n"
-	"var head = document.getElementsByTagName('head')[0];\n"
-	"var script = document.createElement('script');\n"
-	"script.type = 'text/javascript';\n"
-	"script.onload = function () {\n"
-	"	authVk();\n"
-	"}\n"
-	"script.src =\"" + m_punkt_rsrc_url + "vkauth.js\";\n"
-	"head.appendChild(script);\n";
 }
 
 void Punkt::connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req) {

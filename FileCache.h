@@ -13,6 +13,7 @@ public:
 	
 	void addFile(const std::string &_name, const std::string &_path);
 	bool getFile(const std::string &_name, std::string &_content);
+	void apply(const std::string &_name, boost::function<std::string(const std::string &)> _f);
 };
 
 typedef boost::shared_ptr<FileCache> FileCachePtr;

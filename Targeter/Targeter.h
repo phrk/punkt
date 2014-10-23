@@ -42,9 +42,9 @@ public:
 	virtual AdPtr getAd(uint64_t _adid) = 0;
 	virtual uint64_t getAdOwner(uint64_t _adid) = 0;
 	
-	virtual AdPtr getAdToShow(uint64_t _pid, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_extcode) = 0;
+	virtual AdPtr getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_exthtml, std::string &_extjs) = 0;
 	
-	virtual ETN* getCustomEventsRouter() = 0;
+	virtual ETN* getCustomMethodsRouter() = 0;
 	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) = 0;
 	
 	virtual ~Targeter();

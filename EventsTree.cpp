@@ -1,17 +1,24 @@
 #include "EventsTree.h"
 
+EventsTreeNode::EventsTreeNode():
+	m_is_stub(true) {
+	
+}
+
 EventsTreeNode::EventsTreeNode(boost::function<void(std::map<std::string, std::string> _params,
 													HttpConnectionPtr _conn, HttpRequestPtr _req)> _handler):
 	m_handler(_handler),
 	m_handler_set(true),
-	m_event_equals(false) {
+	m_event_equals(false),
+	m_is_stub(false) {
 									
 }
 
 EventsTreeNode::EventsTreeNode(const std::string &_arg,
 								EventsTreeNode *_child):
-								m_handler_set(false),
-								m_event_equals(false) {
+			m_handler_set(false),
+			m_event_equals(false),
+			m_is_stub(false) {
 	m_children[_arg] = _child;
 	_child->parent_name = _arg;
 }
@@ -21,7 +28,8 @@ EventsTreeNode::EventsTreeNode( const std::string &_arg0,
 				const std::string &_arg1,
 				EventsTreeNode *_child1):
 	m_handler_set(false),
-	m_event_equals(false) {
+	m_event_equals(false),
+	m_is_stub(false) {
 					
 	m_children[_arg0] = _child0;
 	m_children[_arg1] = _child1;
@@ -37,7 +45,8 @@ EventsTreeNode::EventsTreeNode( const std::string &_arg0,
 				const std::string &_arg2,
 				EventsTreeNode *_child2):
 	m_handler_set(false),
-	m_event_equals(false) {
+	m_event_equals(false),
+	m_is_stub(false) {
 	
 	m_children[_arg0] = _child0;
 	m_children[_arg1] = _child1;
@@ -54,7 +63,8 @@ EventsTreeNode::EventsTreeNode( bool _equals,
 				const std::string &_arg1,
 				EventsTreeNode *_child1):
 	m_event_equals(true),
-	m_handler_set(false) {
+	m_handler_set(false),
+	m_is_stub(false) {
 
  	m_children[_arg0] = _child0;
  	m_children[_arg1] = _child1;
@@ -63,7 +73,30 @@ EventsTreeNode::EventsTreeNode( bool _equals,
 	_child1->parent_name = _arg1;
 }
 
+EventsTreeNode::EventsTreeNode( bool _equals,
+				const std::string &_arg0,
+				EventsTreeNode *_child0,
+				const std::string &_arg1,
+				EventsTreeNode *_child1,
+				const std::string &_arg2,
+				EventsTreeNode *_child2):
+	m_event_equals(true),
+	m_handler_set(false),
+	m_is_stub(false) {
+
+ 	m_children[_arg0] = _child0;
+ 	m_children[_arg1] = _child1;
+ 	m_children[_arg2] = _child2;
+	
+	_child0->parent_name = _arg0;
+	_child1->parent_name = _arg1;
+	_child2->parent_name = _arg2;
+}
+
 void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
+	
+	if (m_is_stub)
+		return;
 	
 	if (m_handler_set) {
 	

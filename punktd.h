@@ -53,7 +53,9 @@ private:
 	
 	PGconn *m_pg;
 	
-	FileCachePtr m_jscache;
+	hAutoLock lock;
+	
+	FileCachePtr m_files_cache;
 	
 	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
 	uint64_t m_last_reload_ts;

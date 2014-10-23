@@ -117,6 +117,8 @@ void TargeterFull::onCalledZeit (bool _success) {
 
 void TargeterFull::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
+	std::cout << "TargeterFull::handleEvent\n";
+	
 	if (_method == "disp") {
 		
 		handleDispEvent(_pid, _adid, _params, _conn, _req);

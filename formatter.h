@@ -17,7 +17,7 @@ typedef boost::shared_ptr<FormatterArgs> FormatterArgsPtr;
 class Formatter {
 public:
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js) = 0;
-	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_extcode) = 0;
+	virtual void format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_exthtml, const std::string &_extjs) = 0;
 	virtual void formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args) = 0;
 	
 	virtual void handleFormatEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) = 0;

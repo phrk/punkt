@@ -18,3 +18,12 @@ bool FileCache::getFile(const std::string &_name, std::string &_content) {
 	_content = it->second;
 	return true;
 }
+
+void FileCache::apply(const std::string &_name, boost::function<std::string(const std::string &)> _f) {
+	
+	hiaux::hashtable<std::string, std::string>::iterator it = m_cache.find(_name);
+	if (it == m_cache.end())
+		return;
+	
+	it->second = _f(it->second);
+}
