@@ -152,6 +152,11 @@ void TargeterCookieOnly::saveVisitor(VisitorCookieOnly *_v) {
 	_v->m_conn->setCookie("punkt_vdump", vis_dump);
 }
 
+ETN* TargeterCookieOnly::getCustomEventsRouter() {
+	
+	return new ETN();
+}
+
 TargeterCookieOnly::~TargeterCookieOnly() {
 	
 }
