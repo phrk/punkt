@@ -114,12 +114,6 @@ void TargeterCookieOnly::handleDispEvent(uint64_t _pid,
 void TargeterCookieOnly::onCalledZeit (bool _success) {
 	
 }
-
-ETN* TargeterCookieOnly::getCustomEventsRouter() {
-	
-	return NULL;
-}
-
 void TargeterCookieOnly::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	if (_method == "disp") {
