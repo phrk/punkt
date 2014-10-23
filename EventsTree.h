@@ -15,9 +15,10 @@ class EventsTreeNode {
 	bool m_handler_set;
 	bool m_event_equals;
 	boost::function<void(std::map<std::string, std::string> _params, HttpConnectionPtr _conn, HttpRequestPtr _req)> m_handler; 
+
 public:
 	
-	std::string parent_name;	
+	std::string parent_name;
 	
 	EventsTreeNode(boost::function<void(std::map<std::string, std::string> _params, HttpConnectionPtr _conn, HttpRequestPtr _req)> _handler);
 	

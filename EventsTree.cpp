@@ -53,7 +53,8 @@ EventsTreeNode::EventsTreeNode( bool _equals,
 				EventsTreeNode *_child0,
 				const std::string &_arg1,
 				EventsTreeNode *_child1):
-	m_event_equals(true) {
+	m_event_equals(true),
+	m_handler_set(false) {
 
  	m_children[_arg0] = _child0;
  	m_children[_arg1] = _child1;
@@ -65,18 +66,26 @@ EventsTreeNode::EventsTreeNode( bool _equals,
 void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	if (m_handler_set) {
-		
-		//std::cout << "EventsTreeNode::doHandleEvent calling handler\n";
-		m_handler(_params, _conn, _req);
-		return;
-	}
 	
+		m_handler(_params, _conn, _req);
+
+	} else {
+		
+	}
+
 	std::string parent_value;
 	
-	if (_req->getField(parent_name, parent_value)) {
+	if (m_event_equals) {
+	
+		if (!_req->getField(parent_name, parent_value)) {
 		
+			return;
+		} 
+		else {
+		
+		}
 	}
-		
+
 	std::string bf;
 	std::map<std::string, EventsTreeNode*>::iterator it = m_children.begin();
 	std::map<std::string, EventsTreeNode*>::iterator end = m_children.end();
@@ -85,23 +94,15 @@ void EventsTreeNode::doHandleEvent(std::map<std::string, std::string> &_params, 
 		
 		if (m_event_equals) {			
 			
-			//std::cout << "EventsTreeNode::doHandleEvent m_event_equals\n";
 			if (it->first == parent_value) {
 			
-				//std::cout << "EventsTreeNode::doHandleEvent" << it->first << " == parent_value\n";
-				
-				//_params[ parent_name ] = parent_value;
 				it->second->doHandleEvent(_params, _conn, _req);
 				return;
 			}
 			
 		} else {
 		
-			//std::cout << "EventsTreeNode::doHandleEvent !m_event_equals\n";
-		
 			if (_req->getField(it->first, bf)) {
-				
-				//std::cout << "EventsTreeNode::doHandleEvent got field " << it->first << " == " << bf << std::endl;
 				
 				_params[ it->first ] = bf;
 				it->second->doHandleEvent(_params, _conn, _req);
