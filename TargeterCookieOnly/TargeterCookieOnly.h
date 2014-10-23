@@ -42,7 +42,7 @@ public:
 
 	virtual AdPtr getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_exthtml, std::string &_extjs);
 	
-	virtual ETN* getCustomEventsRouter();
+	virtual ETN* getCustomMethodsRouter();
 	
 	virtual void handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	
