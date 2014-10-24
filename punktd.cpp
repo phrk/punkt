@@ -323,10 +323,6 @@ Punktd::Punktd(const std::string &_config_file) {
 							_config ["replid"],
 							_config ["punkt_rsrc_url"]));
 	
-	m_srv.reset(new HttpServer(m_srv_tasklauncher,
-							ResponseInfo("text/html; charset=utf-8", "punktd"),
-							boost::bind(&Punktd::connHandler, this, _1, _2),
-							strtoint(_config["listen_port"])));
 
 	bindFormatters(_config["punkt_url"], _config ["punkt_rsrc_url"]);
 	std::cout << "Formatters binded\n";
@@ -336,6 +332,11 @@ Punktd::Punktd(const std::string &_config_file) {
 	std::cout << "Places loaded\n";
 	
 	std::cout << "All loaded\n";
+
+	m_srv.reset(new HttpServer(m_srv_tasklauncher,
+							ResponseInfo("text/html; charset=utf-8", "punktd"),
+							boost::bind(&Punktd::connHandler, this, _1, _2),
+							strtoint(_config["listen_port"])));
 
 	m_pool->run();
 }
