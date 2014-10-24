@@ -69,7 +69,7 @@ private:
 	
 	bool loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids);
 	void loadPlaces();
-	void loadAds();
+	bool loadAds();
 	
 	void checkReload();
 	

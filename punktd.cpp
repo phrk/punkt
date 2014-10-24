@@ -78,8 +78,8 @@ void Punktd::checkReload() {
 	if (now - m_last_reload_ts < m_reload_period)
 		return;
 	
-	loadAds();
-	loadPlaces();
+	if (loadAds())
+		loadPlaces();
 	
 	m_last_reload_ts = time(0);
 }
@@ -103,7 +103,7 @@ bool Punktd::checkDbConn() {
 	return doCheckDbConn(0);
 }
 
-void Punktd::loadAds() {
+bool Punktd::loadAds() {
 	std::string query("SELECT * FROM punkt.ads");
 	PGresult *res = PQexec(m_pg, query.c_str());
 	
@@ -111,7 +111,7 @@ void Punktd::loadAds() {
 		std::cout << "Punktd::loadAds !PGRES_TUPLES_OK\n";
 		
 		//checkDbConn();
-		return;
+		return false;
 	}
 	
 	int ntuples = PQntuples(res);
@@ -149,7 +149,7 @@ void Punktd::loadAds() {
 		
 		m_targeter->updateAd(id, format_id, ad_owner, formatter_args, targeter_args);
 	}
-	
+	return true;
 }
 
 bool Punktd::loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids) {
