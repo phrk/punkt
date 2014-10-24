@@ -78,6 +78,9 @@ void Punktd::checkReload() {
 	if (now - m_last_reload_ts < m_reload_period)
 		return;
 	
+	hLockTicketPtr ticket = lock.lock();
+	m_last_reload_ts = time(0);
+	
 	if (loadAds())
 		loadPlaces();
 	
@@ -238,8 +241,6 @@ FormatterArgsPtr Punktd::parseFormatterArgs(uint64_t _format_id, const std::stri
 	std::cout << "Punktd::parseFormatterArgs\n";
 	
 	FormatterArgsPtr ret;
-	
-	hLockTicketPtr ticket = lock.lock();
 	
 	hiaux::hashtable<uint64_t, FormatterPtr>::iterator f_it = m_formatters.find(_format_id);
 	
