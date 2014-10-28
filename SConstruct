@@ -21,6 +21,7 @@ b.connectLib(hicore_path+"geber/cpp-client/")
 b.addPath(hicore_path+"geber/")
 b.connectLib(hicore_path+"geber/")
 
+b.addPath(hicore_path+"zeit/")
 b.addPath(hicore_path+"zeit/cpp-client/")
 b.connectLib(hicore_path+"zeit/cpp-client/")
 
@@ -56,7 +57,7 @@ b.addCppGlob("*.cpp")
 b.addCppGlob("*.pb.cc")
 
 
-b.addLinkFlags(["-lprotobuf", "-ljansson", "-lpq", 
+b.addLinkFlags(["-lprotobuf", "-ljansson", "-lpq", "-g", "-O0",
     "-L/usr/local/lib/"])
 
 b.build(Program)
