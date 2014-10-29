@@ -55,21 +55,28 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 	}
 	{
 		
-		FormatterPtr f(new ShowcaseSliderFormatter(m_req_disp,
+		FormatterPtr showcase(new ShowcaseSliderFormatter(m_req_disp,
 													m_files_cache,
 													_punkt_url,
 													_punkt_rsrc_url,
 													m_geber_acli,
 													m_zeit_acli,
 													boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1) ));
-																								
-		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, f);
-		m_punkt->updateFormatter(SHOWCASE_SLIDER_304_224_FORMATTER_ID, f);
-		m_punkt->updateFormatter(SHOWCASE_SLIDER_520_250_4_ITEMS_FORMATTER_ID, f);
 		
-		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_FORMATTER_ID, f));
-		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_304_224_FORMATTER_ID, f));
-		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_520_250_4_ITEMS_FORMATTER_ID, f));
+		FormatterPtr static_image (new StaticImageFormatter(m_files_cache,
+															_punkt_url,
+															_punkt_rsrc_url,
+															boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1)));
+																					
+		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, showcase);
+		m_punkt->updateFormatter(SHOWCASE_SLIDER_304_224_FORMATTER_ID, showcase);
+		m_punkt->updateFormatter(SHOWCASE_SLIDER_520_250_4_ITEMS_FORMATTER_ID, showcase);
+		m_punkt->updateFormatter(STATIC_IMAGE_FORMATTER_ID, static_image);
+		
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_FORMATTER_ID, showcase));
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_304_224_FORMATTER_ID, showcase));
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(SHOWCASE_SLIDER_520_250_4_ITEMS_FORMATTER_ID, showcase));
+		m_formatters.insert(std::pair<uint64_t, FormatterPtr>(STATIC_IMAGE_FORMATTER_ID, static_image));
 	}
 }
 
@@ -290,10 +297,13 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_files_cache->addFile("mootools", "js/mootools-core-1.5.0.js");
 	m_files_cache->addFile("slider.js", "js/buildSlider.js");
 	m_files_cache->addFile("ShowcaseSliderEvents.js", "js/ShowcaseSliderEvents.js");
+	m_files_cache->addFile("static_image.js", "js/static_image.js");
+	
 	m_files_cache->addFile("vkauth.html", "TargeterFull/vkauth.html");
 	m_files_cache->apply("vkauth.html", boost::bind(&escape_symbol, _1, '\"'));
 	m_files_cache->apply("vkauth.html", boost::bind(&add_newline_backslash, _1));
 	m_files_cache->addFile("vkauth.js", "TargeterFull/vkauth.js");
+	
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
 	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));

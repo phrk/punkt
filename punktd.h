@@ -24,6 +24,7 @@
 #include "FileCache.h"
 #include "ShowcaseSimpleFormatter.h"
 #include "ShowcaseSliderFormatter.h"
+#include "StaticImageFormatter.h"
 
 #include "libpq-fe.h"
 
