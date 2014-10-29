@@ -2,7 +2,7 @@
 function renderStaticImage(click_url, img_url, https) {
 	
 	
-	return '<a href=' + click_url + '/>'
+	return '<a href=' + click_url + ' target="_blank">'
 			+ '<img src=' + img_url+ '> </img>'
 			+ '</a>';
 }
