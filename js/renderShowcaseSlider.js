@@ -71,11 +71,18 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 				+ ';  overflow-wrap: break-word;" target="_blank" >';
 				
 		
-		ret += show.items[i].caption + "<br>";
-		if (formatter_args.show_shop_domain)
-			ret += '<div style="font-size:10pt; color:green;">' + show.items[i].shop_domain + '</div>';
-		ret += '<p style="color:' + formatter_args.pricecolor + '; text-decoration:none;">' + show.items[i].price + 'руб </p>';
-		ret += '</a></td>';
+		ret += show.items[i].caption + "</a><br>";
+		
+		
+		if (formatter_args.show_shop_domain=="on") {
+			ret += '<a href=' + show.items[i].directurl + ' style="font-size:10pt; color:' + formatter_args.domaincolor + ';" target="_blank">';
+			ret += show.items[i].shop_domain + '</a>';
+		}
+		
+		ret += '<br><a href=' + show.items[i].directurl + ' style="color:' + formatter_args.pricecolor + '; text-decoration:none;" target="_blank">';
+		ret += show.items[i].price + 'руб';
+		ret += '</a>';
+		ret += '</td>';
 		ret += '</tr>';
 
 		if (document.punkt_showcase_slider_items_displayed == null) {
@@ -187,7 +194,14 @@ function renderShowcaseSlider304x224x1 (pid, show, formatter_args, format_files_
 				
 		
 		ret += show.items[i].caption + "<br>";
-		ret += '<p style="color:' + formatter_args.pricecolor + '; text-decoration:none;">' + show.items[i].price + 'руб </p>';
+		
+		if (formatter_args.show_shop_domain=="on") {
+			ret += '<a href=' + show.items[i].directurl + ' style="font-size:10pt; color:' + formatter_args.domaincolor + ';" target="_blank">';
+			ret += show.items[i].shop_domain + '</a>';
+		}
+		
+		ret += '<br>';
+		ret += '<a href="' + show.items[i].directurl + '" style="color:' + formatter_args.pricecolor + '; text-decoration:none;" target="_blank">' + show.items[i].price + 'руб </a>';
 		ret += '</a></td>';
 		ret += '</tr>';
 
@@ -297,10 +311,15 @@ function renderShowcaseSlider4(pid, show, formatter_args, format_files_path, cli
 		ret += '</td>';
 		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:' + formatter_args.textfont + ' ; font-size:12pt; color:' + formatter_args.textcolor 
 				+ ';  overflow-wrap: break-word;" target="_blank" >';
-				
 		
 		ret += show.items[i].caption + "<br>";
-		ret += '<p style="color:' + formatter_args.pricecolor + '; text-decoration:none;">' + show.items[i].price + 'руб </p>';
+		
+		if (formatter_args.show_shop_domain=="on") {
+			ret += '<a href=' + show.items[i].directurl + ' style="font-size:10pt; color:' + formatter_args.domaincolor + ';" target="_blank">';
+			ret += show.items[i].shop_domain + '</a>';
+		}
+		
+		ret += '<br><a href="' +show.items[i].directurl+ '" style="color:' + formatter_args.pricecolor + '; text-decoration:none;" target="_blank">' + show.items[i].price + 'руб </a>';
 		ret += '</a></td>';
 		
 
