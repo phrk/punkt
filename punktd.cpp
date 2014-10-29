@@ -57,15 +57,11 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 		
 		FormatterPtr showcase(new ShowcaseSliderFormatter(m_req_disp,
 													m_files_cache,
-													_punkt_url,
-													_punkt_rsrc_url,
 													m_geber_acli,
 													m_zeit_acli,
 													boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1) ));
 		
 		FormatterPtr static_image (new StaticImageFormatter(m_files_cache,
-															_punkt_url,
-															_punkt_rsrc_url,
 															boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1)));
 																					
 		m_punkt->updateFormatter(SHOWCASE_SLIDER_FORMATTER_ID, showcase);

@@ -1,12 +1,8 @@
 #include "StaticImageFormatter.h"
 
 StaticImageFormatter::StaticImageFormatter(FileCachePtr _jscache,
-					const std::string &_punkt_url,
-					const std::string &_punkt_rsrc_url,
 					boost::function<uint64_t(uint64_t)> _getAdOwner):
 	m_jscache(_jscache),
-	system_url(_punkt_url),
-	system_rsrc_url(_punkt_rsrc_url),
 	m_getAdOwner(_getAdOwner)
 {	
 }
@@ -16,6 +12,8 @@ FormatterArgsPtr StaticImageFormatter::parseArgs(const std::string &_args_js) {
 	std::cout << "StaticImageFormatter::parseArgs: " << _args_js << std::endl;
 	StaticImageFormatterArgs *a = new StaticImageFormatterArgs();
 	a->json_dump = _args_js;
+	std::string system_url;
+	std::string system_rsrc_url;
 
 //	a->click_url = "http://advaction.ru/tds?cid=651&pid=a4fb9ee9afa2859342ff8f3fd64d69f0";
 //	a->img_url = "http://advaction.ru/creo/5f7/5f79205eb91c7e9b97612415ba09e0ad.jpg";
@@ -39,9 +37,26 @@ FormatterArgsPtr StaticImageFormatter::parseArgs(const std::string &_args_js) {
 		throw "StaticImageFormatter::parseArgs could not parse type";
 	}
 	
+	json_t *j_system_url = json_object_get(root, "system_url");
+	if (json_is_string(j_system_url)) {
+		system_url = json_string_value(j_system_url);
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse system_url\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse system_url";
+	}
+	
+	json_t *j_system_rsrc_url = json_object_get(root, "system_rsrc_url");
+	if (json_is_string(j_system_rsrc_url)) {
+		system_rsrc_url = json_string_value(j_system_rsrc_url);
+	} else {
+		std::cout << "ShowcaseSimpleFormatter::parseArgs could not parse system_rsrc_url\n";
+		throw "ShowcaseSimpleFormatter::parseArgs could not parse system_rsrc_url";
+	}
+	
 	json_decref(root);
 	
 	a->system_url = system_url;
+	a->system_rsrc_url = system_rsrc_url;
 	return FormatterArgsPtr(a);
 }
 

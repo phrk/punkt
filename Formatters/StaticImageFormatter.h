@@ -26,15 +26,13 @@ class StaticImageFormatter : public Formatter {
 	
 	boost::function<uint64_t(uint64_t)> m_getAdOwner;
 	
-	std::string system_url;
-	std::string system_rsrc_url;
+//	std::string system_url;
+//	std::string system_rsrc_url;
 	
 	void buildClickUrl(AdRequestPtr _ad_req, const std::string &_system_url, const std::string &_direct_url, std::string &_click_url);
 public:
 	
 	StaticImageFormatter(FileCachePtr _jscache,
-						const std::string &_punkt_url,
-						const std::string &_punkt_rsrc_url,
 						boost::function<uint64_t(uint64_t)> _getAdOwner);
 	
 	virtual FormatterArgsPtr parseArgs(const std::string &_args_js);

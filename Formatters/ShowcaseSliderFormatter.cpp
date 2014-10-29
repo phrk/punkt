@@ -21,15 +21,13 @@ ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _ni
 
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 						FileCachePtr _jscache,
-						const std::string &_punkt_url,
-						const std::string &_punkt_rsrc_url,
 						GeberdCliApiClientAsyncPtr _geber_acli,
 						ZeitClientAsyncPtr _zeit_acli,
 						boost::function<uint64_t(uint64_t)> _getAdOwner):
 	m_req_disp(_req_disp),
 	m_jscache(_jscache),
-	m_punkt_url(_punkt_url),
-	m_punkt_rsrc_url(_punkt_rsrc_url),
+//	m_punkt_url(_punkt_url),
+//	m_punkt_rsrc_url(_punkt_rsrc_url),
 //	m_getConnById(_getConnById),
 	m_geber_acli(_geber_acli),
 	m_zeit_acli(_zeit_acli),
@@ -194,7 +192,7 @@ void ShowcaseSliderFormatter::renderClickTemplate(const std::string &_advid,
 	replaceSubstring(aim, "{clickid}", clickid_c);
 	
 	escapeUrl(aim);
-	_target = m_punkt_url + "?evtype=tev&fid=1&ev=click&pid=" + 
+	_target = _system_url + "?evtype=tev&fid=1&ev=click&pid=" + 
 					uint64_to_string(_pid) + "&adid=" + uint64_to_string(_adid) + "&item=" + uint64_to_string(_itemid) + "&aim=" + aim;
 }
 
@@ -321,8 +319,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	"	buildSlider('" + uint64_to_string(_ad_req->pid) + "', true, '" + args->system_url + "', " +uint64_to_string(_ad_req->adid)+ ", '" + args->type + "' ); \n"
 	"} \n";
 	
-	std::string resp = \		
-		"<div id=\"punkt_place_0\" width=\"240\" height=\"400\"></div>"
+	std::string resp = "<div id=\"punkt_place_0\" width=\"240\" height=\"400\"></div>"
 		"<script type=\"text/JavaScript\">";
 
 	resp.reserve(slider_events.size() + render_slider.size() + mootools.size() + slider.size() + format_renderer_bind.size());
