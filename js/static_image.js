@@ -13,6 +13,7 @@ function staticImagePost(pid, demo, system_url, adid) {
 		return;
 	
 	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.withCredentials = true;
 	xmlHttp.open( "GET", system_url + "?evtype=tev&fid=1&ev=disp&pid=" + pid + "&adid=" + adid, true);
 	
 	xmlHttp.onload = function (e) {

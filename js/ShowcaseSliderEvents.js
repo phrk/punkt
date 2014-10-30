@@ -2,6 +2,7 @@
 function evShowcaseSliderDisp(punkturl, pid, adid) {
 	
 	xmlHttp = new XMLHttpRequest();
+	xmlHttp.withCredentials = true;
 	xmlHttp.open( "GET", punkturl + "?evtype=tev&fid=1&ev=disp&pid=" + pid + "&adid=" + adid, true);
 	
 	xmlHttp.onload = function (e) {
