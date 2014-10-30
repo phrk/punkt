@@ -106,9 +106,9 @@ void TargeterFull::handleDispEvent(uint64_t _pid,
 	m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 
 //	std::cout << owner_ads_place_counter << std::endl;
-	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
 	
 	getVisitor(_conn, _req, boost::bind(&TargeterFull::saveDispStats, this, _1, ad_owner, _pid, _adid));
+	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
 }
 
 void TargeterFull::saveDispStats(VisitorPtr _v, uint64_t _ownerid, uint64_t _pid, uint64_t _adid) {
