@@ -22,24 +22,25 @@ class VisitorsStorage {
 	//void mergeVisitors(uint64_t _vid0, uint64_t _vid1);
 	
 	void genVid(std::string &_vid);
+	std::string genVid();
 	
 	void getVisitor_onGotDeviceVid (int _err,
 									const std::string &_vid,
 									const std::string &_vdid,
 									boost::function<void(VisitorPtr)> _onVisitor); 
 	
-	void saveVid(const std::string &_vdid, const std::string &_vid); 
+	void saveVid(const std::string &_vdid, const std::string &_vid, uint64_t _ttl_inc); 
 	
 public:
 	
 	VisitorsStorage(HashdClientAsyncPtr _hashd_acli);
-	void getVisitor(const std::string &_vdid, boost::function<void(VisitorPtr)> _onVisitor);
+	void getVisitor(const std::string &_vdid, bool _new_cookie, boost::function<void(VisitorPtr)> _onVisitor);
 	void saveVisitor(VisitorHashd *_visitor);
 	
 	void onSaved(int _err);
 	void onGotVisitor(int _err,
 						const std::string &_dump,
-						bool _newdevice,
+						uint64_t _ttl,
 						const std::string &_vid,
 						const std::string &_vdid,
 						boost::function<void(VisitorPtr)> _onVisitor);

@@ -76,9 +76,6 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		return;
 	}
 	
-	
-	
-	
 	uint64_t adid = string_to_uint64(ad_id_str);	
 	bool https;
 	
@@ -121,7 +118,7 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		
 		unescapeUrl(bf);
 		toLowerUtf8(bf);
-		std::cout << "Punkt::handleDemoGotVisitor query: " << bf << std::endl;
+		//std::cout << "Punkt::handleDemoGotVisitor query: " << bf << std::endl;
 		ad_req->search_queries.push_back(bf); 
 		_visitor->addQuery(bf);
 	} else {
@@ -182,7 +179,7 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnec
 			return;
 		}
 		
-		std::cout << "got ad\n";
+		//std::cout << "got ad\n";
 		
 		hLockTicketPtr ticket = lock.lock();
 	

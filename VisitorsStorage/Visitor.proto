@@ -38,22 +38,20 @@ message VisitDevice {
 	repeated string search_queries = 4;
 	repeated string domains_visited = 5;
 	
-	message AdDisps {
+	message EvCount {
 		
-		required uint64 adid = 1;
+		required uint64 id = 1;
 		required uint64 n = 2;
 	};
 	
-	message AdClicks {
-		
-		required uint64 adid = 1;
-		required uint64 n = 2;
-	};
+	repeated EvCount ads_disped_today = 6;
+	repeated EvCount ads_clicked_today = 7;
+	repeated EvCount places_today = 8;
+	repeated EvCount domains_today = 9;
 	
-	repeated AdDisps ads_disped = 6;
-	repeated AdClicks ads_clicked = 7;
+	required uint64 stats_day_begin_ts = 10;
 	
-	repeated VisitorExt ext = 8;
+	repeated VisitorExt ext = 11;
 };
 
 message Visitor {
@@ -65,4 +63,6 @@ message Visitor {
 	repeated VisitorExt ext = 4;
 	
 	optional VkProfile vk_profile = 5;
+	
+	
 };

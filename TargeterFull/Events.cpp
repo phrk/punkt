@@ -70,7 +70,6 @@ void TargeterFull::handleClickEvent(uint64_t _pid,
 	m_zeit_acli->mergeCounter(owner_place_ad_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 //	m_zeit_acli->mergeCounter(owner_place_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
 //	m_zeit_acli->mergeCounter(owner_item_counter, time(0), 1, boost::bind(&ShowcaseSliderFormatter::onCalledZeit, this, _1));
-
 }
 
 void TargeterFull::handleDispEvent(uint64_t _pid,
@@ -107,8 +106,41 @@ void TargeterFull::handleDispEvent(uint64_t _pid,
 	m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 
 //	std::cout << owner_ads_place_counter << std::endl;
-
 	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
+	
+	getVisitor(_conn, _req, boost::bind(&TargeterFull::saveDispStats, this, _1, ad_owner, _pid, _adid));
+}
+
+void TargeterFull::saveDispStats(VisitorPtr _v, uint64_t _ownerid, uint64_t _pid, uint64_t _adid) {
+	
+	VisitorHashd* v = (VisitorHashd*)_v.get();
+	
+	std::string owner_ads_place_counter = "owners:owner_ads-" + uint64_to_string(_ownerid)
+									+ ":places_ad-" + uint64_to_string(_adid)
+									+ ":visitors:place-" + uint64_to_string(_pid);
+
+	std::string owner_places_ad_counter = "owners:owner_places-" + uint64_to_string(_ownerid) 
+										+ ":ads_place-" + uint64_to_string(_pid) 
+										+ ":visitors:ad-" + uint64_to_string(_adid);
+	
+	
+	if (v->devices[0].ads_disped_today.find(_adid) == v->devices[0].ads_disped_today.end()) {
+		
+		//std::cout << "calling " << owner_ads_place_counter << std::endl;
+		v->devices[0].ads_disped_today[ _adid ] = 1;
+		m_zeit_acli->mergeCounter(owner_ads_place_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
+	}
+	
+	if (v->devices[0].places_today.find(_pid) == v->devices[0].places_today.end()) {
+		
+		v->devices[0].places_today[ _pid ] = 1;
+		m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
+	}
+	
+	v->devices[0].ads_disped_today[ _adid ] ++;
+	v->devices[0].places_today[ _pid ] ++;
+	v->save();
+	//domains_today[]
 }
 
 void TargeterFull::onCalledZeit (bool _success) {
@@ -117,7 +149,7 @@ void TargeterFull::onCalledZeit (bool _success) {
 
 void TargeterFull::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
-	std::cout << "TargeterFull::handleEvent\n";
+	//std::cout << "TargeterFull::handleEvent\n";
 	
 	if (_method == "disp") {
 		

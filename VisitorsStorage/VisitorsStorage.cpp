@@ -31,81 +31,140 @@ void VisitorsStorage::genVid(std::string &_vid) {
 	_vid = std::string(bf);
 }
 
+std::string VisitorsStorage::genVid() {
+	
+	std::string vid;
+	genVid(vid);
+	return vid;
+}
+
+void VisitorsStorage::getVisitor(const std::string &_vdid, bool _new_cookie, boost::function<void(VisitorPtr)> _onVisitor) {
+	
+	if (_new_cookie) {
+		
+		VisitorHashdPtr v(new VisitorHashd(genVid(),
+											_vdid,
+											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
+											true)); // saving
+		v->initCurDevice(_vdid, "_user_agent_");
+		_onVisitor(v);
+		
+	} else
+		m_hashd_acli->get("devicevids", _vdid, boost::bind(&VisitorsStorage::getVisitor_onGotDeviceVid, this, _1, _2, _vdid, _onVisitor));
+}
+
 void VisitorsStorage::getVisitor_onGotDeviceVid (int _err,
 												const std::string &_vid,
 												const std::string &_vdid,
 												boost::function<void(VisitorPtr)> _onVisitor) {
 	
 	
-	bool newdevice = false;
-	if (_err == E_HC_KEY_DONT_EXISTS) // (_success && !_exists)
-		newdevice =  true;
-	
-	if (_err == E_HC_OK) { //(_success && _exists) {
-		m_hashd_acli->get("visitors", _vid, boost::bind(&VisitorsStorage::onGotVisitor, this, _1, _2, newdevice, _vid, _vdid, _onVisitor));
+	if (_err == E_HC_OK) { //(_success && vid _exists)
+
+		//std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid E_HC_OK\n";
+		m_hashd_acli->getWithTtl("visitors", _vid, boost::bind(&VisitorsStorage::onGotVisitor, this, _1, _2, _3, _vid, _vdid, _onVisitor));
 		return;
 	}
 	
-	std::string vid;
-	genVid(vid);
-	onGotVisitor(E_HC_KEY_DONT_EXISTS, "", newdevice, vid, _vdid, _onVisitor);
-}
-
-void VisitorsStorage::saveVid(const std::string &_vdid, const std::string &_vid) {
-	
-//	std::cout << "VisitorsStorage::saveVid " << _vdid << " " << _vid << std::endl;
-	m_hashd_acli->set("devicevids", _vdid, _vid, boost::bind(&VisitorsStorage::onSaved, this, _1));
-}
-
-void VisitorsStorage::getVisitor(const std::string &_vdid, boost::function<void(VisitorPtr)> _onVisitor) {
-	
-	m_hashd_acli->get("devicevids", _vdid, boost::bind(&VisitorsStorage::getVisitor_onGotDeviceVid, this, _1, _2, _vdid, _onVisitor));
-}
-
-void VisitorsStorage::onGotVisitor(int _err,
-									const std::string &_dump,
-									bool _newdevice,
-									const std::string &_vid,
-									const std::string &_vdid,
-									boost::function<void(VisitorPtr)> _onVisitor) {
-	
-
-	std::cout << "VisitorsStorage::onGotVisitor err:" << _err << " _newdevice:" << _newdevice << std::endl;
-
-	std::string _user_agent = "_USER AGENT_";
-	
-	VisitorHashdPtr v(new VisitorHashd(_vid, _vdid, boost::bind(&VisitorsStorage::saveVisitor, this, _1), _newdevice));
-	
-	if (_err != E_HC_OK) {
+	if (_err == E_HC_KEY_DONT_EXISTS) {
 		
-		
-		v->initCurDevice(_vdid, _user_agent);
+		//std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid E_HC_KEY_DONT_EXISTS\n";
+		VisitorHashdPtr v(new VisitorHashd(genVid(),
+											_vdid,
+											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
+											true)); // saving
+		v->initCurDevice(_vdid, "_user_agent_");
 		_onVisitor(v);
 		return;
 	}
 	
-	v->parseProtobuf(_dump);
-	v->initCurDevice(_vdid, _user_agent);
+	if (_err == E_HC_HASH_DONT_EXISTS) {
+		
+		std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid E_HC_HASH_DONT_EXISTS\n"; 
+	}
+	
+	// E_HC_CONNECTIVITY_ERROR
+	//std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid E_HC_CONNECTIVITY_ERROR\n";
+	
+	//std::cout << "err: " << _err << std::endl;
+	
+	VisitorHashdPtr v(new VisitorHashd(genVid(),
+										_vdid,
+										boost::bind(&VisitorsStorage::saveVisitor, this, _1),
+										false)); // not saving
+	v->initCurDevice(_vdid, "_user_agent_");
 	_onVisitor(v);
+}
+
+void VisitorsStorage::saveVid(const std::string &_vdid, const std::string &_vid, uint64_t _ttl_inc) {
+	
+//	std::cout << "VisitorsStorage::saveVid " << _vdid << " " << _vid << std::endl;
+	m_hashd_acli->setAndIncTtl("devicevids", _vdid, _vid, _ttl_inc, boost::bind(&VisitorsStorage::onSaved, this, _1));
+}
+
+
+
+void VisitorsStorage::onGotVisitor(int _err,
+									const std::string &_dump,
+									uint64_t _ttl,
+									const std::string &_vid,
+									const std::string &_vdid,
+									boost::function<void(VisitorPtr)> _onVisitor) {
+	
+	if (_err == E_HC_OK) {
+		
+		std::cout << "VisitorsStorage::onGotVisitor ttl:" << _ttl << std::endl;
+		
+		VisitorHashdPtr v(new VisitorHashd(_vid,
+											_vdid,
+											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
+											true)); // saving
+		v->parseProtobuf(_dump);
+		v->initCurDevice(_vdid, "_user_agent_");
+		_onVisitor(v);
+		return;
+	}
+	
+	if (_err == E_HC_KEY_DONT_EXISTS) {
+		
+		VisitorHashdPtr v(new VisitorHashd(_vid,
+											_vdid,
+											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
+											true)); // saving
+		v->initCurDevice(_vdid, "_user_agent_");
+		_onVisitor(v);
+		return;
+	}
+	
+	// E_HC_CONNECTIVITY_ERROR | E_HC_HASH_DONT_EXISTS
+	
+	VisitorHashdPtr v(new VisitorHashd(_vid,
+										_vdid,
+										boost::bind(&VisitorsStorage::saveVisitor, this, _1),
+										false)); // saving
+	v->initCurDevice(_vdid, "_user_agent_");
+	_onVisitor(v);						
 }
 
 void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 	
+	if (!_visitor->m_saving)
+		return;
 	
 	std::string dump, vid;
 	_visitor->dump(dump);
 	_visitor->getId(vid);
 	
-	std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
+	//std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
 	
 	m_hashd_acli->setAndIncTtl("visitors", vid, dump, _visitor->ttl_inc, boost::bind(&VisitorsStorage::onSaved, this, _1));
 	
-	if (_visitor->newdevice) {
-
-		saveVid(_visitor->cur_vdid, _visitor->getId());
+	for (int i = 0; i<_visitor->devices.size(); i++) {
+		
+		saveVid(_visitor->devices[i].vdid, vid, _visitor->ttl_inc);
 	}
 	
-//	std::cout << "devices: " << _visitor->devices.size() << std::endl;
+	//	std::cout << "devices: " << _visitor->devices.size() << std::endl;
 	
 	//std::cout << "VisitorsStorage::saveVisitor NEW DEVICE=" << _visitor->newdevice << " " << _visitor->getId() << " " << _visitor->cur_vdid << " " << dump << std::endl;
 }

@@ -1,4 +1,15 @@
 
 message VisitorCookie {
+
 	repeated string queries = 1;
+	
+	message EvCount {
+		
+		required uint64 id = 1;
+		required uint64 n = 2;
+	};
+	
+	repeated EvCount ads_disped_today = 2;
+	repeated EvCount places_today = 3;
+	required uint64 stats_day_begin_ts = 4;
 };

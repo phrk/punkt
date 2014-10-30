@@ -25,6 +25,8 @@ public:
 	
 	virtual void getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boost::function<void(VisitorPtr)> _onGot);
 	
+	void saveDispStats(VisitorPtr _v, uint64_t _ownerid, uint64_t _pid, uint64_t _adid);
+	
 	virtual void updateAd(uint64_t _id,
 							uint64_t _format_id,
 							uint64_t _ownerid,

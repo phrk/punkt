@@ -1,34 +1,11 @@
 #include "VisitDevice.h"
+#include "hiaux/strings/string_utils.h"
 
 VisitDevice::VisitDevice(const std::string &_vdid, const std::string &_user_agent, uint64_t _create_ts):
 	 vdid(_vdid),
 	 user_agent(_user_agent),
 	 create_ts(_create_ts) {
 	
-}
-
-AdDisps::AdDisps(const punkt::VisitDevice::AdDisps &_pb) {
-	
-	adid = _pb.adid();
-	n = _pb.n();
-}
-
-void AdDisps::dump(punkt::VisitDevice::AdDisps *_pb) {
-	
-	_pb->set_adid(adid);
-	_pb->set_n(n);
-}
-
-AdClicks::AdClicks(const punkt::VisitDevice::AdClicks &_pb) {
-	
-	adid = _pb.adid();
-	n = _pb.n();
-}
-
-void AdClicks::dump(punkt::VisitDevice::AdClicks *_pb) {
-	
-	_pb->set_adid(adid);
-	_pb->set_n(n);
 }
 
 VisitorExt::VisitorExt(const punkt::VisitorExt &_pb) {
@@ -59,55 +36,113 @@ VisitDevice::VisitDevice(const punkt::VisitDevice &_pb) {
 		domains_visited.push_back(_pb.domains_visited(i));
 	}
 	
-	for (size_t i = 0; i< _pb.ads_disped_size(); i++) {
+	for (size_t i = 0; i< _pb.ads_disped_today_size(); i++) {
 		
-		ads_disped.push_back( AdDisps(_pb.ads_disped(i)) );
+		ads_disped_today[ _pb.ads_disped_today(i).id() ] = _pb.ads_disped_today(i).n();
 	}
 	
-	for (size_t i = 0; i< _pb.ads_clicked_size(); i++) {
+	for (size_t i = 0; i< _pb.ads_clicked_today_size(); i++) {
 		
-		ads_clicked.push_back( AdClicks(_pb.ads_clicked(i)) );
+		ads_clicked_today[ _pb.ads_clicked_today(i).id() ] = _pb.ads_clicked_today(i).n();
+	}
+	
+	for (size_t i = 0; i< _pb.places_today_size(); i++) {
+		
+		places_today[ _pb.places_today(i).id() ] = _pb.places_today(i).n();
+	}
+	
+	for (size_t i = 0; i< _pb.domains_today_size(); i++) {
+		
+		domains_today[ _pb.domains_today(i).id() ] = _pb.domains_today(i).n();
 	}
 	
 	for (size_t i = 0; i< _pb.ext_size(); i++) {
 		
 		ext.push_back( VisitorExt(_pb.ext(i)) );
 	}
+	
+	stats_day_begin_ts = _pb.stats_day_begin_ts();
+	
+	uint64_t cur_beginning_of_day_ts = getBeginningOfDayTs(time(0));
+	
+	if (cur_beginning_of_day_ts > stats_day_begin_ts) {
+		
+		ads_disped_today.clear();
+		ads_clicked_today.clear();
+		places_today.clear();
+		domains_today.clear();
+		stats_day_begin_ts = cur_beginning_of_day_ts;
+	}
 }
 
 void VisitDevice::dump(punkt::VisitDevice *_pb) {
-	
-//	std::cout << "VisitDevice::dump\n";
 	
 	_pb->set_vdid(vdid);
 	_pb->set_create_ts(create_ts);
 	_pb->set_user_agent(user_agent);
 	
 	for (size_t i = 0; i<search_queries.size(); i++) {
+		
 		std::string *s = _pb->add_search_queries();
 		*s = search_queries[i];
 	}
 	
 	for (size_t i = 0; i<domains_visited.size(); i++) {
+		
 		std::string *s = _pb->add_domains_visited();
 		*s = domains_visited[i];
 	}
 	
-	for (size_t i = 0; i< ads_disped.size(); i++) {
+	
+	hiaux::hashtable<uint64_t, int>::const_iterator it = ads_disped_today.begin();
+	hiaux::hashtable<uint64_t, int>::const_iterator end = ads_disped_today.end();
+	
+	while (it != end) {
 		
-		punkt::VisitDevice::AdDisps *_ad_disps_pb = _pb->add_ads_disped();
-		ads_disped[i].dump(_ad_disps_pb);
+		punkt::VisitDevice::EvCount *_ad_disps_pb = _pb->add_ads_disped_today();
+		_ad_disps_pb->set_id( it->first );
+		_ad_disps_pb->set_n( it->second );
+		it++;
 	}
 	
-	for (size_t i = 0; i< ads_clicked.size(); i++) {
-		
-		punkt::VisitDevice::AdClicks *_ad_clicked_pb = _pb->add_ads_clicked();
-		ads_clicked[i].dump(_ad_clicked_pb);
-	}
+	it = ads_clicked_today.begin();
+	end = ads_clicked_today.end();
 	
+	while (it != end) {
+		
+		punkt::VisitDevice::EvCount *_ad_clicked_today_pb = _pb->add_ads_clicked_today();
+		_ad_clicked_today_pb->set_id( it->first );
+		_ad_clicked_today_pb->set_n( it->second );
+		it++;
+	}
+
+	it = places_today.begin();
+	end = places_today.end();
+	
+	while (it != end) {
+		
+		punkt::VisitDevice::EvCount *_places_today_pb = _pb->add_places_today();
+		_places_today_pb->set_id( it->first );
+		_places_today_pb->set_n( it->second );
+		it++;
+	}
+
+	it = domains_today.begin();
+	end = domains_today.end();
+	
+	while (it != end) {
+		
+		punkt::VisitDevice::EvCount *_domains_today_pb = _pb->add_domains_today();
+		_domains_today_pb->set_id( it->first );
+		_domains_today_pb->set_n( it->second );
+		it++;
+	}
+
 	for (size_t i = 0; i< ext.size(); i++) {
 		
 		punkt::VisitorExt *ext_pb = _pb->add_ext();
 		ext[i].dump(ext_pb);
 	}
+	
+	_pb->set_stats_day_begin_ts(stats_day_begin_ts);
 }

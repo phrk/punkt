@@ -107,13 +107,49 @@ void TargeterCookieOnly::handleDispEvent(uint64_t _pid,
 	m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&TargeterCookieOnly::onCalledZeit, this, _1));
 
 //	std::cout << owner_ads_place_counter << std::endl;
+	
+	getVisitor(_conn, _req, boost::bind(&TargeterCookieOnly::saveDispStats, this, _1, ad_owner, _pid, _adid));
+}
 
-	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
+void TargeterCookieOnly::saveDispStats(VisitorPtr _v, uint64_t _ownerid, uint64_t _pid, uint64_t _adid) {
+	
+	VisitorCookieOnly* v = (VisitorCookieOnly*)_v.get();
+	
+	std::string owner_ads_place_counter = "owners:owner_ads-" + uint64_to_string(_ownerid)
+									+ ":places_ad-" + uint64_to_string(_adid)
+									+ ":visitors:place-" + uint64_to_string(_pid);
+
+	std::string owner_places_ad_counter = "owners:owner_places-" + uint64_to_string(_ownerid) 
+										+ ":ads_place-" + uint64_to_string(_pid) 
+										+ ":visitors:ad-" + uint64_to_string(_adid);
+	
+	
+	if (v->ads_disped_today.find(_adid) == v->ads_disped_today.end()) {
+		
+		v->ads_disped_today[ _adid ] = 1;
+		m_zeit_acli->mergeCounter(owner_ads_place_counter, time(0), 1, boost::bind(&TargeterCookieOnly::onCalledZeit, this, _1));
+	}
+	
+	if (v->places_today.find(_pid) == v->places_today.end()) {
+		
+		v->places_today[ _pid ] = 1;
+		m_zeit_acli->mergeCounter(owner_places_ad_counter, time(0), 1, boost::bind(&TargeterCookieOnly::onCalledZeit, this, _1));
+	}
+	
+	
+	//std::cout << "TargeterCookieOnly::saveDispStats " << std::endl;
+	
+	v->ads_disped_today[ _adid ] ++;
+	v->places_today[ _pid ] ++;
+	v->save();
+	v->m_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
+	//domains_today[]
 }
 
 void TargeterCookieOnly::onCalledZeit (bool _success) {
 	
 }
+
 void TargeterCookieOnly::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	if (_method == "disp") {

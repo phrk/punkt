@@ -3,12 +3,13 @@
 VisitorHashd::VisitorHashd(const std::string &_vid,
 						const std::string &_vdid,
 						boost::function<void(VisitorHashd*)> _onSave,
-						bool _newdevice):
+						bool _saving):
 	cur_vdid(_vdid),
 	m_onSave(_onSave),
 	Visitor(_vid),
-	newdevice(_newdevice),
-	ttl_inc(0) {
+	m_saving(_saving),
+	ttl_inc(0),
+	newdevice(false) {
 	
 }
 
@@ -66,7 +67,7 @@ void VisitorHashd::dump(std::string &_dump) {
 	}
 	
 	if (vk_profile) 
-		vk_profile->dump(pb.mutable_vk_profile());
+		vk_profile->dump(pb.mutable_vk_profile()); 
 	
 	_dump = pb.SerializeAsString();
 }

@@ -26,12 +26,12 @@ void TargeterFull::getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boos
 	
 	std::string vdid;
 	std::string dump;
-//	bool new_visitor = true;
+	bool new_cookie = false;
 	if (!_req->getCookie("punkt_vdid", vdid)) {
 		
 		genVdid(vdid);
 		_conn->setCookie("punkt_vdid", vdid);
-		
+		new_cookie = true;
 //		VisitorHashdPtr visitor(new VisitorHashd(vid, boost::bind(&TargeterHashd::saveVisitor, this, _1)));
 //		_onGot(visitor);
 //		return;
@@ -40,7 +40,7 @@ void TargeterFull::getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boos
 //		new_visitor = false;
 	
 //	std::cout << "TargeterHashd::getVisitor " << vid << std::endl;
-	m_storage->getVisitor(vdid, _onGot);
+	m_storage->getVisitor(vdid, new_cookie, _onGot);
 	
 	//boost::bind(&TargeterHashd::onGotVisitor, this, vid, _onGot, _1, _2));
 }

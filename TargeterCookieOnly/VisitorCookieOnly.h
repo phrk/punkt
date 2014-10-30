@@ -14,6 +14,11 @@ public:
 	std::vector<std::string> m_queries;
 	HttpConnectionPtr m_conn;
 
+	hiaux::hashtable<uint64_t, int> ads_disped_today;
+	hiaux::hashtable<uint64_t, int> places_today;
+
+	uint64_t stats_day_begin_ts;
+
 	VisitorCookieOnly(const std::string &_vid,
 						boost::function<void(VisitorCookieOnly*)> _onSave,
 						HttpConnectionPtr _conn);

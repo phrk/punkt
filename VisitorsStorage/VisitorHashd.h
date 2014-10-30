@@ -16,10 +16,13 @@
 class VisitorHashd : public Visitor {
 	
 	boost::function<void(VisitorHashd*)> m_onSave;
+	
 public:
 	VkProfilePtr vk_profile;
 	std::vector<VisitDevice> devices;
 	std::vector<VisitorExt> ext;
+	
+	bool m_saving;
 	
 	bool newdevice;
 	std::string cur_vdid;
@@ -28,9 +31,9 @@ public:
 	uint64_t ttl_inc;
 	
 	VisitorHashd(const std::string &_vid,
-					const std::string &_vdid,
-						boost::function<void(VisitorHashd*)> _onSave,
-						bool _newdevice);
+				const std::string &_vdid,
+				boost::function<void(VisitorHashd*)> _onSave,
+				bool _saving);
 	
 	void initCurDevice(const std::string &_vdid, const std::string &_user_agent);
 	void parseProtobuf(const std::string &_dump);

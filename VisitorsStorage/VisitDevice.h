@@ -7,27 +7,9 @@
 #include <string>
 #include <vector>
 
+#include "hiaux/structs/hashtable.h"
+
 #include "Visitor.pb.h"
-
-class AdDisps {
-public:
-	
-	AdDisps(const punkt::VisitDevice::AdDisps &_pb);
-	void dump(punkt::VisitDevice::AdDisps *_pb);
-	
-	uint64_t adid;
-	uint32_t n;
-};
-
-class AdClicks {
-public:
-	
-	AdClicks(const punkt::VisitDevice::AdClicks &_pb);
-	void dump(punkt::VisitDevice::AdClicks *_pb);
-	
-	uint64_t adid;
-	uint32_t n;
-};
 
 class VisitorExt {
 public:
@@ -53,9 +35,13 @@ public:
 	std::vector<std::string> search_queries;
 	std::vector<std::string> domains_visited;
 	
-	std::vector<AdDisps> ads_disped;
-	std::vector<AdClicks> ads_clicked;
+	uint64_t stats_day_begin_ts;
 	
+	hiaux::hashtable<uint64_t, int> ads_disped_today;
+	hiaux::hashtable<uint64_t, int> ads_clicked_today;
+	hiaux::hashtable<uint64_t, int> places_today;
+	hiaux::hashtable<uint64_t, int> domains_today;
+		
 	std::vector<VisitorExt> ext;
 };
 
