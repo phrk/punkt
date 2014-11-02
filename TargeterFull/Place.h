@@ -17,6 +17,8 @@ public:
 	uint64_t id;
 	PlaceTargets targeted_ads;
 	bool vk_match;
+	std::string vk_app_id;
+	std::string domain;
 	
 	std::string m_targeter_args;
 	

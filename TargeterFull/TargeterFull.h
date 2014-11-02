@@ -24,8 +24,6 @@ class TargeterFull : public Targeter {
 	
 	std::string m_punkt_rsrc_url;
 	FileCachePtr m_files_cache;
-	// domain / app_id
-	hiaux::hashtable<std::string, std::string> m_vk_app_ids;
 	
 	void genVdid(std::string &_vdid) const;
 	void handleClickEvent(uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
@@ -35,7 +33,7 @@ class TargeterFull : public Targeter {
 	
 	AdTargeterArgsPtr parseAdTargeterArgs(const std::string &_targeter_args_str);
 	
-	void getVkMatchCode(const std::string &_domain, uint64_t _pid, std::string &_exthtml, std::string &_extjs) const;
+	void getVkMatchCode(PlacePtr _place, std::string &_exthtml, std::string &_extjs) const;
 	
 public:
 	

@@ -11,8 +11,6 @@ TargeterFull::TargeterFull(const std::string &_repl_id, VisitorsStoragePtr _stor
 	 m_zeit_acli(_zeit_acli),
 	 m_files_cache(_files_cache) {
 	
-	m_vk_app_ids["localhost"] = "4601879";
-	m_vk_app_ids["melook.in"] = "4602113";
 }
 
 void TargeterFull::genVdid(std::string &_vdid) const {
@@ -153,14 +151,11 @@ uint64_t TargeterFull::getAdOwner(uint64_t _adid) {
 	return ownerid;
 }
 
-void TargeterFull::getVkMatchCode(const std::string &_domain, uint64_t _pid, std::string &_exthtml, std::string &_extjs) const {
+void TargeterFull::getVkMatchCode(PlacePtr _place, std::string &_exthtml, std::string &_extjs) const {
 	
-	std::cout << "TargeterFull::getVkMatchCode " << _domain << std::endl;
+	std::cout << "TargeterFull::getVkMatchCode " << _place->id << " " << _place->domain << std::endl;
 	
-	hiaux::hashtable<std::string, std::string>::const_iterator it = m_vk_app_ids.find(_domain);
-	
-	if (it == m_vk_app_ids.end())
-		return;
+	//hiaux::hashtable<std::string, std::string>::const_iterator it = m_vk_app_ids.find(_domain);
 	
 	if (!m_files_cache->getFile("vkauth.html", _exthtml)) {
 		std::cout << "TargeterFull::getVkMatchCode file vkauth.html not loaded\n"; 
@@ -173,7 +168,7 @@ void TargeterFull::getVkMatchCode(const std::string &_domain, uint64_t _pid, std
 	}
 	
 	_extjs += "\n"
-		"authVk("+ it->second +", true, null, true, function (profile) {"
+		"authVk("+ _place->vk_app_id +", true, null, true, function (profile) {"
 		"	alert(JSON.stringify(profile));"	
 		"	});\n";
 	
@@ -211,10 +206,12 @@ AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::
 	if (pit == m_places.end())
 		return AdPtr();
 
-	if (pit->second->vk_match) {
+	if (pit->second->vk_match &&
+		(_ad_req->domain == pit->second->domain) &&
+		(pit->second->vk_app_id.size() != 0)) {
 		
 		//if (!visitor->vk_profile)
-		getVkMatchCode (_ad_req->domain, _ad_req->pid, _exthtml, _extjs);
+		getVkMatchCode (pit->second, _exthtml, _extjs);
 	}
 
 	if (pit->second->targeted_ads.ads.size()==0)
