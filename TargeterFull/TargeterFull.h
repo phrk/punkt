@@ -22,7 +22,6 @@ class TargeterFull : public Targeter {
 	VisitorsStoragePtr m_storage;
 	ZeitClientAsyncPtr m_zeit_acli;
 	
-	std::string m_punkt_rsrc_url;
 	FileCachePtr m_files_cache;
 	
 	void genVdid(std::string &_vdid) const;
@@ -33,14 +32,14 @@ class TargeterFull : public Targeter {
 	
 	AdTargeterArgsPtr parseAdTargeterArgs(const std::string &_targeter_args_str);
 	
-	void getVkMatchCode(PlacePtr _place, uint64_t _adid, uint64_t fid, std::string &_exthtml, std::string &_extjs) const;
+	void getVkMatchCode(PlacePtr _place, const std::string &_punkt_url, uint64_t _adid, uint64_t fid, std::string &_exthtml, std::string &_extjs) const;
 	void onVkMatch(std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
 	void saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile);
 	
 public:
 	
-	TargeterFull(const std::string &_repl_id, VisitorsStoragePtr _storage,
-			const std::string &_punkt_rsrc_url,
+	TargeterFull(const std::string &_repl_id,
+			VisitorsStoragePtr _storage,
 			ZeitClientAsyncPtr _zeit_acli,
 			FileCachePtr _files_cache,
 			boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs);

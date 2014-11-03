@@ -313,7 +313,8 @@ Punktd::Punktd(const std::string &_config_file) {
 #ifdef PUNKT_TARGETER_FULL
 	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
 	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
-	m_targeter.reset(new TargeterFull(_config ["replid"], m_visitors_storage, _config ["punkt_rsrc_url"],
+	m_targeter.reset(new TargeterFull(_config ["replid"],
+							m_visitors_storage,
 							m_zeit_acli,
 							m_files_cache,
 							boost::bind(&Punktd::parseFormatterArgs, this, _1, _2)));

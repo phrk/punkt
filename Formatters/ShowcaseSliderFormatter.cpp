@@ -12,11 +12,13 @@ ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _ni
 	nitems(_nitems),
 	partner_ids(_partner_ids),
 	click_templates(_click_templates),
-	system_url(_system_url),
-	system_rsrc_url(_system_rsrc_url),
+	
 	system_depot_url_prefix(_system_depot_url_prefix),
 	json_dump(_json_dump),
 	type(_type) {
+		
+		system_url = _system_url;
+		system_rsrc_url = _system_rsrc_url;
 }
 
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,

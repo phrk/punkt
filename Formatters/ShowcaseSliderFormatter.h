@@ -24,8 +24,7 @@ public:
 	int nitems;
 	hiaux::hashtable<std::string, std::string> partner_ids;
 	hiaux::hashtable<std::string, std::string> click_templates;
-	std::string system_url;
-	std::string system_rsrc_url;
+	
 	std::string system_depot_url_prefix;
 	std::string json_dump;
 	std::string type;

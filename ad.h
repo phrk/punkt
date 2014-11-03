@@ -21,8 +21,12 @@ public:
 
 	FormatterArgsPtr args;
 	AdTargeterArgsPtr targeter_args;
-	
-	Ad(uint64_t _id, uint64_t _format_id, uint64_t ownerid, const std::string &_formatter_args_str, const std::string &_targeter_args);
+		
+	Ad(uint64_t _id,
+		uint64_t _format_id,
+		uint64_t ownerid,
+		const std::string &_formatter_args_str,
+		const std::string &_targeter_args);
 	virtual ~Ad();
 };
 

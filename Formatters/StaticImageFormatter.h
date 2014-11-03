@@ -11,8 +11,6 @@
 class StaticImageFormatterArgs : public FormatterArgs {
 public:
 	
-	std::string system_url;
-	std::string system_rsrc_url;
 	std::string json_dump;
 	
 	std::string click_url;

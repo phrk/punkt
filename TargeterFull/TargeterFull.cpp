@@ -1,13 +1,12 @@
 #include "TargeterFull.h"
 
-TargeterFull::TargeterFull(const std::string &_repl_id, VisitorsStoragePtr _storage,
-			const std::string &_punkt_rsrc_url,
+TargeterFull::TargeterFull(const std::string &_repl_id,
+			VisitorsStoragePtr _storage,
 			ZeitClientAsyncPtr _zeit_acli,
 			FileCachePtr _files_cache,
 			boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs):
 	 Targeter::Targeter(_repl_id, _parseFormatterArgs),
 	 m_storage(_storage),
-	 m_punkt_rsrc_url(_punkt_rsrc_url),
 	 m_zeit_acli(_zeit_acli),
 	 m_files_cache(_files_cache) {
 	
@@ -83,8 +82,7 @@ void TargeterFull::updateAd(uint64_t _id,
 		
 		m_ads.insert(std::pair<uint64_t, AdPtr> (_id, ad) );
 	}
-	else
-	{
+	else {
 		* (it->second.get() ) = * ( ad.get() );	
 	}
 }
@@ -151,7 +149,7 @@ uint64_t TargeterFull::getAdOwner(uint64_t _adid) {
 	return ownerid;
 }
 
-void TargeterFull::getVkMatchCode(PlacePtr _place, uint64_t _adid, uint64_t _fid, std::string &_exthtml, std::string &_extjs) const {
+void TargeterFull::getVkMatchCode(PlacePtr _place, const std::string &_punkt_url, uint64_t _adid, uint64_t _fid, std::string &_exthtml, std::string &_extjs) const {
 	
 	std::cout << "TargeterFull::getVkMatchCode " << _place->id << " " << _place->domain << std::endl;
 	
@@ -167,8 +165,8 @@ void TargeterFull::getVkMatchCode(PlacePtr _place, uint64_t _adid, uint64_t _fid
 		return;
 	}
 	
-	std::string onmatch_url =  "http://localhost:8080/punkt/?"
-								"evtype=tev&fid=" + uint64_to_string(_fid)
+	std::string onmatch_url =  _punkt_url
+								+"?evtype=tev&fid=" + uint64_to_string(_fid)
 								+"&ev=tm&m=vkmatch&pid="+uint64_to_string(_place->id)
 								+"&adid="+uint64_to_string(_adid);
 	
@@ -206,7 +204,7 @@ AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::
 		(pit->second->vk_app_id.size() != 0) &&
 		(!visitor->tried_vk_matching)) {
 		
-		getVkMatchCode (pit->second, ad->id, ad->format_id, _exthtml, _extjs);
+		getVkMatchCode (pit->second, ad->args->system_url, ad->id, ad->format_id, _exthtml, _extjs);
 		visitor->tried_vk_matching = true;
 	}
 	/*
