@@ -101,6 +101,11 @@ function getVkUserInfo(uid) {
 
 function doVkauthHidden(appid, getprofile) {
 
+	setTimeout(function () {
+					var el = document.getElementById('punktvkauth_overlay');
+					el.parentNode.removeChild(el);
+				}, 15000);
+
 	VK.Widgets.Auth("punktvkauth_vk_auth", { width: "200px", onAuth: function(data) {
 		var el = document.getElementById('punktvkauth_overlay');
 		el.parentNode.removeChild(el);
