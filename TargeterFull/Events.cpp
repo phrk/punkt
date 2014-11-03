@@ -152,12 +152,30 @@ void TargeterFull::onVkMatch(std::map<std::string, std::string> &_params, HttpCo
 	// log event
 	std::cout << "TargeterFull::onVkMatch: " << _req->body << std::endl;
 	
-	VkProfilePtr vk_profile(new VkProfile(_req->body));
+	VkProfilePtr vk_profile;
 	
-	getVisitor(_conn, _req, boost::bind(&TargeterFull::saveVkProfile, this, _1, vk_profile));
+	try {
+		vk_profile = VkProfilePtr(new VkProfile(_req->body));
+	} catch (...) {
+		return;
+	}
+	
+	std::string pid_str = _params["pid"];
+	std::string adid_str = _params["adid"];
+	std::string ad_owner_str;
+	
+	try {
+
+		ad_owner_str = uint64_to_string(getAdOwner(string_to_uint64(adid_str)));
+
+	} catch (...) {
+		return;
+	}
+	
+	getVisitor(_conn, _req, boost::bind(&TargeterFull::saveVkProfile, this, _1, vk_profile, ad_owner_str, pid_str));
 }
 
-void TargeterFull::saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile) {
+void TargeterFull::saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile, const std::string &_ad_owner_str, const std::string &_pid_str) {
 	
 	VisitorHashd* v = (VisitorHashd*)_visitor.get();
 	
@@ -166,8 +184,10 @@ void TargeterFull::saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile) 
 	v->ttl_inc = fmax(v->ttl, 3600*24*30 - v->ttl); // at least month
 	
 	m_storage->saveVkProfile(_vk_profile, 3600*24*30*6); // half a year
-	
 	v->save();
+	
+	std::string vk_match_counter = "owners:owner_places-" + _ad_owner_str+ ":ads_place-"+ _pid_str +":vk_match";
+	m_zeit_acli->mergeCounter(vk_match_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 }
 
 ETN* TargeterFull::getCustomMethodsRouter() {

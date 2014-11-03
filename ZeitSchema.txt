@@ -12,6 +12,8 @@ owners:owner_places-{ID}	:ads_place-{ID} 	:disps		:ad-{ID}
 												:clicks		:ad-{ID} 
 												:convs		:ad-{ID}
 												:visitors	:ad-{ID}
+												:vk_match
+												:vk_match_try
 
 							:items_place-{ID}	:disps		:item-{ID}
 												:clicks		:item-{ID}

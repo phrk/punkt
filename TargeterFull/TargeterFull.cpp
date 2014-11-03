@@ -206,6 +206,10 @@ AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::
 		
 		getVkMatchCode (pit->second, ad->args->system_url, ad->id, ad->format_id, _exthtml, _extjs);
 		visitor->tried_vk_matching = true;
+		
+		std::string vk_match_try_counter = "owners:owner_places-" + uint64_to_string(ad->ownerid)
+											+ ":ads_place-"+ uint64_to_string(_ad_req->pid) +":vk_match_try";
+		m_zeit_acli->mergeCounter(vk_match_try_counter, time(0), 1, boost::bind(&TargeterFull::onCalledZeit, this, _1));
 	}
 
 	if (pit->second->targeted_ads.ads.size()==0)

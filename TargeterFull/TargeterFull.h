@@ -34,7 +34,7 @@ class TargeterFull : public Targeter {
 	
 	void getVkMatchCode(PlacePtr _place, const std::string &_punkt_url, uint64_t _adid, uint64_t fid, std::string &_exthtml, std::string &_extjs) const;
 	void onVkMatch(std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
-	void saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile);
+	void saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile, const std::string &_ad_owner_str, const std::string &_pid_str);
 	
 public:
 	
