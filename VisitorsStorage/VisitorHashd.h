@@ -18,11 +18,12 @@ class VisitorHashd : public Visitor {
 	boost::function<void(VisitorHashd*)> m_onSave;
 	
 public:
-	VkProfilePtr vk_profile;
+	//VkProfilePtr vk_profile;
 	std::vector<VisitDevice> devices;
 	std::vector<VisitorExt> ext;
 	
 	bool tried_vk_matching;
+	std::string vk_uid;
 	
 	bool m_saving;
 	

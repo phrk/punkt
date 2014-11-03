@@ -38,6 +38,7 @@ public:
 	VisitorsStorage(HashdClientAsyncPtr _hashd_acli);
 	void getVisitor(const std::string &_vdid, bool _new_cookie, boost::function<void(VisitorPtr)> _onVisitor);
 	void saveVisitor(VisitorHashd *_visitor);
+	void saveVkProfile(VkProfilePtr _v, uint64_t _ttl_inc);
 	
 	void onSaved(int _err);
 	void onGotVisitor(int _err,

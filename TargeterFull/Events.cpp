@@ -161,8 +161,12 @@ void TargeterFull::saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile) 
 	
 	VisitorHashd* v = (VisitorHashd*)_visitor.get();
 	
-	v->vk_profile = _vk_profile;
+	v->vk_uid = _vk_profile->id;
+	
 	v->ttl_inc = fmax(v->ttl, 3600*24*30 - v->ttl); // at least month
+	
+	m_storage->saveVkProfile(_vk_profile, 3600*24*30*6); // half a year
+	
 	v->save();
 }
 

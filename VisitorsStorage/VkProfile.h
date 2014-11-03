@@ -30,8 +30,8 @@ public:
 	std::string university;
 	std::string graduation;
 	
-	std::vector<std::string> friends;
-	std::vector<std::string> groups;
+	std::vector<uint32_t> friends;
+	std::vector<uint32_t> groups;
 	
 	VkProfile(const punkt::VkProfile &_pb);
 	VkProfile(const std::string &_json_dump);

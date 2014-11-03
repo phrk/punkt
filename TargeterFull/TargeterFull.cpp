@@ -207,37 +207,12 @@ AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::
 		getVkMatchCode (pit->second, ad->args->system_url, ad->id, ad->format_id, _exthtml, _extjs);
 		visitor->tried_vk_matching = true;
 	}
-	/*
-	if (visitor->vk_profile) {
-		
-		std::cout << "TargeterFull::getAdToShow\n";
-		
-		VkProfilePtr _vk_profile = visitor->vk_profile;
-	
-		std::cout << "uid: " << _vk_profile->id  << std::endl;
-		std::cout << "first_name: " << _vk_profile->first_name  << std::endl;
-		std::cout << "last_name: " << _vk_profile->last_name  << std::endl;
-	
-		std::cout << "has_sex: " << _vk_profile->has_sex  << std::endl;
-		std::cout << "sex: " << _vk_profile->sex  << std::endl;
-		std::cout << "bdate: " << _vk_profile->bdate  << std::endl;
-		std::cout << "city: " << _vk_profile->city  << std::endl;
-		std::cout << "country: " << _vk_profile->country  << std::endl;
-	
-		std::cout << "timezone: " << _vk_profile->timezone  << std::endl;
-		std::cout << "photo_url: " << _vk_profile->photo_url  << std::endl;
-		std::cout << "site: " << _vk_profile->site  << std::endl;
-		std::cout << "university: " << _vk_profile->university  << std::endl;
-		std::cout << "graduation: " << _vk_profile->graduation  << std::endl;
-	
-		std::cout << "friends: " << _vk_profile->friends.size() << std::endl;
-	}
-*/
+
 	if (pit->second->targeted_ads.ads.size()==0)
 		return AdPtr();
 
 	// inc ttl
-	if (visitor->vk_profile)
+	if (visitor->vk_uid != "")
 		visitor->ttl_inc = fmax(visitor->ttl, 3600*24*30 - visitor->ttl); // at least month
 	else
 		visitor->ttl_inc = fmax(visitor->ttl, 3600*24*7 - visitor->ttl); // at least week

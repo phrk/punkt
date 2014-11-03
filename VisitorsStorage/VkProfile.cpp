@@ -99,7 +99,7 @@ VkProfile::VkProfile(const std::string &_json_dump) {
 		for(int i = 0; i < json_array_size(j_friends); i++) {
 			json_t *j_friend_i = json_array_get(j_friends, i);
 			if (json_is_integer(j_friend_i)) {
-				friends.push_back(inttostr(json_integer_value(j_friend_i)));
+				friends.push_back(json_integer_value(j_friend_i));
 			}
 		}
 	}
@@ -109,7 +109,7 @@ VkProfile::VkProfile(const std::string &_json_dump) {
 		for(int i = 0; i < json_array_size(j_groups); i++) {
 			json_t *j_group_i = json_array_get(j_groups, i);
 			if (json_is_integer(j_group_i)) {
-				groups.push_back(inttostr(json_integer_value(j_group_i)));
+				groups.push_back(json_integer_value(j_group_i));
 			}
 		}
 	}
@@ -191,12 +191,10 @@ void VkProfile::dump(punkt::VkProfile *_pb) {
 		_pb->set_graduation(graduation);
 	
 	for (size_t i = 0; i<friends.size(); i++) {
-		std::string *s = _pb->add_friends();
-		*s = friends[i];
+		_pb->add_friends(friends[i]);
 	}
 	
 	for (size_t i = 0; i<groups.size(); i++) {
-		std::string *s = _pb->add_groups();
-		*s = groups[i];
+		_pb->add_groups(groups[i]);
 	}
 }

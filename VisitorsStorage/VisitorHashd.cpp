@@ -71,8 +71,10 @@ void VisitorHashd::dump(std::string &_dump) {
 	
 	pb.set_tried_vk_matching(tried_vk_matching);
 	
-	if (vk_profile) 
-		vk_profile->dump(pb.mutable_vk_profile()); 
+	pb.set_vk_uid(vk_uid);
+	
+	//if (vk_profile) 
+	//	vk_profile->dump(pb.mutable_vk_profile()); 
 	
 	_dump = pb.SerializeAsString();
 }
@@ -103,10 +105,9 @@ void VisitorHashd::parseProtobuf(const std::string &_dump) {
 	
 	tried_vk_matching = pb.tried_vk_matching();
 	
-	if (pb.has_vk_profile()) {
+	if (pb.has_vk_uid()) {
 		
-		tried_vk_matching = true;
-		vk_profile.reset(new VkProfile(pb.vk_profile()));
+		vk_uid = pb.vk_uid();
 	}	
 }
 

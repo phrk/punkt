@@ -19,8 +19,8 @@ message VkProfile {
 	optional string university = 11;
 	optional string graduation = 12;
 	
-	repeated string friends = 13;
-	repeated string groups = 14;
+	repeated uint32 friends = 13;
+	repeated uint32 groups = 14;
 };
 
 message VisitorExt {
@@ -71,5 +71,5 @@ message Visitor {
 	repeated VisitorExt ext = 4;
 	
 	required bool tried_vk_matching = 5;
-	optional VkProfile vk_profile = 6;
+	optional string vk_uid = 6;
 };

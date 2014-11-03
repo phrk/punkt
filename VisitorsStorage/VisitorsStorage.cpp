@@ -176,6 +176,9 @@ void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 	
 	//std::cout << "VisitorsStorage::saveVisitor " << vid << std::endl;	
 	
+//	std::cout << "saveVisitor size:" << dump.size() << std::endl;
+//	std::cout << "vk_uid: " << _visitor->vk_uid << std::endl;
+	
 	m_hashd_acli->setAndIncTtl("visitors", vid, dump, _visitor->ttl_inc, boost::bind(&VisitorsStorage::onSaved, this, _1));
 	
 	for (int i = 0; i<_visitor->devices.size(); i++) {
@@ -186,6 +189,17 @@ void VisitorsStorage::saveVisitor(VisitorHashd *_visitor) {
 	//	std::cout << "devices: " << _visitor->devices.size() << std::endl;
 	
 	//std::cout << "VisitorsStorage::saveVisitor NEW DEVICE=" << _visitor->newdevice << " " << _visitor->getId() << " " << _visitor->cur_vdid << " " << dump << std::endl;
+}
+
+void VisitorsStorage::saveVkProfile(VkProfilePtr _v, uint64_t _ttl_inc) {
+	
+	punkt::VkProfile _pb;
+	_v->dump(&_pb);
+	std::string dump = _pb.SerializeAsString();
+	
+//	std::cout << "saving vk_profile size:" << dump.size() << std::endl;
+	
+	m_hashd_acli->setAndIncTtl("vk_profiles", _v->id, dump, _ttl_inc, boost::bind(&VisitorsStorage::onSaved, this, _1));
 }
 
 void VisitorsStorage::onSaved(int _err) {
