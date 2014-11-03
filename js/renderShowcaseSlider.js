@@ -48,7 +48,7 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 	for (var i in show.items) {
 	
 		ret += '<tr>';
-		ret += '<td>';
+		ret += '<td style="white-space: normal;">';
 		
 		if (click_url != null)
 			show.items[i].directurl = click_url + escape(show.items[i].directurl);
