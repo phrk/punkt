@@ -54,6 +54,14 @@ message VisitDevice {
 	repeated VisitorExt ext = 11;
 };
 
+message ShopRetargeting {
+	
+	required string advid = 1;
+	
+	repeated string interesting_items = 2;
+	repeated string bought_items = 3;
+};
+
 message Visitor {
 
 	required string vid = 1;
@@ -62,7 +70,6 @@ message Visitor {
 	
 	repeated VisitorExt ext = 4;
 	
-	optional VkProfile vk_profile = 5;
-	
-	
+	required bool tried_vk_matching = 5;
+	optional VkProfile vk_profile = 6;
 };

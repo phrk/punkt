@@ -151,7 +151,7 @@ uint64_t TargeterFull::getAdOwner(uint64_t _adid) {
 	return ownerid;
 }
 
-void TargeterFull::getVkMatchCode(PlacePtr _place, std::string &_exthtml, std::string &_extjs) const {
+void TargeterFull::getVkMatchCode(PlacePtr _place, uint64_t _adid, uint64_t _fid, std::string &_exthtml, std::string &_extjs) const {
 	
 	std::cout << "TargeterFull::getVkMatchCode " << _place->id << " " << _place->domain << std::endl;
 	
@@ -167,33 +167,26 @@ void TargeterFull::getVkMatchCode(PlacePtr _place, std::string &_exthtml, std::s
 		return;
 	}
 	
-	_extjs += "\n"
-		"authVk("+ _place->vk_app_id +", true, null, true, function (profile) {"
-		"	alert(JSON.stringify(profile));"	
-		"	});\n";
+	std::string onmatch_url =  "http://localhost:8080/punkt/?"
+								"evtype=tev&fid=" + uint64_to_string(_fid)
+								+"&ev=tm&m=vkmatch&pid="+uint64_to_string(_place->id)
+								+"&adid="+uint64_to_string(_adid);
 	
-	//_exthtml = ;
-	/*
-	_code = "\n"
-	"var xmlHttp = new XMLHttpRequest();\n"
-	"xmlHttp.open(\"GET\", \""+ m_punkt_rsrc_url +"vkauth.html\", false);\n"
-	"xmlHttp.send(null);\n"
-	"var au = document.createElement('div');\n"
-	"au.innerHTML = xmlHttp.responseText;\n"
-	"var place = document.getElementById(\"punkt_place_" + uint64_to_string(_pid) + "\");\n"
-	"place.appendChild(au);\n"
-	"\n"
-	"var head = document.getElementsByTagName('head')[0];\n"
-	"var script = document.createElement('script');\n"
-	"script.type = 'text/javascript';\n"
-	"script.onload = function () {\n"
-	"	//authVk(\""+ it->second +"\", true, null, true, function (profile) {"
-	"	//	alert(JSON.stringify(profile));"	
-	"	});\n"
-	""
-	"}\n"
-	"script.src =\"" + m_punkt_rsrc_url + "vkauth.js\";\n"
-	"head.appendChild(script);\n";*/
+	_extjs += "\n"
+		"authVk("+ _place->vk_app_id +", true, null, true, function (profile) {\n"
+		"	var xmlHttp = new XMLHttpRequest();\n"
+		"	xmlHttp.withCredentials = true;\n"
+		"	xmlHttp.open( \"POST\", '" +onmatch_url+ "', true);\n"
+		"\n"
+		"	xmlHttp.onload = function (e) {\n"
+		"		if (xmlHttp.readyState === 4) {\n"
+		"			if (xmlHttp.status === 200) {\n"
+		"			} else {\n"
+		"			}\n"
+		"		}\n"
+		"	};\n"
+		"	xmlHttp.send( JSON.stringify(profile) );\n"
+		"	});\n";
 }
 
 AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::vector<std::string> &_queries, std::string &_exthtml, std::string &_extjs) {
@@ -206,29 +199,58 @@ AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::
 	if (pit == m_places.end())
 		return AdPtr();
 
+	AdPtr ad = m_ads [ pit->second->targeted_ads.ads [ rand() % pit->second->targeted_ads.ads.size() ] ];
+
 	if (pit->second->vk_match &&
 		(_ad_req->domain == pit->second->domain) &&
-		(pit->second->vk_app_id.size() != 0)) {
+		(pit->second->vk_app_id.size() != 0) &&
+		(!visitor->tried_vk_matching)) {
 		
-		//if (!visitor->vk_profile)
-		getVkMatchCode (pit->second, _exthtml, _extjs);
+		getVkMatchCode (pit->second, ad->id, ad->format_id, _exthtml, _extjs);
+		visitor->tried_vk_matching = true;
 	}
-
+	/*
+	if (visitor->vk_profile) {
+		
+		std::cout << "TargeterFull::getAdToShow\n";
+		
+		VkProfilePtr _vk_profile = visitor->vk_profile;
+	
+		std::cout << "uid: " << _vk_profile->id  << std::endl;
+		std::cout << "first_name: " << _vk_profile->first_name  << std::endl;
+		std::cout << "last_name: " << _vk_profile->last_name  << std::endl;
+	
+		std::cout << "has_sex: " << _vk_profile->has_sex  << std::endl;
+		std::cout << "sex: " << _vk_profile->sex  << std::endl;
+		std::cout << "bdate: " << _vk_profile->bdate  << std::endl;
+		std::cout << "city: " << _vk_profile->city  << std::endl;
+		std::cout << "country: " << _vk_profile->country  << std::endl;
+	
+		std::cout << "timezone: " << _vk_profile->timezone  << std::endl;
+		std::cout << "photo_url: " << _vk_profile->photo_url  << std::endl;
+		std::cout << "site: " << _vk_profile->site  << std::endl;
+		std::cout << "university: " << _vk_profile->university  << std::endl;
+		std::cout << "graduation: " << _vk_profile->graduation  << std::endl;
+	
+		std::cout << "friends: " << _vk_profile->friends.size() << std::endl;
+	}
+*/
 	if (pit->second->targeted_ads.ads.size()==0)
 		return AdPtr();
 
-	AdPtr ad = m_ads [ pit->second->targeted_ads.ads [ rand() % pit->second->targeted_ads.ads.size() ] ];
+	// inc ttl
+	if (visitor->vk_profile)
+		visitor->ttl_inc = fmax(visitor->ttl, 3600*24*30 - visitor->ttl); // at least month
+	else
+		visitor->ttl_inc = fmax(visitor->ttl, 3600*24*7 - visitor->ttl); // at least week
+	////
+
 	return ad;
 }
 
 void TargeterFull::saveVisitor(VisitorHashd *_v) {
 	
 	m_storage->saveVisitor(_v);
-}
-
-ETN* TargeterFull::getCustomMethodsRouter() {
-	
-	return new ETN();
 }
 
 TargeterFull::~TargeterFull() {

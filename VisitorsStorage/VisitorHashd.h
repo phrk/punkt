@@ -22,16 +22,20 @@ public:
 	std::vector<VisitDevice> devices;
 	std::vector<VisitorExt> ext;
 	
+	bool tried_vk_matching;
+	
 	bool m_saving;
 	
 	bool newdevice;
 	std::string cur_vdid;
 	VisitDevice *cur_device;
 	
+	uint64_t ttl;
 	uint64_t ttl_inc;
 	
 	VisitorHashd(const std::string &_vid,
 				const std::string &_vdid,
+				uint64_t _ttl,
 				boost::function<void(VisitorHashd*)> _onSave,
 				bool _saving);
 	

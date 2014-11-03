@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 
+#include "hiaux/strings/string_utils.h"
+
+#include <jansson.h>
 #include "Visitor.pb.h"
 
 class VkProfile {
@@ -31,6 +34,7 @@ public:
 	std::vector<std::string> groups;
 	
 	VkProfile(const punkt::VkProfile &_pb);
+	VkProfile(const std::string &_json_dump);
 	void dump(punkt::VkProfile *_pb);
 	
 	//void parseProtobuf(const std::string &_dump);

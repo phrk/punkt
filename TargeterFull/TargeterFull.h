@@ -33,7 +33,9 @@ class TargeterFull : public Targeter {
 	
 	AdTargeterArgsPtr parseAdTargeterArgs(const std::string &_targeter_args_str);
 	
-	void getVkMatchCode(PlacePtr _place, std::string &_exthtml, std::string &_extjs) const;
+	void getVkMatchCode(PlacePtr _place, uint64_t _adid, uint64_t fid, std::string &_exthtml, std::string &_extjs) const;
+	void onVkMatch(std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req);
+	void saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile);
 	
 public:
 	

@@ -59,6 +59,17 @@ EventsTreeNode::EventsTreeNode( const std::string &_arg0,
 
 EventsTreeNode::EventsTreeNode( bool _equals,
 				const std::string &_arg0,
+				EventsTreeNode *_child0):
+	m_event_equals(true),
+	m_handler_set(false),
+	m_is_stub(false) {
+	
+	m_children[_arg0] = _child0;
+	_child0->parent_name = _arg0;		
+}
+
+EventsTreeNode::EventsTreeNode( bool _equals,
+				const std::string &_arg0,
 				EventsTreeNode *_child0,
 				const std::string &_arg1,
 				EventsTreeNode *_child1):

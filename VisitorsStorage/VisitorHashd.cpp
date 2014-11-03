@@ -2,14 +2,17 @@
 
 VisitorHashd::VisitorHashd(const std::string &_vid,
 						const std::string &_vdid,
+						uint64_t _ttl,
 						boost::function<void(VisitorHashd*)> _onSave,
 						bool _saving):
 	cur_vdid(_vdid),
 	m_onSave(_onSave),
 	Visitor(_vid),
 	m_saving(_saving),
+	ttl(_ttl),
 	ttl_inc(0),
-	newdevice(false) {
+	newdevice(false),
+	tried_vk_matching(false) {
 	
 }
 
@@ -66,6 +69,8 @@ void VisitorHashd::dump(std::string &_dump) {
 		ext[i].dump(s);
 	}
 	
+	pb.set_tried_vk_matching(tried_vk_matching);
+	
 	if (vk_profile) 
 		vk_profile->dump(pb.mutable_vk_profile()); 
 	
@@ -96,10 +101,13 @@ void VisitorHashd::parseProtobuf(const std::string &_dump) {
 		ext.push_back( VisitorExt(pb.ext(i)) );
 	}
 	
+	tried_vk_matching = pb.tried_vk_matching();
+	
 	if (pb.has_vk_profile()) {
 		
+		tried_vk_matching = true;
 		vk_profile.reset(new VkProfile(pb.vk_profile()));
-	}
+	}	
 }
 
 void VisitorHashd::addQuery(const std::string &_q) {

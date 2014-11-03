@@ -42,6 +42,10 @@ public:
 	
 	EventsTreeNode( bool _equals,
 					const std::string &_arg0,
+					EventsTreeNode *_child0);
+	
+	EventsTreeNode( bool _equals,
+					const std::string &_arg0,
 					EventsTreeNode *_child0,
 					const std::string &_arg1,
 					EventsTreeNode *_child1);

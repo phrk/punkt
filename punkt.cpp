@@ -34,9 +34,9 @@ Punkt::Punkt(TargeterPtr _targeter,
 											"click",
 											new ETN ("pid",
 													new ETN ("adid",
-																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3)))), 
+																new ETN(boost::bind(&Punkt::handleTargeterEvent, this, "click", _1, _2, _3)))),
 											"tm",						
-											targeter_custom_methods		))));
+											targeter_custom_methods	))));
 
 	ETN *demo = new ETN(boost::bind(&Punkt::handleDemo, this, _1, _2, _3));
 

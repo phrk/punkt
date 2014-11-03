@@ -147,6 +147,36 @@ void TargeterFull::onCalledZeit (bool _success) {
 	
 }
 
+void TargeterFull::onVkMatch(std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
+	
+	// log event
+	std::cout << "TargeterFull::onVkMatch: " << _req->body << std::endl;
+	
+	VkProfilePtr vk_profile(new VkProfile(_req->body));
+	
+	getVisitor(_conn, _req, boost::bind(&TargeterFull::saveVkProfile, this, _1, vk_profile));
+}
+
+void TargeterFull::saveVkProfile(VisitorPtr _visitor, VkProfilePtr _vk_profile) {
+	
+	VisitorHashd* v = (VisitorHashd*)_visitor.get();
+	
+	v->vk_profile = _vk_profile;
+	v->ttl_inc = fmax(v->ttl, 3600*24*30 - v->ttl); // at least month
+	v->save();
+}
+
+ETN* TargeterFull::getCustomMethodsRouter() {
+	
+	return new ETN ("m",
+					new ETN (EVENT_EQUALS,
+								"vkmatch",
+									new ETN ("pid",
+											new ETN("adid",
+														new ETN (boost::bind(&TargeterFull::onVkMatch, this, _1, _2, _3))))));
+}
+
+// standart events handler
 void TargeterFull::handleEvent(const std::string &_method, uint64_t _pid, uint64_t _adid, const std::map<std::string, std::string> &_params, HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	
 	//std::cout << "TargeterFull::handleEvent\n";

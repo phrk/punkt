@@ -21,6 +21,8 @@ class VisitorsStorage {
 	
 	//void mergeVisitors(uint64_t _vid0, uint64_t _vid1);
 	
+	uint64_t m_default_ttl;
+	
 	void genVid(std::string &_vid);
 	std::string genVid();
 	

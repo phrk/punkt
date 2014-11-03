@@ -3,16 +3,27 @@
 VisitorsStorage::VisitorsStorage(HashdClientAsyncPtr _hashd_acli):
 	m_hashd_acli(_hashd_acli) {
 	
+	m_default_ttl = 43200; // 12 hours
+	
 	std::map<std::string, std::string> opts;
 	opts["type"] = "ttl";
-	opts["default_ttl"] = "86400"; // 24 hours
+	opts["default_ttl"] = uint64_to_string(m_default_ttl);
 	opts["cleanup_period"] = "25";
 	opts["cleanup_check_size"] = "2000";
 	
 	m_hashd_acli->createHash("visitors", opts, boost::bind(&VisitorsStorage::onSaved, this, _1));
 	
+	opts.clear();
 	opts["type"] = "ttl";
-	opts["default_ttl"] = "43200"; // 12 hours
+	opts["default_ttl"] = uint64_to_string(m_default_ttl);
+	opts["cleanup_period"] = "25";
+	opts["cleanup_check_size"] = "2000";
+	
+	m_hashd_acli->createHash("vk_profiles", opts, boost::bind(&VisitorsStorage::onSaved, this, _1));
+	
+	opts.clear();
+	opts["type"] = "ttl";
+	opts["default_ttl"] = uint64_to_string(m_default_ttl);
 	opts["cleanup_period"] = "25";
 	opts["cleanup_check_size"] = "2000";
 	m_hashd_acli->createHash("devicevids", opts, boost::bind(&VisitorsStorage::onSaved, this, _1));
@@ -44,6 +55,7 @@ void VisitorsStorage::getVisitor(const std::string &_vdid, bool _new_cookie, boo
 		
 		VisitorHashdPtr v(new VisitorHashd(genVid(),
 											_vdid,
+											m_default_ttl,
 											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
 											true)); // saving
 		v->initCurDevice(_vdid, "_user_agent_");
@@ -71,6 +83,7 @@ void VisitorsStorage::getVisitor_onGotDeviceVid (int _err,
 		//std::cout << "VisitorsStorage::getVisitor_onGotDeviceVid E_HC_KEY_DONT_EXISTS\n";
 		VisitorHashdPtr v(new VisitorHashd(genVid(),
 											_vdid,
+											m_default_ttl,
 											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
 											true)); // saving
 		v->initCurDevice(_vdid, "_user_agent_");
@@ -90,6 +103,7 @@ void VisitorsStorage::getVisitor_onGotDeviceVid (int _err,
 	
 	VisitorHashdPtr v(new VisitorHashd(genVid(),
 										_vdid,
+										m_default_ttl,
 										boost::bind(&VisitorsStorage::saveVisitor, this, _1),
 										false)); // not saving
 	v->initCurDevice(_vdid, "_user_agent_");
@@ -113,14 +127,17 @@ void VisitorsStorage::onGotVisitor(int _err,
 	
 	if (_err == E_HC_OK) {
 		
-		std::cout << "VisitorsStorage::onGotVisitor ttl:" << _ttl << std::endl;
+	//	std::cout << "VisitorsStorage::onGotVisitor ttl:" << _ttl << std::endl;
+	//	std::cout << "dump size: " << _dump.size() << std::endl;
 		
 		VisitorHashdPtr v(new VisitorHashd(_vid,
 											_vdid,
+											_ttl,
 											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
 											true)); // saving
 		v->parseProtobuf(_dump);
 		v->initCurDevice(_vdid, "_user_agent_");
+		//v->ttl_inc += fmax(_ttl, 3600*24*7 - _ttl ); // repeated visit. set ttl at least one week
 		_onVisitor(v);
 		return;
 	}
@@ -129,6 +146,7 @@ void VisitorsStorage::onGotVisitor(int _err,
 		
 		VisitorHashdPtr v(new VisitorHashd(_vid,
 											_vdid,
+											m_default_ttl,
 											boost::bind(&VisitorsStorage::saveVisitor, this, _1),
 											true)); // saving
 		v->initCurDevice(_vdid, "_user_agent_");
@@ -140,6 +158,7 @@ void VisitorsStorage::onGotVisitor(int _err,
 	
 	VisitorHashdPtr v(new VisitorHashd(_vid,
 										_vdid,
+										m_default_ttl,
 										boost::bind(&VisitorsStorage::saveVisitor, this, _1),
 										false)); // saving
 	v->initCurDevice(_vdid, "_user_agent_");
