@@ -48,7 +48,7 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 	for (var i in show.items) {
 	
 		ret += '<tr>';
-		ret += '<td style="white-space: normal;">';
+		ret += '<td>';
 		
 		if (click_url != null)
 			show.items[i].directurl = click_url + escape(show.items[i].directurl);
@@ -67,7 +67,7 @@ function renderShowcaseSlider240x400x3 (pid, show, formatter_args, format_files_
 			ret += '<a href=' + show.items[i].directurl + ' target="_blank"><img src=' + imgurl + ' class="oshop_240_400_slider_img"></a>';
 		
 		ret += '</td>';
-		ret += '<td><a href=' + show.items[i].directurl + ' style="font-family:' + formatter_args.textfont + ' ; font-size:11pt; color:' + formatter_args.textcolor 
+		ret += '<td style="white-space: normal;"><a href=' + show.items[i].directurl + ' style="font-family:' + formatter_args.textfont + ' ; font-size:11pt; color:' + formatter_args.textcolor 
 				+ ';  overflow-wrap: break-word;" target="_blank" >';
 				
 		
