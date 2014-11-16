@@ -197,6 +197,9 @@ AdPtr TargeterFull::getAdToShow(AdRequestPtr _ad_req, VisitorPtr _visitor, std::
 	if (pit == m_places.end())
 		return AdPtr();
 
+	if (pit->second->targeted_ads.ads.size() == 0)
+		return AdPtr();
+
 	AdPtr ad = m_ads [ pit->second->targeted_ads.ads [ rand() % pit->second->targeted_ads.ads.size() ] ];
 
 	if (pit->second->vk_match &&

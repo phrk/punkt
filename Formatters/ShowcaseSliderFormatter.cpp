@@ -17,8 +17,8 @@ ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _ni
 	json_dump(_json_dump),
 	type(_type) {
 		
-		system_url = _system_url;
-		system_rsrc_url = _system_rsrc_url;
+	system_url = _system_url;
+	system_rsrc_url = _system_rsrc_url;
 }
 
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
