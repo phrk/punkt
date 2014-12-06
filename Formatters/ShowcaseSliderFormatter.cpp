@@ -268,7 +268,8 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 	
 	if (_show.items.size()<3) {
 		
-		_ad_req->conn->sendResponse("<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>");
+		_ad_req->conn->sendResponse(HttpResponse(200,
+			"<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>"));
 	}
 	
 	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
@@ -337,7 +338,7 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 		"document._punkt_codes_post[\"0\"]();\n"
 		"</script>";
 	
-	_ad_req->conn->sendResponse(resp);
+	_ad_req->conn->sendResponse(HttpResponse(200, resp));
 }
 
 void ShowcaseSliderFormatter::onGotShowcase(bool _success,
@@ -412,6 +413,6 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success,
 	resp += slider;
 	resp += format_renderer_bind;
 	
-	_ad_req->conn->sendResponse(resp);
+	_ad_req->conn->sendResponse(HttpResponse(200, resp));
 }
 

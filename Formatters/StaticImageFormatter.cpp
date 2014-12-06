@@ -110,7 +110,7 @@ void StaticImageFormatter::formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _ar
 		"document._punkt_codes_post[\"0\"]();\n"
 		"</script>";
 	
-	_ad_req->conn->sendResponse(resp);
+	_ad_req->conn->sendResponse(HttpResponse(200, resp));
 }
 
 void StaticImageFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_exthtml, const std::string &_extjs) {
@@ -152,7 +152,7 @@ void StaticImageFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args, 
 	resp += static_image_js;
 	resp += format_renderer_bind;
 	
-	_ad_req->conn->sendResponse(resp);
+	_ad_req->conn->sendResponse(HttpResponse(200, resp));
 }
 
 void StaticImageFormatter::handleFormatEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {

@@ -41,7 +41,7 @@ void ShowcaseSliderFormatter::handleShowDispEvent(HttpConnectionPtr _conn, HttpR
 	
 //	std::cout << owner_ads_place_counter << std::endl;
 	
-	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
+	_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }"));
 }
 
 void ShowcaseSliderFormatter::handleItemDispEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
@@ -82,7 +82,7 @@ void ShowcaseSliderFormatter::handleItemDispEvent(HttpConnectionPtr _conn, HttpR
 	
 //	std::cout << owner_ads_counter << "\n" << owner_ads_place_counter << "\n" << owner_items_counter << "\n";
 	
-	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleItemsShowEvent\" }");
+	_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"ShowcaseSliderFormatter::handleItemsShowEvent\" }"));
 }
 
 void ShowcaseSliderFormatter::handleClickEvent(HttpConnectionPtr _conn, HttpRequestPtr _req) {
@@ -106,7 +106,7 @@ void ShowcaseSliderFormatter::handleClickEvent(HttpConnectionPtr _conn, HttpRequ
 	
 	_conn->setHttpStatus(302); // Found
 	_conn->addHeader("Location: " + aim);
-	_conn->sendResponse(resp);
+	_conn->sendResponse(HttpResponse(200, resp));
 	
 	std::string pid_str;
 	std::string adid_str;
@@ -165,7 +165,7 @@ void ShowcaseSliderFormatter::handleConvEvent(HttpConnectionPtr _conn, HttpReque
 	std::string clickid;
 	if (!_req->getField("clickid", clickid)) {
 		
-		_conn->sendResponse("{ \"status\" : \"clickid not set\" }");
+		_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"clickid not set\" }"));
 		return;
 	}
 	
@@ -203,7 +203,7 @@ void ShowcaseSliderFormatter::handleConvEvent(HttpConnectionPtr _conn, HttpReque
 //	std::cout << "owner_ad_place_counter: " << owner_ad_place_counter << std::endl;
 //	std::cout << "owner_place_ad_counter: " << owner_place_ad_counter << std::endl;
 	
-	_conn->sendResponse("{ \"status\": \"ok\" }");
+	_conn->sendResponse(HttpResponse(200, "{ \"status\": \"ok\" }"));
 //	_conn->close();
 }
 

@@ -25,7 +25,7 @@ void TargeterFull::handleClickEvent(uint64_t _pid,
 
 	_conn->setHttpStatus(302); // Found
 	_conn->addHeader("Location: " + aim);
-	_conn->sendResponse(resp);
+	_conn->sendResponse(HttpResponse(200, resp));
 
 	std::string pid_str = _params.at("pid");
 	std::string adid_str = _params.at("adid");
@@ -108,7 +108,7 @@ void TargeterFull::handleDispEvent(uint64_t _pid,
 //	std::cout << owner_ads_place_counter << std::endl;
 	
 	getVisitor(_conn, _req, boost::bind(&TargeterFull::saveDispStats, this, _1, ad_owner, _pid, _adid));
-	_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
+	_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }"));
 }
 
 void TargeterFull::saveDispStats(VisitorPtr _v, uint64_t _ownerid, uint64_t _pid, uint64_t _adid) {

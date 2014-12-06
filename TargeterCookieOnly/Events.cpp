@@ -25,7 +25,7 @@ void TargeterCookieOnly::handleClickEvent(uint64_t _pid,
 
 	_conn->setHttpStatus(302); // Found
 	_conn->addHeader("Location: " + aim);
-	_conn->sendResponse(resp);
+	_conn->sendResponse(HttpResponse(200, resp));
 
 	std::string pid_str = _params.at("pid");
 	std::string adid_str = _params.at("adid");
@@ -142,7 +142,7 @@ void TargeterCookieOnly::saveDispStats(VisitorPtr _v, uint64_t _ownerid, uint64_
 	v->ads_disped_today[ _adid ] ++;
 	v->places_today[ _pid ] ++;
 	v->save();
-	v->m_conn->sendResponse("{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }");
+	v->m_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"ShowcaseSliderFormatter::handleShowDispEvent\" }"));
 	//domains_today[]
 }
 

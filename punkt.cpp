@@ -72,7 +72,7 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 	
 	if (!_req->getField("adid", ad_id_str)) {
 
-		_conn->sendResponse("{ \"status\" : \"wrong params\" }");
+		_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"wrong params\" }"));
 		return;
 	}
 	
@@ -95,7 +95,7 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		if (!ad) {
 		
 			std::cout << "Punkt::handleDemo unknown ad " << adid << std::endl;
-			_conn->sendResponse("{ \"status\" : \"internal error\" }");
+			_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"internal error\" }"));
 			return;
 		}
 		
@@ -104,7 +104,7 @@ void Punkt::handleDemoGotVisitor(VisitorPtr _visitor, HttpConnectionPtr _conn, H
 		if (f_it == m_formatters.end()) {
 		
 			std::cout << "Punkt::handleDemo unknown format " << ad->format_id << std::endl;
-			_conn->sendResponse("{ \"status\" : \"internal error\" }");
+			_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"internal error\" }"));
 			return;
 		}
 		
@@ -188,7 +188,7 @@ void Punkt::handlePlaceGotVisitor(uint64_t _pid, VisitorPtr _visitor, HttpConnec
 		if (f_it == m_formatters.end()) {
 
 			std::cout << "Punkt::connHandler unknown formatter " << ad->format_id << " fid: " << ad->format_id << std::endl;
-			_conn->sendResponse("{ \"status\" : \"internal error\" }");
+			_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"internal error\" }"));
 			return;
 		}
 	
@@ -218,7 +218,7 @@ void Punkt::handleFormatEvent(const std::map<std::string, std::string> &_params,
 	{
 		hiaux::hashtable<uint64_t, FormatterPtr>::iterator it = m_formatters.find(format_id);
 		if (it == m_formatters.end()) {
-			_conn->sendResponse("{ \"status\" : \"unknown format\" }");
+			_conn->sendResponse(HttpResponse(200, "{ \"status\" : \"unknown format\" }"));
 			return;
 		}
 		format = it->second;
