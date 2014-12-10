@@ -20,7 +20,11 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	required_params.push_back("listen_port");
 	required_params.push_back("punkt_url");
 	required_params.push_back("punkt_rsrc_url");
-	required_params.push_back("geberd_url");
+	
+	required_params.push_back("geberd_ip");
+	required_params.push_back("geberd_port");
+	required_params.push_back("geberd_nconns");
+	
 	required_params.push_back("zeit_url");
 	required_params.push_back("hashd_url");
 	
@@ -57,7 +61,7 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 		
 		FormatterPtr showcase(new ShowcaseSliderFormatter(m_req_disp,
 													m_files_cache,
-													m_geber_acli,
+													m_geber_clia,
 													m_zeit_acli,
 													boost::bind(&Punkt::getAdOwner, m_punkt.get(), _1) ));
 		
@@ -306,9 +310,15 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 
-	m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
+	//m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
 	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
 
+	m_hiapi_bin_clienta_geber.reset (new hiapi::client::BinClientA(hiapi::client::BinClientA::INTERNET,
+							_config["geberd_ip"], strtoint(_config["geberd_port"]), strtoint(_config["geberd_nconns"])));
+	
+	m_geber_clia.reset(new GeberCliApiClientA( m_hiapi_bin_clienta_geber ));
+
+	m_srv_tasklauncher->addTask(NEW_LAUNCHER_TASK2(&Punktd::clientLoop, this));
 
 #ifdef PUNKT_TARGETER_FULL
 	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
@@ -347,6 +357,14 @@ Punktd::Punktd(const std::string &_config_file) {
 							strtoint(_config["listen_port"])));
 
 	m_pool->run();
+}
+
+TaskLauncher::TaskRet Punktd::clientLoop() {
+	
+	while (true) {
+		
+		m_hiapi_bin_clienta_geber->handleEvents();
+	}
 }
 
 void Punktd::connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req) {

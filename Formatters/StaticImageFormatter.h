@@ -16,6 +16,8 @@ public:
 	std::string click_url;
 	std::string img_url;
 	
+	virtual ~StaticImageFormatterArgs() { }
+	
 };
 
 class StaticImageFormatter : public Formatter {
@@ -45,6 +47,7 @@ public:
 									const std::map<std::string, std::string> &_params,
 									HttpConnectionPtr _conn,
 									HttpRequestPtr _req);
+	virtual ~StaticImageFormatter();
 };
 
 typedef boost::shared_ptr<StaticImageFormatter> StaticImageFormatterPtr;

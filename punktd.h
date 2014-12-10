@@ -6,7 +6,10 @@
 #include "hiaux/network/HttpOutReqDisp.h"
 #include "hiaux/loadconf/loadconf.h"
 
+#include "hiaux/network/HttpApi/BinClient/BinClientA.h"
+
 #include "geber/cpp-client/GeberdCliApiClient.h"
+#include "geber/cpp-client/GeberCliApiClientA.h"
 
 #include "punkt_consts.h"
 
@@ -37,6 +40,8 @@ private:
 	TaskLauncherPtr m_srv_tasklauncher;
 	HttpServerPtr m_srv;
 	
+	hiapi::client::BinClientAPtr m_hiapi_bin_clienta_geber;
+	
 #ifdef PUNKT_TARGETER_FULL
 	HashdClientAsyncPtr m_hashd_acli;
 	VisitorsStoragePtr m_visitors_storage;
@@ -49,7 +54,11 @@ private:
 	
 	PunktPtr m_punkt;
 	HttpOutRequestDispPtr m_req_disp;
-	GeberdCliApiClientAsyncPtr m_geber_acli;
+	//GeberdCliApiClientAsyncPtr m_geber_acli;
+	
+	GeberCliApiClientAPtr m_geber_clia;
+	
+	
 	ZeitClientAsyncPtr m_zeit_acli;
 	
 	PGconn *m_pg;
@@ -63,6 +72,8 @@ private:
 	uint64_t m_reload_period;
 	
 	hiaux::hashtable<std::string,std::string> parseConfig(const std::string &_config_file);
+	
+	TaskLauncher::TaskRet clientLoop();
 	
 	void fallDown(std::string _s);
 	void bindFormatters(const std::string &_punkt_url,

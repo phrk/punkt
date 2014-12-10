@@ -21,9 +21,13 @@ ShowcaseSliderFormatterArgs::ShowcaseSliderFormatterArgs(uint64_t _shid, int _ni
 	system_rsrc_url = _system_rsrc_url;
 }
 
+ShowcaseSliderFormatterArgs::~ShowcaseSliderFormatterArgs() {
+	
+}
+
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 						FileCachePtr _jscache,
-						GeberdCliApiClientAsyncPtr _geber_acli,
+						GeberCliApiClientAPtr _geber_clia,
 						ZeitClientAsyncPtr _zeit_acli,
 						boost::function<uint64_t(uint64_t)> _getAdOwner):
 	m_req_disp(_req_disp),
@@ -31,10 +35,14 @@ ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp
 //	m_punkt_url(_punkt_url),
 //	m_punkt_rsrc_url(_punkt_rsrc_url),
 //	m_getConnById(_getConnById),
-	m_geber_acli(_geber_acli),
+	m_geber_clia(_geber_clia),
 	m_zeit_acli(_zeit_acli),
 	m_getAdOwner(_getAdOwner) {
 
+}
+
+ShowcaseSliderFormatter::~ShowcaseSliderFormatter() {
+	
 }
 
 FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js) {
@@ -146,24 +154,34 @@ FormatterArgsPtr ShowcaseSliderFormatter::parseArgs(const std::string &_args_js)
 
 void ShowcaseSliderFormatter::format(AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_exthtml, const std::string &_extjs) {
 	
-	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
+	ShowcaseSliderFormatterArgs* args = dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get());
+	
+	if (args == NULL) {
+		std::cout << "ShowcaseSliderFormatter::format error: dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get())\n";
+		return;
+	}
 	
 	if (_ad_req->search_queries.size() != 0)
-		m_geber_acli->getShowcaseSearch(args->shid, args->nitems, _ad_req->search_queries,
+		m_geber_clia->getShowcaseSearch(args->shid, args->nitems, _ad_req->search_queries,
 										boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _ad_req, _args, _exthtml, _extjs));
 	else
-		m_geber_acli->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _ad_req, _args, _exthtml, _extjs));
+		m_geber_clia->getShowcase(args->shid, args->nitems, boost::bind(&ShowcaseSliderFormatter::onGotShowcase, this, _1, _2, _ad_req, _args, _exthtml, _extjs));
 }
 
 void ShowcaseSliderFormatter::formatDemo(AdRequestPtr _ad_req, FormatterArgsPtr _args) {
 	
-	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
+	ShowcaseSliderFormatterArgs* args = dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get());
+	
+	if (args == NULL) {
+		std::cout << "ShowcaseSliderFormatter::formatDemo error: dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get())\n";
+		return;
+	}
 	
 	if (_ad_req->search_queries.size() != 0)
-		m_geber_acli->getShowcaseSearch(args->shid, args->nitems, _ad_req->search_queries,
+		m_geber_clia->getShowcaseSearch(args->shid, args->nitems, _ad_req->search_queries,
 										boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _ad_req, _args));
 	else
-		m_geber_acli->getShowcase(args->shid, args->nitems,
+		m_geber_clia->getShowcase(args->shid, args->nitems,
 									boost::bind(&ShowcaseSliderFormatter::onGotShowcaseDemo, this, _1, _2, _ad_req, _args));
 }
 
@@ -272,7 +290,12 @@ void ShowcaseSliderFormatter::onGotShowcaseDemo (bool _success, ShowcaseInstance
 			"<font color=B22222>Добавьте больше категорий или товаров на витрину, чтобы она показывалась</font>"));
 	}
 	
-	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();
+	ShowcaseSliderFormatterArgs* args = dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get());
+	
+	if (args == NULL) {
+		std::cout << "ShowcaseSliderFormatter::onGotShowcaseDemo error: dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get())\n";
+		return;
+	}
 	
 	std::string slider_events;
 	std::string render_slider;
@@ -353,7 +376,12 @@ void ShowcaseSliderFormatter::onGotShowcase(bool _success,
 		return;
 	}
 	
-	ShowcaseSliderFormatterArgs* args = (ShowcaseSliderFormatterArgs*)_args.get();	
+	ShowcaseSliderFormatterArgs* args = dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get());	
+	
+	if (args == NULL) {
+		std::cout << "ShowcaseSliderFormatter::onGotShowcase error: dynamic_cast<ShowcaseSliderFormatterArgs*>(_args.get())\n";
+		return;
+	}
 	
 	std::string slider_events;
 	std::string render_slider;

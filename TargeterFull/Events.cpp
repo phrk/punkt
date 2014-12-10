@@ -23,9 +23,10 @@ void TargeterFull::handleClickEvent(uint64_t _pid,
 		"</body>"
 	"</html>";
 
-	_conn->setHttpStatus(302); // Found
-	_conn->addHeader("Location: " + aim);
-	_conn->sendResponse(HttpResponse(200, resp));
+	HttpResponse res(302, resp);
+	res.addHeader("Location: " + aim);
+	
+	_conn->sendResponse(res);
 
 	std::string pid_str = _params.at("pid");
 	std::string adid_str = _params.at("adid");

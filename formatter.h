@@ -12,6 +12,8 @@ class FormatterArgs {
 public:
 	std::string system_url;
 	std::string system_rsrc_url;
+
+	virtual ~FormatterArgs() { }
 };
 
 typedef boost::shared_ptr<FormatterArgs> FormatterArgsPtr;
@@ -32,6 +34,8 @@ public:
 									const std::map<std::string, std::string> &_params,
 									HttpConnectionPtr _conn,
 									HttpRequestPtr _req) = 0;
+									
+	virtual ~Formatter() { }
 };
 
 typedef boost::shared_ptr<Formatter> FormatterPtr;

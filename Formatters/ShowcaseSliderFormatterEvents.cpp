@@ -104,9 +104,9 @@ void ShowcaseSliderFormatter::handleClickEvent(HttpConnectionPtr _conn, HttpRequ
 		"</body>"
 	"</html>";
 	
-	_conn->setHttpStatus(302); // Found
-	_conn->addHeader("Location: " + aim);
-	_conn->sendResponse(HttpResponse(200, resp));
+	HttpResponse res(302, resp);
+	res.addHeader("Location: " + aim);
+	_conn->sendResponse(res);
 	
 	std::string pid_str;
 	std::string adid_str;

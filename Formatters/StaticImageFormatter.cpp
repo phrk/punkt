@@ -7,6 +7,10 @@ StaticImageFormatter::StaticImageFormatter(FileCachePtr _jscache,
 {	
 }
 
+StaticImageFormatter::~StaticImageFormatter() {
+	
+}
+
 FormatterArgsPtr StaticImageFormatter::parseArgs(const std::string &_args_js) {
 	
 	std::cout << "StaticImageFormatter::parseArgs: " << _args_js << std::endl;

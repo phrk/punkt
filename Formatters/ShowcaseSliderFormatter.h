@@ -1,9 +1,7 @@
 #ifndef _SHOWCASE_SLIDER_FORMATTER_H_
 #define _SHOWCASE_SLIDER_FORMATTER_H_
 
-#include "geber/cpp-client/GeberdCliApiClient.h"
-
-#include "geber/cpp-client/GeberdCliApiClientAsync.h"
+#include "geber/cpp-client/GeberCliApiClientA.h"
 
 #include "hiaux/network/HttpOutReqDisp.h"
 #include "formatter.h"
@@ -38,6 +36,8 @@ public:
 								const std::string &_system_depot_url_prefix,
 								const std::string &_type,
 								const std::string &_json_dump);
+								
+	virtual ~ShowcaseSliderFormatterArgs();
 };
 
 class ShowcaseSliderFormatter : public Formatter {
@@ -47,7 +47,8 @@ class ShowcaseSliderFormatter : public Formatter {
 //	boost::function<HttpConnectionPtr(int)> m_getConnById;
 	//GeberdCliApiClientPtr m_geber_cli;
 
-	GeberdCliApiClientAsyncPtr m_geber_acli;
+	GeberCliApiClientAPtr m_geber_clia;
+	//GeberdCliApiClientAsyncPtr m_geber_acli;
 	ZeitClientAsyncPtr m_zeit_acli;
 		
 	boost::function<uint64_t(uint64_t)> m_getAdOwner;
@@ -85,7 +86,7 @@ public:
 	
 	ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 							FileCachePtr _jscache,
-							GeberdCliApiClientAsyncPtr _geber_acli,
+							GeberCliApiClientAPtr _geber_clia,
 							ZeitClientAsyncPtr _zeit_acli,
 							boost::function<uint64_t(uint64_t)> _getAdOwner);
 	
@@ -106,7 +107,7 @@ public:
 									HttpRequestPtr _req);
 	
 	void onCalledZeit (bool _success);
-	
+	virtual ~ShowcaseSliderFormatter();
 };
 
 typedef boost::shared_ptr<ShowcaseSliderFormatter> ShowcaseSliderFormatterPtr;
