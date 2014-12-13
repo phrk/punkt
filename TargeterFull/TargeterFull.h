@@ -12,6 +12,8 @@
 
 #include "Place.h"
 
+#include "math.h"
+
 class TargeterFull : public Targeter {
 	
 	hAutoLock lock;
