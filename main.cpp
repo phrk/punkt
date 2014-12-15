@@ -26,7 +26,7 @@ int main (int argc, char** argv) {
 	
 	return 0;
 */	
-	
+	/*
 	signal(SIGPIPE, empty_handler);
 	
 	Punktd *pd;
@@ -57,7 +57,10 @@ int main (int argc, char** argv) {
 		std::cout << "::main exception: " << *_s << std::endl;
 		exit(0);
 	}
-	pd->join();
+	pd->join();*/
+	
+	Punktd* pd = new Punktd("punkt.conf");
+	pd->start(false);
 	
 	return 0;
 }

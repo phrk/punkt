@@ -9,11 +9,8 @@ void Punktd::fallDown(std::string _s) {
 	exit(0);
 }
 
-hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string &_config_file) {
-	hiaux::hashtable<std::string,std::string> ret;
+void Punktd::setParamsList(std::vector<std::string> &required_params, std::vector<std::string> &_optional_params) {
 	
-	std::vector<std::string> required_params;
-	std::vector<std::string> optional_params;
 	required_params.push_back("systemid");
 	required_params.push_back("replid");
 	
@@ -35,20 +32,29 @@ hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string 
 	required_params.push_back("pg_user");
 	required_params.push_back("pg_pass");
 	required_params.push_back("pg_db");
+}
+
+/*
+hiaux::hashtable<std::string,std::string> Punktd::parseConfig(const std::string &m_config_file) {
+	hiaux::hashtable<std::string,std::string> ret;
+	
+	std::vector<std::string> required_params;
+	std::vector<std::string> optional_params;
+	
 		
 	try {
-		ret = LoadConf::load(_config_file, required_params, optional_params);
+		ret = LoadConf::load(m_config_file, required_params, optional_params);
 	}
 	catch (const std::string s) {
 		fallDown(s);
 	} catch (const char *s) {
 		fallDown(s);
 	} catch (...) {
-		fallDown("Geberd::parseConfig: Could not parse config file: " + _config_file);
+		fallDown("Geberd::parseConfig: Could not parse config file: " + m_config_file);
 	}
 		
 	return ret;
-}
+}*/
 
 void Punktd::bindFormatters(const std::string &_punkt_url,
 							const std::string &_punkt_rsrc_url) {
@@ -80,166 +86,16 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 	}
 }
 
-void Punktd::checkReload() {
-	uint64_t now = time(0);
-	if (now - m_last_reload_ts < m_reload_period)
-		return;
-	
-	hLockTicketPtr ticket = lock.lock();
-	m_last_reload_ts = time(0);
-	
-	if (loadAds())
-		loadPlaces();
-	
-	m_last_reload_ts = time(0);
-}
 
-bool Punktd::doCheckDbConn(size_t _attempt) {
-	
-	if (_attempt > 10)
-		return false;
-	
-	if (PQstatus(m_pg) != CONNECTION_OK) {
-		
-		std::cout << "Reseting connection to PostgreSQL\n;";
-		PQreset(m_pg);
-		return doCheckDbConn(_attempt + 1);
-	}
-	return true;
-}
-
-bool Punktd::checkDbConn() {
-	
-	return doCheckDbConn(0);
-}
-
-bool Punktd::loadAds() {
-	std::string query("SELECT * FROM punkt.ads");
-	PGresult *res = PQexec(m_pg, query.c_str());
-	
-	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-		std::cout << "Punktd::loadAds !PGRES_TUPLES_OK\n";
-		
-		//checkDbConn();
-		return false;
-	}
-	
-	int ntuples = PQntuples(res);
-	int ncols = PQnfields(res);
-	
-	uint64_t id;
-	uint64_t format_id;
-	std::string formatter_args;
-	std::string targeter_args;
-	uint64_t ad_owner;
-	
-	for (int t = 0; t<ntuples; t++) {	
-		for (int c = 0; c < ncols; c++) {
-		
-			if (std::string("id") == PQfname(res, c)) {
-				id = string_to_uint64( PQgetvalue(res, t, c) );
-			}
-			
-			if (std::string("ad_owner") == PQfname(res, c)) {
-				ad_owner = string_to_uint64( PQgetvalue(res, t, c) );
-			}
-			
-			if (std::string("format_id") == PQfname(res, c)) {
-				format_id = string_to_uint64( PQgetvalue(res, t, c) );
-			}
-			if (std::string("formatter_args") == PQfname(res, c)) {
-				formatter_args = PQgetvalue(res, t, c);
-			}
-			
-			if (std::string("targeter_args") == PQfname(res, c)) {
-				targeter_args = PQgetvalue(res, t, c);
-			}
-		}
-		//AdPtr ad (new Ad(id, format_id, ad_owner, formatter_args, targeter_args));
-		
-		m_targeter->updateAd(id, format_id, ad_owner, formatter_args, targeter_args);
-	}
-	return true;
-}
-
-bool Punktd::loadPlaceTarges(uint64_t _place, std::vector<uint64_t> &_ads_ids) {
-	
-	std::string query("SELECT ad_id FROM punkt.targets WHERE place_id=" + uint64_to_string(_place));
-	PGresult *res = PQexec(m_pg, query.c_str());
-	
-	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-		std::cout << "Punktd::loadPlaceTarges !PGRES_TUPLES_OK _place: " << _place << std::endl;
-		return false;
-	}
-	
-	int ntuples = PQntuples(res);
-	int ncols = PQnfields(res);
-	
-	for (int t = 0; t<ntuples; t++) {	
-		for (int c = 0; c < ncols; c++) {
-		
-			if (std::string("ad_id") == PQfname(res, c))
-				_ads_ids.push_back( string_to_uint64( PQgetvalue(res, t, c) ) );
-		}
-	}
-	PQclear(res);
-	return true;
-}
-
-void Punktd::loadPlaces() {
-
-	std::string query  ("SELECT * FROM punkt.places");
-	PGresult *res = PQexec(m_pg, query.c_str());
-	
-	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
-		std::cout << "Punktd::loadPlaces !PGRES_TUPLES_OK\n";
-		return;
-	}
-	
-	int ntuples = PQntuples(res);
-	int ncols = PQnfields(res);
-	
-	uint64_t id;
-	std::string targeter_args;
-	//bool readok = false;
-	
-	for (int t = 0; t<ntuples; t++) {	
-		//readok = false;
-		for (int c = 0; c < ncols; c++) {
-			if (std::string("id") == PQfname(res, c)) {
-				id = string_to_uint64(PQgetvalue(res, t, c));
-				//readok = true;
-			}
-			
-			if (std::string("targeter_args") == PQfname(res, c)) {
-				
-				targeter_args = std::string(PQgetvalue(res, t, c));
-			}
-			
-		}
-		
-//		if (!readok) {
-//			std::cout << "Punktd::loadPlaces could not load place id\n";
-//			continue;
-//		}
-		
-		std::vector<uint64_t> ads_ids;
-		if (loadPlaceTarges(id, ads_ids)) {
-			m_targeter->updatePlace(id, targeter_args, ads_ids);
-		}
-	}
-	
-	PQclear(res);
-}
 /*
-void Punktd::getClickTemplates(const hiaux::hashtable<std::string,std::string> &_config) {
+void Punktd::getClickTemplates(const hiaux::hashtable<std::string,std::string> &m_config) {
 	
-	hiaux::hashtable<std::string, std::string>::const_iterator it = _config.find("wikimart_click_template");
-	if (it != _config.end())
+	hiaux::hashtable<std::string, std::string>::const_iterator it = m_config.find("wikimart_click_template");
+	if (it != m_config.end())
 		_click_templates[WIKIMART_ADVID] = it->second;
 	
-	it = _config.find("ozon_click_template");
-	if (it != _config.end())
+	it = m_config.find("ozon_click_template");
+	if (it != m_config.end())
 		_click_templates[OZON_ADVID] = it->second;
 }*/
 
@@ -267,23 +123,32 @@ FormatterArgsPtr Punktd::parseFormatterArgs(uint64_t _format_id, const std::stri
 	return ret;
 }
 
-Punktd::Punktd(const std::string &_config_file) {
+Punktd::Punktd(const std::string &m_config_file) {
+	
+	loadConfig(m_config_file);
+}
+
+Punktd::~Punktd() {
+	
+}
+
+void Punktd::doStart() {
 	
 	m_last_reload_ts = 0;
 	
-	hiaux::hashtable<std::string,std::string> _config = parseConfig(_config_file);
+	//hiaux::hashtable<std::string,std::string> m_config = parseConfig(m_config_file);
 	
 	std::cout << "Config loaded\n";
 	
-	m_reload_period = string_to_uint64(_config["reload_period"]);
+	m_reload_period = string_to_uint64(m_config["reload_period"]);
 	
-	m_pg  = PQsetdbLogin(_config["pg_ip"].c_str(),
-                      _config ["pg_port"].c_str(),
+	m_pg  = PQsetdbLogin(m_config["pg_ip"].c_str(),
+                      m_config ["pg_port"].c_str(),
                      "",
                      "",
-                     _config ["pg_user"].c_str(),
-                     _config ["pg_pass"].c_str(),
-                     _config ["pg_db"].c_str());
+                     m_config ["pg_user"].c_str(),
+                     m_config ["pg_pass"].c_str(),
+                     m_config ["pg_db"].c_str());
 					 
 	if (PQstatus(m_pg) != CONNECTION_OK) {
 		std::cout << "Could not connect to db";
@@ -310,20 +175,27 @@ Punktd::Punktd(const std::string &_config_file) {
 	
 	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 
-	//m_geber_acli.reset(new GeberdCliApiClientAsync(_config["geberd_url"], m_req_disp));
-	m_zeit_acli.reset(new ZeitClientAsync(_config["zeit_url"], "_user_", "_key_", m_req_disp));
+	//m_geber_acli.reset(new GeberdCliApiClientAsync(m_config["geberd_url"], m_req_disp));
+	
+	try {
+	
+	m_zeit_acli.reset(new ZeitClientAsync(m_config["zeit_url"], "_user_", "_key_", m_req_disp));
+
+	} catch (...) {
+		std::cout << "zeit connect exception\n";
+	}
 
 	m_hiapi_bin_clienta_geber.reset (new hiapi::client::BinClientA(hiapi::client::BinClientA::INTERNET,
-							_config["geberd_ip"], strtoint(_config["geberd_port"]), strtoint(_config["geberd_nconns"])));
+							m_config["geberd_ip"], strtoint(m_config["geberd_port"]), strtoint(m_config["geberd_nconns"])));
 	
 	m_geber_clia.reset(new GeberCliApiClientA( m_hiapi_bin_clienta_geber ));
 
 	m_srv_tasklauncher->addTask(NEW_LAUNCHER_TASK2(&Punktd::clientLoop, this));
 
 #ifdef PUNKT_TARGETER_FULL
-	m_hashd_acli.reset(new HashdClientAsync(_config["hashd_url"], m_req_disp));
+	m_hashd_acli.reset(new HashdClientAsync(m_config["hashd_url"], m_req_disp));
 	m_visitors_storage.reset(new VisitorsStorage(m_hashd_acli));	
-	m_targeter.reset(new TargeterFull(_config ["replid"],
+	m_targeter.reset(new TargeterFull(m_config ["replid"],
 							m_visitors_storage,
 							m_zeit_acli,
 							m_files_cache,
@@ -332,17 +204,17 @@ Punktd::Punktd(const std::string &_config_file) {
 #endif
 	
 #ifdef PUNKT_TARGETER_COOKIE_ONLY
-	m_targeter.reset(new TargeterCookieOnly(_config ["replid"], m_zeit_acli,
+	m_targeter.reset(new TargeterCookieOnly(m_config ["replid"], m_zeit_acli,
 											boost::bind(&Punktd::parseFormatterArgs, this, _1, _2)));
 #endif
 	
 	m_punkt.reset(new Punkt(m_targeter,
-							_config ["systemid"],
-							_config ["replid"],
-							_config ["punkt_rsrc_url"]));
+							m_config ["systemid"],
+							m_config ["replid"],
+							m_config ["punkt_rsrc_url"]));
 	
 
-	bindFormatters(_config["punkt_url"], _config ["punkt_rsrc_url"]);
+	bindFormatters(m_config["punkt_url"], m_config ["punkt_rsrc_url"]);
 	std::cout << "Formatters binded\n";
 	loadAds();
 	std::cout << "Ads loaded\n";
@@ -354,10 +226,12 @@ Punktd::Punktd(const std::string &_config_file) {
 	m_srv.reset(new HttpServer(m_srv_tasklauncher,
 							ResponseInfo("text/html; charset=utf-8", "punktd"),
 							boost::bind(&Punktd::connHandler, this, _1, _2),
-							strtoint(_config["listen_port"])));
+							strtoint(m_config["listen_port"])));
 
 	m_pool->run();
+	m_pool->join();
 }
+
 
 TaskLauncher::TaskRet Punktd::clientLoop() {
 	
@@ -377,6 +251,3 @@ void Punktd::connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 	m_punkt->connHandler(_conn, _req);
 }
 
-void Punktd::join() {
-	m_pool->join();
-}

@@ -4,7 +4,7 @@
 #include "hiconfig.h"
 #include "hiaux/network/HttpServer/HttpServer.h"
 #include "hiaux/network/HttpOutReqDisp.h"
-#include "hiaux/loadconf/loadconf.h"
+#include "hiaux/tools/Daemon.h"
 
 #include "hiaux/network/HttpApi/BinClient/BinClientA.h"
 
@@ -31,9 +31,11 @@
 
 #include "libpq-fe.h"
 
+#include <boost/noncopyable.hpp>
+
 #define PUNKTD_NTHREADS 8
 
-class Punktd {
+class Punktd : public Daemon, public boost::noncopyable {
 
 private:
 	hThreadPoolPtr m_pool;
@@ -91,11 +93,15 @@ public:
 	
 	FormatterArgsPtr parseFormatterArgs(uint64_t _format_id, const std::string &_args);
 	
-	void onFinished();
-	Punktd(const std::string &_config_file);
+	virtual void setParamsList(std::vector<std::string> &_required_params, std::vector<std::string> &_optional_params);
+	virtual void doStart();
 	
-	void connHandler(HttpConnectionPtr, HttpRequestPtr);
-	void join();
+	virtual void connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req);
+	
+	void onFinished();
+	
+	Punktd(const std::string &_config_file);
+	~Punktd();
 };
 
 #endif
