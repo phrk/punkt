@@ -5,7 +5,7 @@
 #include "Targeter.h"
 #include "VisitorCookieOnly.h"
 #include <math.h>
-#include "zeit_client_async.h"
+#include "ZeitClientA.h"
 
 class TargeterCookieOnly : public Targeter {
 	
@@ -13,14 +13,14 @@ class TargeterCookieOnly : public Targeter {
 	hiaux::hashtable<uint64_t, AdPtr> m_ads;
 	hiaux::hashtable<uint64_t, PlaceTargetsPtr> m_places;
 	
-	ZeitClientAsyncPtr m_zeit_acli;
+	ZeitClientAPtr m_zeit_acli;
 	
 	void genVid(std::string &_vid) const;
 	
 	void saveVisitor(VisitorCookieOnly *_v);
 public:
 	
-	TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli,
+	TargeterCookieOnly(const std::string &_repl_id, ZeitClientAPtr _zeit_acli,
 			boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs);
 	
 	virtual void getVisitor(HttpConnectionPtr _conn, HttpRequestPtr _req, boost::function<void(VisitorPtr)> _onGot);

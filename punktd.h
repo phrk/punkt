@@ -43,6 +43,7 @@ private:
 	HttpServerPtr m_srv;
 	
 	hiapi::client::BinClientAPtr m_hiapi_bin_clienta_geber;
+	hiapi::client::BinClientAPtr m_hiapi_bin_clienta_zeit;
 	
 #ifdef PUNKT_TARGETER_FULL
 	HashdClientAsyncPtr m_hashd_acli;
@@ -61,7 +62,7 @@ private:
 	GeberCliApiClientAPtr m_geber_clia;
 	
 	
-	ZeitClientAsyncPtr m_zeit_acli;
+	ZeitClientAPtr m_zeit_acli;
 	
 	PGconn *m_pg;
 	
@@ -100,7 +101,7 @@ public:
 	
 	void onFinished();
 	
-	Punktd(const std::string &_config_file);
+	Punktd();
 	~Punktd();
 };
 

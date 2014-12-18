@@ -28,7 +28,7 @@ ShowcaseSliderFormatterArgs::~ShowcaseSliderFormatterArgs() {
 ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 						FileCachePtr _jscache,
 						GeberCliApiClientAPtr _geber_clia,
-						ZeitClientAsyncPtr _zeit_acli,
+						ZeitClientAPtr _zeit_acli,
 						boost::function<uint64_t(uint64_t)> _getAdOwner):
 	m_req_disp(_req_disp),
 	m_jscache(_jscache),

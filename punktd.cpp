@@ -22,6 +22,10 @@ void Punktd::setParamsList(std::vector<std::string> &required_params, std::vecto
 	required_params.push_back("geberd_port");
 	required_params.push_back("geberd_nconns");
 	
+	required_params.push_back("zeit_ip");
+	required_params.push_back("zeit_port");
+	required_params.push_back("zeit_nconns");
+	
 	required_params.push_back("zeit_url");
 	required_params.push_back("hashd_url");
 	
@@ -123,9 +127,10 @@ FormatterArgsPtr Punktd::parseFormatterArgs(uint64_t _format_id, const std::stri
 	return ret;
 }
 
-Punktd::Punktd(const std::string &m_config_file) {
+Punktd::Punktd() {
 	
-	loadConfig(m_config_file);
+	setDefaultSignalHandlers();
+	//loadConfig(m_config_file);
 }
 
 Punktd::~Punktd() {
@@ -179,7 +184,10 @@ void Punktd::doStart() {
 	
 	try {
 	
-	m_zeit_acli.reset(new ZeitClientAsync(m_config["zeit_url"], "_user_", "_key_", m_req_disp));
+	m_hiapi_bin_clienta_zeit.reset (new hiapi::client::BinClientA(hiapi::client::BinClientA::INTERNET,
+							m_config["zeit_ip"], strtoint(m_config["zeit_port"]), strtoint(m_config["zeit_nconns"])));
+	
+	m_zeit_acli.reset(new ZeitClientA( m_hiapi_bin_clienta_zeit ));
 
 	} catch (...) {
 		std::cout << "zeit connect exception\n";

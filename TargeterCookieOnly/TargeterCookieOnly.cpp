@@ -1,6 +1,6 @@
 #include "TargeterCookieOnly.h"
 
-TargeterCookieOnly::TargeterCookieOnly(const std::string &_repl_id, ZeitClientAsyncPtr _zeit_acli,
+TargeterCookieOnly::TargeterCookieOnly(const std::string &_repl_id, ZeitClientAPtr _zeit_acli,
 		boost::function<FormatterArgsPtr(uint64_t _format_id, const std::string &_args)> _parseFormatterArgs):
 	 Targeter::Targeter(_repl_id, _parseFormatterArgs),
 	 m_zeit_acli(_zeit_acli) {

@@ -14,7 +14,7 @@
 
 #include "punkt_consts.h"
 
-#include "zeit_client_async.h"
+#include "ZeitClientA.h"
 
 class ShowcaseSliderFormatterArgs: public FormatterArgs {
 public:
@@ -49,7 +49,7 @@ class ShowcaseSliderFormatter : public Formatter {
 
 	GeberCliApiClientAPtr m_geber_clia;
 	//GeberdCliApiClientAsyncPtr m_geber_acli;
-	ZeitClientAsyncPtr m_zeit_acli;
+	ZeitClientAPtr m_zeit_acli;
 		
 	boost::function<uint64_t(uint64_t)> m_getAdOwner;
 	
@@ -87,7 +87,7 @@ public:
 	ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
 							FileCachePtr _jscache,
 							GeberCliApiClientAPtr _geber_clia,
-							ZeitClientAsyncPtr _zeit_acli,
+							ZeitClientAPtr _zeit_acli,
 							boost::function<uint64_t(uint64_t)> _getAdOwner);
 	
 	void onGotShowcase(bool _success, ShowcaseInstance &_show, AdRequestPtr _ad_req, FormatterArgsPtr _args, const std::string &_exthtml,

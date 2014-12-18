@@ -59,8 +59,8 @@ int main (int argc, char** argv) {
 	}
 	pd->join();*/
 	
-	Punktd* pd = new Punktd("punkt.conf");
-	pd->start(false);
+	Punktd* pd = new Punktd();
+	pd->start("punkt.conf", argc, argv);
 	
 	return 0;
 }
