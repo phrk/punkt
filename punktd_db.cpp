@@ -21,7 +21,7 @@ bool Punktd::doCheckDbConn(size_t _attempt) {
 	
 	if (PQstatus(m_pg) != CONNECTION_OK) {
 		
-		std::cout << "Reseting connection to PostgreSQL\n;";
+		std::cout << "Reseting connection to PostgreSQL\n";
 		PQreset(m_pg);
 		return doCheckDbConn(_attempt + 1);
 	}
@@ -40,7 +40,7 @@ bool Punktd::loadAds() {
 	if (PQresultStatus(res) != PGRES_TUPLES_OK) {
 		std::cout << "Punktd::loadAds !PGRES_TUPLES_OK\n";
 		
-		//checkDbConn();
+		checkDbConn();
 		return false;
 	}
 	
