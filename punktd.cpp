@@ -26,10 +26,11 @@ void Punktd::setParamsList(std::vector<std::string> &required_params, std::vecto
 	required_params.push_back("zeit_port");
 	required_params.push_back("zeit_nconns");
 	
-	required_params.push_back("zeit_url");
 	required_params.push_back("hashd_url");
 	
 	required_params.push_back("reload_period");
+	
+	required_params.push_back("jsdir");
 	
 	required_params.push_back("pg_ip");
 	required_params.push_back("pg_port");
@@ -69,7 +70,7 @@ void Punktd::bindFormatters(const std::string &_punkt_url,
 	}
 	{
 		
-		FormatterPtr showcase(new ShowcaseSliderFormatter(m_req_disp,
+		FormatterPtr showcase(new ShowcaseSliderFormatter(//m_req_disp,
 													m_files_cache,
 													m_geber_clia,
 													m_zeit_acli,
@@ -162,23 +163,26 @@ void Punktd::doStart() {
 	
 	std::cout << "Connected to db\n";
 	
-	m_files_cache.reset(new FileCache);
-	m_files_cache->addFile("renderShowcaseSlider.js", "js/renderShowcaseSlider.js");
-	m_files_cache->addFile("mootools", "js/mootools-core-1.5.0.js");
-	m_files_cache->addFile("slider.js", "js/buildSlider.js");
-	m_files_cache->addFile("ShowcaseSliderEvents.js", "js/ShowcaseSliderEvents.js");
-	m_files_cache->addFile("static_image.js", "js/static_image.js");
+	std::string jsdir = m_config["jsdir"];
 	
+	m_files_cache.reset(new FileCache);
+	m_files_cache->addFile("renderShowcaseSlider.js", jsdir + "renderShowcaseSlider.js");
+	m_files_cache->addFile("mootools", jsdir + "mootools-core-1.5.0.js");
+	m_files_cache->addFile("slider.js", jsdir + "buildSlider.js");
+	m_files_cache->addFile("ShowcaseSliderEvents.js", jsdir + "ShowcaseSliderEvents.js");
+	m_files_cache->addFile("static_image.js", jsdir + "static_image.js");
+	
+	/*
 	m_files_cache->addFile("vkauth.html", "TargeterFull/vkauth.html");
 	m_files_cache->apply("vkauth.html", boost::bind(&escape_symbol, _1, '\"'));
 	m_files_cache->apply("vkauth.html", boost::bind(&add_newline_backslash, _1));
 	m_files_cache->addFile("vkauth.js", "TargeterFull/vkauth.js");
-	
+	*/
 	
 	m_pool.reset(new hThreadPool(PUNKTD_NTHREADS));
 	m_srv_tasklauncher.reset(new TaskLauncher(m_pool, PUNKTD_NTHREADS, boost::bind(&Punktd::onFinished, this)));
 	
-	m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
+	//m_req_disp.reset(new HttpOutRequestDisp(m_srv_tasklauncher));
 
 	//m_geber_acli.reset(new GeberdCliApiClientAsync(m_config["geberd_url"], m_req_disp));
 	

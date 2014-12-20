@@ -56,7 +56,7 @@ private:
 #endif
 	
 	PunktPtr m_punkt;
-	HttpOutRequestDispPtr m_req_disp;
+	//HttpOutRequestDispPtr m_req_disp;
 	//GeberdCliApiClientAsyncPtr m_geber_acli;
 	
 	GeberCliApiClientAPtr m_geber_clia;

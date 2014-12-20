@@ -25,12 +25,12 @@ ShowcaseSliderFormatterArgs::~ShowcaseSliderFormatterArgs() {
 	
 }
 
-ShowcaseSliderFormatter::ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
+ShowcaseSliderFormatter::ShowcaseSliderFormatter(//HttpOutRequestDispPtr _req_disp,
 						FileCachePtr _jscache,
 						GeberCliApiClientAPtr _geber_clia,
 						ZeitClientAPtr _zeit_acli,
 						boost::function<uint64_t(uint64_t)> _getAdOwner):
-	m_req_disp(_req_disp),
+	//m_req_disp(_req_disp),
 	m_jscache(_jscache),
 //	m_punkt_url(_punkt_url),
 //	m_punkt_rsrc_url(_punkt_rsrc_url),

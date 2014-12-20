@@ -41,7 +41,7 @@ public:
 };
 
 class ShowcaseSliderFormatter : public Formatter {
-	HttpOutRequestDispPtr m_req_disp;
+	//HttpOutRequestDispPtr m_req_disp;
 	FileCachePtr m_jscache;
 	//std::string m_punkt_url;
 //	boost::function<HttpConnectionPtr(int)> m_getConnById;
@@ -84,7 +84,7 @@ class ShowcaseSliderFormatter : public Formatter {
 	
 public:
 	
-	ShowcaseSliderFormatter(HttpOutRequestDispPtr _req_disp,
+	ShowcaseSliderFormatter(//HttpOutRequestDispPtr _req_disp,
 							FileCachePtr _jscache,
 							GeberCliApiClientAPtr _geber_clia,
 							ZeitClientAPtr _zeit_acli,
