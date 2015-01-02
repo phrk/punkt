@@ -5,6 +5,9 @@
 #include "hiaux/network/HttpServer/HttpServer.h"
 #include "hiaux/network/HttpOutReqDisp.h"
 #include "hiaux/tools/Daemon.h"
+#include "hiaux/tools/RegularTask.h"
+
+#include "hiaux/pg/pg.h"
 
 #include "hiaux/network/HttpApi/BinClient/BinClientA.h"
 
@@ -71,8 +74,9 @@ private:
 	FileCachePtr m_files_cache;
 	
 	hiaux::hashtable<uint64_t, FormatterPtr> m_formatters;
-	uint64_t m_last_reload_ts;
-	uint64_t m_reload_period;
+	
+	
+	hiaux::RegularTaskPtr m_db_reload_task;
 	
 	hiaux::hashtable<std::string,std::string> parseConfig(const std::string &_config_file);
 	
@@ -86,7 +90,8 @@ private:
 	void loadPlaces();
 	bool loadAds();
 	
-	void checkReload();
+	//void checkReload();
+	void reloadDb();
 	
 	bool doCheckDbConn(size_t _attempt);
 	bool checkDbConn();

@@ -140,13 +140,9 @@ Punktd::~Punktd() {
 
 void Punktd::doStart() {
 	
-	m_last_reload_ts = 0;
-	
 	//hiaux::hashtable<std::string,std::string> m_config = parseConfig(m_config_file);
 	
 	std::cout << "Config loaded\n";
-	
-	m_reload_period = string_to_uint64(m_config["reload_period"]);
 	
 	m_pg  = PQsetdbLogin(m_config["pg_ip"].c_str(),
                       m_config ["pg_port"].c_str(),
@@ -160,6 +156,8 @@ void Punktd::doStart() {
 		std::cout << "Could not connect to db";
 		exit(0);
 	}
+	
+	m_db_reload_task.reset(new hiaux::RegularTask(string_to_uint64(m_config["reload_period"]), boost::bind(&Punktd::reloadDb, this)));
 	
 	std::cout << "Connected to db\n";
 	
@@ -259,7 +257,7 @@ void Punktd::connHandler(HttpConnectionPtr _conn, HttpRequestPtr _req) {
 //	_conn->close();
 //	return;
 	
-	checkReload();
+	m_db_reload_task->checkRun();
 	m_punkt->connHandler(_conn, _req);
 }
 

@@ -1,17 +1,24 @@
 #include "punktd.h"
+#include "punktd_db.h"
 
-void Punktd::checkReload() {
-	uint64_t now = time(0);
-	if (now - m_last_reload_ts < m_reload_period)
-		return;
+PunktdDb::PunktdDb(PGPtr _pg):
+	 m_pg(_pg){
+	
+}
+
+PunktdDb::~PunktdDb() {
+	
+}
+
+PunktPtr PunktdDb::getFreshPunkt() {
+	
+}
+
+void Punktd::reloadDb() {
 	
 	hLockTicketPtr ticket = lock.lock();
-	m_last_reload_ts = time(0);
-	
 	if (loadAds())
 		loadPlaces();
-	
-	m_last_reload_ts = time(0);
 }
 
 bool Punktd::doCheckDbConn(size_t _attempt) {
@@ -34,6 +41,7 @@ bool Punktd::checkDbConn() {
 }
 
 bool Punktd::loadAds() {
+	
 	std::string query("SELECT * FROM punkt.ads");
 	PGresult *res = PQexec(m_pg, query.c_str());
 	
